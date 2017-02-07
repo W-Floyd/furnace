@@ -18,7 +18,9 @@ Options:
   -i  --install         Install or update .minecraft folder copy
   -m  --mobile          Make mobile resource pack as well
   -t  --time            Time functions (for debugging)
-  -d  --debug           Use debugging mode\
+  -l  --locate          The next given option will identify the
+                        resource pack (for debugging)
+  -d  --debug           Keep temporary files (for debugging)\
 "
 }
 ################################################################
@@ -43,6 +45,14 @@ __warn () {
 ################################################################
 
 ################################################################
+# __inform <MESSAGE GOES HERE>
+#
+# Tells the user something
+__inform () {
+    echo -e "\e[92mInfo\e[39m    - ${@}"
+}
+
+################################################################
 # Default variables
 #__dir_bin='/usr/share/mc-resource-packer'
 __dir_bin='/home/william/Documents/git/Original/mc-resource-packer'
@@ -52,6 +62,9 @@ __file_default_functions="${__dir_bin}/functions.sh"
 __dir_source='src'
 __dir_scripts='scripts'
 __file_catalogue='catalogue.xml'
+__var_identifier='$$'
+__var_sizes='32 64 128 256 512'
+__var_custom_sizes='0'
 ################################################################
 
 ################################################################
@@ -85,6 +98,68 @@ fi
 # Check for required files
 if ! [ -e "${__file_catalogue}" ]; then
     __error "Missing catalogue file"
+fi
+################################################################
+
+################################################################
+# Read options
+if ! [ "${#}" = 0 ]; then
+
+while ! [ "${#}" = '0' ]; do
+
+    case "${__last_option}" in
+
+        "-l" | "--locate")
+            __identifier="${1}"
+            ;;
+
+        *)
+
+            case "${1}" in
+                "-h" | "--help" | "-?")
+                    __usage
+                    exit 0
+                    ;;
+
+                "-"*)
+                    __error "Invalid option '${1}' given"
+                    ;;
+
+                [0-9]*)
+                    if [ "${__var_custom_sizes}" = '0' ]; then
+                        __sizes=''
+                    fi
+                    __inform "Using size ${1}"
+                    __sizes="${1}
+${__sizes}"
+                    ;;
+
+                *)
+                    if [ -z "${__interface}" ]; then
+                        if ! ifconfig "${1}" &> /dev/null; then
+                            __error "Network interface '${1}' does not exist"
+                        fi
+                        __interface="${1}"
+                    else
+                        __error "Only one interface may be specified"
+                    fi
+                    ;;
+
+            esac
+            ;;
+
+    esac
+
+    __last_option="${1}"
+
+    shift
+
+done
+
+else
+    if ! [ -e "${__file_config_script}" ]; then
+        __warn "No inputs given"
+    fi
 fi
 ################################################################
 
