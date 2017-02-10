@@ -1,11 +1,18 @@
 #!/bin/bash
 
-################################################################
-# __usage
-#
-# Prints the usage of the program
+__sizes=''
+__verbose='0'
+__very_verbose_pack='0'
+__install='0'
+__mobile='0'
+__quick='1'
+__time='0'
+__force='0'
+__debug='0'
+
+# Print help
 __usage () {
-echo "${0} <OPTIONS> <SIZE>
+echo "$0 <OPTIONS> <SIZE>
 
 Makes the texture pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
@@ -17,172 +24,195 @@ Options:
   -vv --very-verbose    Be very verbose
   -i  --install         Install or update .minecraft folder copy
   -m  --mobile          Make mobile resource pack as well
+  -s  --slow            Use Inkscape instead of rsvg-convert
   -t  --time            Time functions (for debugging)
-  -l  --locate          The next given option will identify the
-                        resource pack (for debugging)
-  -d  --debug           Keep temporary files (for debugging)\
+  -d  --debug           Use debugging mode\
 "
 }
-################################################################
 
-################################################################
-# __error <MESSAGE GOES HERE>
-#
-# Spits out an error message and exist appropriately
-__error () {
-    echo -e "\e[31mError\e[39m   - ${@}, exiting"
-    exit 1
-}
-################################################################
+# get functions from file
+source "$(which __smelt_functions)"
 
-################################################################
-# __warn <MESSAGE GOES HERE>
-#
-# Spits out a warning message
-__warn () {
-    echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway"
-}
-################################################################
-
-################################################################
-# __inform <MESSAGE GOES HERE>
-#
-# Tells the user something
-__inform () {
-    echo -e "\e[92mInfo\e[39m    - ${@}"
-}
-
-################################################################
-# Default variables
-#__dir_bin='/usr/share/mc-resource-packer'
-__dir_bin='/home/william/Documents/git/Original/mc-resource-packer'
-__dir_top="$(pwd)"
-__file_config_script='config.sh'
-__file_default_functions="${__dir_bin}/functions.sh"
-__dir_source='src'
-__dir_scripts='scripts'
-__file_catalogue='catalogue.xml'
-__var_identifier='$$'
-__var_sizes='32 64 128 256 512'
-__var_custom_sizes='0'
-################################################################
-
-################################################################
-# Checking for default functions
-if [ -e "${__file_default_functions}" ]; then
-    source "${__file_default_functions}" &> /dev/null || __error "Defaults functions could not be set, this should never happen"
-else
-    __warn "Defaults functions '${__file_default_functions}' are missing, this should never happen"
-fi
-################################################################
-
-################################################################
-# Set whatever things are in the config script
-if [ -e "${__file_config_script}" ]; then
-    source "${__file_config_script}" || __error "Config script ran with errors, this should never happen"
-else
-    __warn "Config script missing, using default values"
-fi
-################################################################
-
-################################################################
-# Check for required directories
-if ! [ -d "${__dir_source}" ]; then
-    __error "Missing source directory"
-elif ! [ -d "${__dir_scripts}" ]; then
-    __error "Missing scripts directory"
-fi
-################################################################
-
-################################################################
-# Check for required files
-if ! [ -e "${__file_catalogue}" ]; then
-    __error "Missing catalogue file"
-fi
-################################################################
-
-################################################################
-# Read options
+# If there are are options,
 if ! [ "${#}" = 0 ]; then
 
+# then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
 
-    case "${__last_option}" in
+    case "${1}" in
 
-        "-l" | "--locate")
-            __identifier="${1}"
+        "-h" | "--help" | "-?")
+            __usage
+            exit
+            ;;
+
+        "-v" | "--verbose")
+            __verbose='1'
+            ;;
+
+        "-vv" | "--very-verbose")
+            __verbose='1'
+            __very_verbose_pack='1'
+            ;;
+
+        "-i" | "--install")
+            __install='1'
+            ;;
+
+        "-m" | "--mobile")
+            __mobile='1'
+            ;;
+
+        "-s" | "--slow")
+            __quick='0'
+            ;;
+
+        "-t" | "--time")
+            __time='1'
+            ;;
+
+        "-d" | "--debug")
+            __debug='1'
+            ;;
+
+        "-f" | "--force")
+            __force='1'
+            ;;
+
+        [0-9]*)
+            __sizes="${__sizes}
+${1}"
             ;;
 
         *)
-
-            case "${1}" in
-                "-h" | "--help" | "-?")
-                    __usage
-                    exit 0
-                    ;;
-
-                "-"*)
-                    __error "Invalid option '${1}' given"
-                    ;;
-
-                [0-9]*)
-                    if [ "${__var_custom_sizes}" = '0' ]; then
-                        __sizes=''
-                    fi
-                    __inform "Using size ${1}"
-                    __sizes="${1}
-${__sizes}"
-                    ;;
-
-                *)
-                    if [ -z "${__interface}" ]; then
-                        if ! ifconfig "${1}" &> /dev/null; then
-                            __error "Network interface '${1}' does not exist"
-                        fi
-                        __interface="${1}"
-                    else
-                        __error "Only one interface may be specified"
-                    fi
-                    ;;
-
-            esac
+            echo "Unknown option \"${1}\""
+            echo
+            __usage
+            exit 1
             ;;
 
     esac
-
-    __last_option="${1}"
 
     shift
 
 done
 
-else
-    if ! [ -e "${__file_config_script}" ]; then
-        __warn "No inputs given"
-    fi
 fi
-################################################################
 
-__list_fields='CONFIG
-SIZE
-OPTIONS
-KEEP
-DEPENDS
-CLEANUP
-COMMON'
+if [ -z "${__sizes}" ]; then
+__sizes="32
+64
+128
+256
+512"
+fi
 
-declare -A __array_catalogue
+__render_and_pack () {
 
-# TODO - WHY IS THIS NOT WORKING?
+echo "Processing size ${1}"
 
-__get_range "${__file_catalogue}" ITEM | while read __var_range; do
-    __var_tmp_range="$(__read_range "${__file_catalogue}" "${__var_range}")"
-    __var_tmp_name="$(__get_value "NAME" <<< "${__var_tmp_range}")"
-    for __var_field in ${__list_fields}; do
-        declare -A __array_catalogue["${__var_tmp_name}","${__var_field}"]="$(__get_value "${__var_field}" <<< "${__var_tmp_range}")"
-    done
+__options="${1}"
+
+if [ "${__mobile}" = '1' ]; then
+    __options="${__options} -m"
+fi
+
+if [ "${__quick}" = '0' ]; then
+    __options="${__options} -s"
+fi
+
+if [ "${__time}" = '1' ]; then
+    __options="${__options} -t"
+fi
+
+if [ "${__debug}" = '1' ]; then
+    __options="${__options} -d"
+fi
+
+if [ "${__force}" = '1' ]; then
+    __options="${__options} -f"
+fi
+
+if [ "${__very_verbose_pack}" = '1' ]; then
+    __smelt_render ${__options} -v -p "${1}"
+else
+    __smelt_render ${__options} -p "${1}" &> /dev/null
+fi
+
+if [ -a "${2}.zip" ]; then
+    rm "${2}.zip"
+fi
+
+if [ "${__mobile}" = '1' ] && [ -a "${2}_mobile.zip" ]; then
+    rm "${2}_mobile.zip"
+fi
+
+__pushd "${2}_cleaned"
+
+zip -qZ store -r "../${2}" ./
+
+__popd
+
+if [ "${__mobile}" = '1' ]; then
+    __pushd "${2}_mobile"
+    zip -qZ store -r "../${2}_mobile" ./
+    __popd
+fi
+
+if [ -d "${2}_cleaned" ]; then
+    rm -r "${2}_cleaned"
+fi
+
+if [ -d "${2}_mobile" ]; then
+    rm -r "${2}_mobile"
+fi
+
+}
+
+__loop () {
+for __size in ${__sizes}; do
+
+    __packfile="$(__smelt_render --name-only "${__size}")"
+
+    if [ "${__time}" = '1' ]; then
+
+        echo
+        echo
+        time __render_and_pack "${__size}" "${__packfile}"
+
+    else
+
+        __render_and_pack "${__size}" "${__packfile}"
+
+    fi
+
+    __dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
+
+    if [ "${__install}" = '1' ]; then
+
+    if [ -a "${__dest}" ] ; then
+        rm "${__dest}"
+    fi
+
+    cp "${__packfile}.zip" "${__dest}"
+
+    fi
+
 done
+}
 
-echo "${__array_catalogue[@]}"
+__time "Rendered" start
+
+if [ "${__verbose}" = '1' ]; then
+
+    __loop
+
+else
+
+    __loop # &> /dev/null
+
+fi
+
+__time "Rendered" end
 
 exit
