@@ -9,6 +9,10 @@ __quick='1'
 __time='0'
 __force='0'
 __debug='0'
+__silent='0'
+
+__smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
+__smelt_render_bin='/usr/share/smelt/smelt_render.sh'
 
 # Print help
 __usage () {
@@ -26,12 +30,37 @@ Options:
   -m  --mobile          Make mobile resource pack as well
   -s  --slow            Use Inkscape instead of rsvg-convert
   -t  --time            Time functions (for debugging)
-  -d  --debug           Use debugging mode\
+  -d  --debug           Use debugging mode
+  -q  --quiet           No output\
 "
 }
 
 # get functions from file
-source "$(which __smelt_functions)"
+source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
+
+if ! [ -e 'config.sh' ]; then
+    __warn "No config file was found, using default values"
+else
+    source 'config.sh' || __error "Config file has an error."
+fi
+
+################################################################
+
+# Location of catalogue file
+if [ -z "${__catalogue}" ]; then
+    __catalogue='catalogue.xml'
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Catalogue '${__catalogue}' is missing"
+    fi
+else
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Custom catalogue '${__catalogue}' is missing"
+    fi
+fi
+
+if ! [ -d 'src' ]; then
+    __error "Source file directory 'src' is missing"
+fi
 
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
@@ -79,14 +108,17 @@ while ! [ "${#}" = '0' ]; do
             __force='1'
             ;;
 
+        "-q" | "--quiet")
+            __silent='1'
+            ;;
+
         [0-9]*)
             __sizes="${__sizes}
 ${1}"
             ;;
 
         *)
-            echo "Unknown option \"${1}\""
-            echo
+            __warn "Unknown option '${1}'"
             __usage
             exit 1
             ;;
@@ -134,9 +166,11 @@ if [ "${__force}" = '1' ]; then
 fi
 
 if [ "${__very_verbose_pack}" = '1' ]; then
-    __smelt_render ${__options} -v -p "${1}"
+    "${__smelt_render_bin}" ${__options} -vv -p "${1}" || __error "Render encountered errors"
+elif [ "${__verbose}" = '1' ]; then
+    "${__smelt_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 else
-    __smelt_render ${__options} -p "${1}" &> /dev/null
+    "${__smelt_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 fi
 
 if [ -a "${2}.zip" ]; then
@@ -172,7 +206,12 @@ fi
 __loop () {
 for __size in ${__sizes}; do
 
-    __packfile="$(__smelt_render --name-only "${__size}")"
+    __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
+
+    if ! [ "$?" = 0 ]; then
+        echo "${__packfile}"
+        exit 1
+    fi
 
     if [ "${__time}" = '1' ]; then
 
@@ -198,18 +237,20 @@ for __size in ${__sizes}; do
 
     fi
 
+    echo
+
 done
 }
 
 __time "Rendered" start
 
-if [ "${__verbose}" = '1' ]; then
+if [ "${__silent}" = '1' ]; then
 
-    __loop
+    __loop &> /dev/null
 
 else
 
-    __loop # &> /dev/null
+    __loop
 
 fi
 

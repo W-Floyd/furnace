@@ -4,12 +4,14 @@
 # Defaults
 ###############################
 
+__smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
+
 __size='128'
 __verbose='0'
 __very_verbose='0'
 __force='0'
 __re_use_xml='0'
-__pid="$$"
+export __pid="$$"
 __debug='0'
 __xml_only='0'
 __name_only='0'
@@ -22,7 +24,7 @@ __time='0'
 ###############################################################
 
 # get functions from file
-source "$(which __smelt_functions)"
+source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
 
 # temporary timer for quick timing
 __time_var='temporary timer'
@@ -77,7 +79,7 @@ while ! [ "${#}" = '0' ]; do
             if [ "${1}" -eq "${1}" ] 2>/dev/null; then
 
 # set the PID to this
-                __pid="${1}"
+                export __pid="${1}"
 
 # If it isn't though,
             else
@@ -243,8 +245,8 @@ if [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '0' ]; then
 # if inkscape exists, but rsvg-convert doesn't exist, and we're
 # wanting to use rsvg-convert, say so and force inkscape
 elif [ "${__has_inkscape}" = '1' ] && [ "${__has_rsvg_convert}" = '0' ] && [ "${__quick}" = '1' ]; then
-    echo "Missing rsvg-convert. Cannot continue in quick mode."
-    echo "Please install 'librsvg-devel'. Defaulting to inkscape."
+    __warn "Missing rsvg-convert. Cannot continue in quick mode.
+Please install 'librsvg-devel', defaulting to inkscape"
     export __quick='0'
 
 # if rsvg-convert exists, but inkscape doesn't exist, and we're
@@ -256,24 +258,47 @@ elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${
 fi
 
 ###############################################################
-# Set variables
+# Set variables from config
 ###############################################################
 
 # Master folder
-__working_dir="$PWD"
+__working_dir="$(pwd)"
 
-# Master name of pack, so re-branding is easy.
-__name='Angl'
+if ! [ -e 'config.sh' ]; then
+    __warn "No config file was found, using default values"
+else
+    source 'config.sh' || __error "Config file has an error."
+fi
 
-# Designated temporary directory
-__tmp_dir="/tmp/texpack${__pid}"
+###############################################################
+# Fill the blanks that the config didn't fill
+###############################################################
 
-# Location of catalogue file, just to be pedantic
-__catalogue='catalogue.xml'
+if [ -z "${__name}" ]; then
+    __name="$(basename "${__working_dir}")"
+    __warn "Pack name not defined, defaulting to ${__name}"
+fi
+
+if [ -z "${__tmp_dir}" ]; then
+    __tmp_dir="/tmp/texpack${__pid}"
+#else
+#    __warn "Using custom tempory directory '${__tmp_dir}'"
+fi
+
+# Location of catalogue file
+if [ -z "${__catalogue}" ]; then
+    __catalogue='catalogue.xml'
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Catalogue '${__catalogue}' is missing"
+    fi
+else
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Custom catalogue '${__catalogue}' is missing"
+    fi
+fi
 
 if ! [ -e "${__catalogue}" ]; then
-    echo "Missing catalogue, aborting."
-    exit 1
+    __error "Missing catalogue"
 fi
 
 # Rendered folder name
@@ -886,7 +911,7 @@ done < "${__shared_source_list}"
 
 else
 
-    __announce "No changes to source."
+    __force_announce "No changes to source."
 
     if [ -e "${__unchanged_source}" ]; then
 
@@ -1203,7 +1228,7 @@ while [ -s "${__render_list}" ]; do
             if [ "${__failed}" = '0' ]; then
 
 # announce that we are processing the given config
-                __announce "Processing \"${__config}\""
+                __force_announce "Processing \"${__config}\""
 
                 __render_num="$(echo "${__render_num}+1" | bc)"
 
@@ -1306,9 +1331,6 @@ __time "Made cleaned folder" end
 # Make mobile pack if asked to
 ###############################################################
 
-# mobile script to be used to make a mobile pack
-__mobile_script='convert_to_mobile.sh'
-
 # if a mobile pack is supposed to be made
 if [ "${__mobile}" = '1' ]; then
 
@@ -1327,28 +1349,25 @@ if [ "${__mobile}" = '1' ]; then
     cp -r "${__pack_cleaned}" "${__pack_end}"
 
 # if the mobile script doesn't exist,
-    if ! [ -e "${__mobile_script}" ]; then
+    if ! [ -e "${__smelt_make_mobile_bin}" ]; then
 
 # complain
-        echo "Missing mobile script system, aborting."
-
-# and exit
-        exit 1
+        __error "Missing mobile script system"
 
 # end if statement whether the mobile script exists
     fi
 
 # copy the script to the end pack folder
-    cp "${__mobile_script}" "${__pack_end}/${__mobile_script}"
+    cp "${__smelt_make_mobile_bin}" "${__pack_end}/$(basename "${__smelt_make_mobile_bin}")"
 
 # get into the end pack folder
     __pushd "${__pack_end}"
 
 # excecute the mobile script folder
-    "./${__mobile_script}"
+    "./${__smelt_make_mobile_bin}" || __error "Make mobile script failed"
 
 # remove the mobile script folder
-    rm "${__mobile_script}"
+    rm "${__smelt_make_mobile_bin}"
 
 # get back into the main directory
     __popd

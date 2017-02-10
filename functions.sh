@@ -588,11 +588,7 @@ md5sum -c "${1}" > "${2}"
 
 __pushd () {
 if [ -d "${1}" ]; then
-    if [ "${__very_verbose}" = 1 ]; then
-        pushd "${1}"
-    else
-        pushd "${1}" 1> /dev/null
-    fi
+    pushd "${1}" 1> /dev/null
 else
     echo "Directory \"${1}\" does not exist!"
     exit 2
@@ -608,10 +604,21 @@ fi
 ###############################################################
 
 __popd () {
-if [ "${__very_verbose}" = 1 ]; then
-    popd
-else
-    popd 1> /dev/null
+popd 1> /dev/null
+}
+
+###############################################################
+#
+# __force_announce <MESSAGE>
+#
+# Announce
+# Echos a statement
+#
+###############################################################
+
+__force_announce () {
+if ! [ "${__name_only}" = '1' ]; then
+    echo "${1}"
 fi
 }
 
@@ -620,17 +627,48 @@ fi
 # __announce <MESSAGE>
 #
 # Announce
-# Echos a statement, only if __verbose is equal to 1
+# Echos a statement, only if __very_verbose is equal to 1
 #
 ###############################################################
 
 __announce () {
 if [ "${__time}" = '0' ]; then
-if [ "${__verbose}" = 1 ]; then
-    echo "
-${1}"
+if [ "${__very_verbose}" = '1' ]; then
+    __force_announce "${1}"
 fi
 fi
+}
+
+###############################################################
+#
+# __warn <MESSAGE>
+#
+# Warn
+# Echos a statement when something has gone wrong, to be used
+# when it is tolerable.
+#
+###############################################################
+
+__warn () {
+if [ "${__very_verbose}" = '1' ]; then
+if ! [ "${__name_only}" = '1' ]; then
+    echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway" 1>&2
+fi
+fi
+}
+
+###############################################################
+#
+# __error <MESSAGE>
+#
+# Error
+# Echos a statement when something has gone wrong, then exits
+#
+###############################################################
+
+__error () {
+echo -e "\e[31mError\e[39m   - ${@}, exiting" 1>&2
+exit 1
 }
 
 ###############################################################
