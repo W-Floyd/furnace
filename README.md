@@ -1,7 +1,7 @@
 # Smelt
 ## A Minecraft resource pack builder
 
-[![Logo](https://github.com/W-Floyd/smelt/raw/master/logo.png "Logo")]
+![Logo](https://github.com/W-Floyd/smelt/raw/master/logo.png)
 
 From this directory, run:
 
