@@ -43,8 +43,9 @@ Options:
   -h  --help  -?        This help message
   -f  --force           Discard pre-rendered data
   -v  --verbose         Verbose
-  -vv --very-verbose    Very verbose
   -p  --process-id      Using PID as given after
+  -d  --debug           Debugging mode
+  -l  --lengthy         Very verbose output (for debugging)
   -x  --xml-only        Only process xml files
   -n  --name-only       Print output folder name
   -m  --mobile          Make mobile resource pack
@@ -59,6 +60,19 @@ __start_debugging () {
     PS4='Line ${LINENO}: '
     set -x
 }
+
+###############################################################
+# Set variables from config
+###############################################################
+
+# Master folder
+__working_dir="$(pwd)"
+
+if ! [ -e 'config.sh' ]; then
+    __warn "No config file was found, using default values"
+else
+    source 'config.sh' || __error "Config file has an error"
+fi
 
 ###############################################################
 # Read options
@@ -87,10 +101,8 @@ while ! [ "${#}" = '0' ]; do
             else
 
 # warn the user and exit, because they're doing it wrong.
-                echo "Invalid process ID \"${1}\""
-                echo
                 __usage
-                exit 1
+                __error "Invalid process ID \"${1}\""
             fi
             ;;
 
@@ -119,7 +131,7 @@ while ! [ "${#}" = '0' ]; do
                     ;;
 
 # tell the script to be very verbose,
-                "-vv" | "--very-verbose")
+                "-l" | "--lengthy")
                     __verbose='1'
                     __very_verbose='1'
 # If we're supposed to be in debugging mode and be very verbose
@@ -137,7 +149,7 @@ while ! [ "${#}" = '0' ]; do
 
 # make the script be verbose and not clean up,
                 "-d" | "--debug")
-                    echo "Debugging mode enabled"
+                    __force_announce "Debugging mode enabled"
                     __debug='1'
                     __verbose='1'
 # If we're supposed to be in debugging mode and be very verbose
@@ -150,7 +162,7 @@ while ! [ "${#}" = '0' ]; do
 
 # only process xml files
                 "-x" | "--xml-only")
-                    echo "Only processing xml files"
+                    __force_announce "Only processing xml files"
                     __xml_only='1'
                     ;;
 
@@ -193,10 +205,8 @@ while ! [ "${#}" = '0' ]; do
 # any other options are invalid so the script says what it was
 # and exits after telling you how to use it.
 	            *)
-                    echo "Unknown option \"${1}\""
-                    echo
-                    __usage
-                    exit 1
+	                __usage
+                    __error "Unknown option \"${1}\""
                     ;;
 
 # We're done with single flag options
@@ -222,25 +232,12 @@ __time "Read options" end
 __time "Set variables" start
 
 ###############################################################
-# Set variables from config
-###############################################################
-
-# Master folder
-__working_dir="$(pwd)"
-
-if ! [ -e 'config.sh' ]; then
-    __warn "No config file was found, using default values"
-else
-    source 'config.sh' || __error "Config file has an error"
-fi
-
-###############################################################
 # Fill the blanks that the config didn't fill
 ###############################################################
 
 if [ -z "${__name}" ]; then
     __name="$(basename "${__working_dir}")"
-    __warn "Pack name not defined, defaulting to ${__name}"
+    __force_warn "Pack name not defined, defaulting to ${__name}"
 fi
 
 if [ -z "${__tmp_dir}" ]; then
@@ -1244,7 +1241,7 @@ while [ -s "${__render_list}" ]; do
             if [ "${__failed}" = '0' ]; then
 
 # announce that we are processing the given config
-                __force_announce "Processing \"${__config}\""
+                __force_announce "Processing \".${__config//.\/xml/}\""
 
                 __render_num="$(echo "${__render_num}+1" | bc)"
 

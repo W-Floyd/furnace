@@ -627,13 +627,13 @@ fi
 # __announce <MESSAGE>
 #
 # Announce
-# Echos a statement, only if __very_verbose is equal to 1
+# Echos a statement, only if __verbose is equal to 1
 #
 ###############################################################
 
 __announce () {
 if [ "${__time}" = '0' ]; then
-if [ "${__very_verbose}" = '1' ]; then
+if [ "${__verbose}" = '1' ]; then
     __force_announce "${1}"
 fi
 fi

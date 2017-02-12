@@ -27,12 +27,12 @@ important.
 Options:
   -h  --help  -?        This help message
   -v  --verbose         Be verbose
-  -vv --very-verbose    Be very verbose
   -i  --install         Install or update .minecraft folder copy
   -m  --mobile          Make mobile resource pack as well
   -s  --slow            Use Inkscape instead of rsvg-convert
   -t  --time            Time functions (for debugging)
   -d  --debug           Use debugging mode
+  -l  --lengthy         Very verbose output (for debugging)
   -f  --force           Discard pre-rendered data
   -q  --quiet           No output
   -w  --warn            Show warnings\
@@ -83,7 +83,7 @@ while ! [ "${#}" = '0' ]; do
             __verbose='1'
             ;;
 
-        "-vv" | "--very-verbose")
+        "-l" | "--lengthy")
             __verbose='1'
             __very_verbose_pack='1'
             ;;
