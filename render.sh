@@ -110,7 +110,7 @@ while ! [ "${#}" = '0' ]; do
 # let the script and user know it should and will force rendering,
                 "-f" | "--force")
                     __force='1'
-                    echo "Discarding pre-rendered data"
+                    __force_warn "Discarding pre-rendered data"
                     ;;
 
 # tell the script to be verbose,
@@ -245,6 +245,8 @@ fi
 
 if [ -z "${__tmp_dir}" ]; then
     __tmp_dir="/tmp/texpack${__pid}"
+else
+    __warn "Using custom tempory directory '${__tmp_dir}'"
 fi
 
 # Location of catalogue file

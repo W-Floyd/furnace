@@ -11,6 +11,7 @@ __force='0'
 __debug='0'
 __silent='0'
 __should_warn='0'
+__use_custom_size='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -120,8 +121,15 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         [0-9]*)
-            __sizes="${__sizes}
+            if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
+                __use_custom_size='1'
+                __sizes="${__sizes}
 ${1}"
+            else
+                __warn "Overriding render sizes"
+                __use_custom_size='1'
+                __sizes="${1}"
+            fi
             ;;
 
         *)

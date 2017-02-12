@@ -641,6 +641,21 @@ fi
 
 ###############################################################
 #
+# __force_warn <MESSAGE>
+#
+# Warn
+# Echos a statement when something has gone wrong
+#
+###############################################################
+
+__force_warn () {
+if ! [ "${__name_only}" = '1' ]; then
+    echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway" 1>&2
+fi
+}
+
+###############################################################
+#
 # __warn <MESSAGE>
 #
 # Warn
@@ -652,7 +667,7 @@ fi
 __warn () {
 if [ "${__very_verbose}" = '1' ] || [ "${__should_warn}" = '1' ]; then
 if ! [ "${__name_only}" = '1' ]; then
-    echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway" 1>&2
+    __force_warn "${@}"
 fi
 fi
 }
