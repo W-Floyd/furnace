@@ -707,14 +707,14 @@ fi
 
 if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ]; then
     if [ -z "${2}" ]; then
-        echo "No input to __time function, disabling timer."
+        __force_warn "No input to __time function, disabling timer."
         __time='0'
     else
 
         if [ "${2}" = 'end' ]; then
             __force_announce "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds"
         elif ! [ "${2}" = 'start' ]; then
-            echo "Invalid input to __time, disabling timer."
+            __force_warn "Invalid input to __time, disabling timer."
             __time='0'
         fi
 
