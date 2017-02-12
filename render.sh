@@ -16,8 +16,8 @@ __debug='0'
 __xml_only='0'
 __name_only='0'
 __mobile='0'
-export __quick='1'
 __time='0'
+__should_warn='0'
 
 ###############################################################
 # Setting up functions
@@ -49,7 +49,9 @@ Options:
   -n  --name-only       Print output folder name
   -m  --mobile          Make mobile resource pack
   -s  --slow            Use slower render engine (Inkscape)
-  -t  --time            Time operations (for debugging)\
+  -q  --quick           Use quicker render engine (rsvg-convert)
+  -t  --time            Time operations (for debugging)
+  -w  --warn            Show warnings\
 "
 }
 
@@ -167,9 +169,19 @@ while ! [ "${#}" = '0' ]; do
                     export __quick='0'
                     ;;
 
+# whether to use quick render engine
+                "-q" | "--quick")
+                    export __quick='1'
+                    ;;
+
 # whether to time functions
                 "-t" | "--time")
                     __time='1'
+                    ;;
+
+# whether to warn
+                "-w" | "--warn")
+                    __should_warn='1'
                     ;;
 
 # general catch all for any number input that isn't for the PID
@@ -210,13 +222,89 @@ __time "Read options" end
 __time "Set variables" start
 
 ###############################################################
+# Set variables from config
+###############################################################
+
+# Master folder
+__working_dir="$(pwd)"
+
+if ! [ -e 'config.sh' ]; then
+    __warn "No config file was found, using default values"
+else
+    source 'config.sh' || __error "Config file has an error"
+fi
+
+###############################################################
+# Fill the blanks that the config didn't fill
+###############################################################
+
+if [ -z "${__name}" ]; then
+    __name="$(basename "${__working_dir}")"
+    __warn "Pack name not defined, defaulting to ${__name}"
+fi
+
+if [ -z "${__tmp_dir}" ]; then
+    __tmp_dir="/tmp/texpack${__pid}"
+fi
+
+# Location of catalogue file
+if [ -z "${__catalogue}" ]; then
+    __catalogue='catalogue.xml'
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Catalogue '${__catalogue}' is missing"
+    fi
+else
+    if ! [ -e "${__catalogue}" ]; then
+        __error "Custom catalogue '${__catalogue}' is missing"
+    fi
+fi
+
+if ! [ -e "${__catalogue}" ]; then
+    __error "Missing catalogue"
+fi
+
+if [ -z "${__quick}" ]; then
+    __warn "Quick/Slow mode not set, defaulting to quick"
+    export __quick='1'
+fi
+
+# Rendered folder name
+__pack="${__name}-${__size}px"
+
+# if we're supossed to make a mobile pack,
+if [ "${__mobile}" = '1' ]; then
+
+# set a special end pack folder
+    __pack_end="${__pack}_mobile"
+
+# otherwise
+else
+
+# set the end pack name the same as normal
+    __pack_end="${__pack}"
+
+# end mobile if statement
+fi
+
+# if we're only supposed to print the pack name
+if [ "${__name_only}" = '1' ]; then
+
+# print the pack end pack folder name
+    echo "${__pack_end}"
+
+# and exit
+    exit
+
+# exit the name only if statement
+fi
+
+###############################################################
 # Check software deps
 ###############################################################
 
 # check tsort
 if ! which tsort &> /dev/null; then
-    echo "Please install 'tsort' to continue. It is required for dependency resolution."
-    exit 1
+    __error "Please install 'tsort' to continue. It is required for dependency resolution"
 fi
 
 # check inkscape
@@ -255,78 +343,6 @@ elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${
     echo "Missing Inkscape. Must continue in quick mode."
     echo "Please install 'inkscape'. Defaulting to rsvg-convert."
     export __quick='1'
-fi
-
-###############################################################
-# Set variables from config
-###############################################################
-
-# Master folder
-__working_dir="$(pwd)"
-
-if ! [ -e 'config.sh' ]; then
-    __warn "No config file was found, using default values"
-else
-    source 'config.sh' || __error "Config file has an error."
-fi
-
-###############################################################
-# Fill the blanks that the config didn't fill
-###############################################################
-
-if [ -z "${__name}" ]; then
-    __name="$(basename "${__working_dir}")"
-    __warn "Pack name not defined, defaulting to ${__name}"
-fi
-
-if [ -z "${__tmp_dir}" ]; then
-    __tmp_dir="/tmp/texpack${__pid}"
-fi
-
-# Location of catalogue file
-if [ -z "${__catalogue}" ]; then
-    __catalogue='catalogue.xml'
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Catalogue '${__catalogue}' is missing"
-    fi
-else
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Custom catalogue '${__catalogue}' is missing"
-    fi
-fi
-
-if ! [ -e "${__catalogue}" ]; then
-    __error "Missing catalogue"
-fi
-
-# Rendered folder name
-__pack="${__name}-${__size}px"
-
-# if we're supossed to make a mobile pack,
-if [ "${__mobile}" = '1' ]; then
-
-# set a special end pack folder
-    __pack_end="${__pack}_mobile"
-
-# otherwise
-else
-
-# set the end pack name the same as normal
-    __pack_end="${__pack}"
-
-# end mobile if statement
-fi
-
-# if we're only supposed to print the pack name
-if [ "${__name_only}" = '1' ]; then
-
-# print the pack end pack folder name
-    echo "${__pack_end}"
-
-# and exit
-    exit
-
-# exit the name only if statement
 fi
 
 __time "Set variables" end

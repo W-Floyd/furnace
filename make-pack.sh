@@ -10,6 +10,7 @@ __time='0'
 __force='0'
 __debug='0'
 __silent='0'
+__should_warn='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -31,7 +32,9 @@ Options:
   -s  --slow            Use Inkscape instead of rsvg-convert
   -t  --time            Time functions (for debugging)
   -d  --debug           Use debugging mode
-  -q  --quiet           No output\
+  -f  --force           Discard pre-rendered data
+  -q  --quiet           No output
+  -w  --warn            Show warnings\
 "
 }
 
@@ -41,7 +44,7 @@ source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functio
 if ! [ -e 'config.sh' ]; then
     __warn "No config file was found, using default values"
 else
-    source 'config.sh' || __error "Config file has an error."
+    source 'config.sh' || __error "Config file has an error"
 fi
 
 ################################################################
@@ -112,6 +115,10 @@ while ! [ "${#}" = '0' ]; do
             __silent='1'
             ;;
 
+        "-w" | "--warn")
+            __should_warn='1'
+            ;;
+
         [0-9]*)
             __sizes="${__sizes}
 ${1}"
@@ -141,7 +148,7 @@ fi
 
 __render_and_pack () {
 
-echo "Processing size ${1}"
+__force_announce "Processing size ${1}"
 
 __options="${1}"
 
@@ -163,6 +170,10 @@ fi
 
 if [ "${__force}" = '1' ]; then
     __options="${__options} -f"
+fi
+
+if [ "${__should_warn}" = '1' ]; then
+    __options="${__options} -w"
 fi
 
 if [ "${__very_verbose_pack}" = '1' ]; then

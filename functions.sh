@@ -618,7 +618,7 @@ popd 1> /dev/null
 
 __force_announce () {
 if ! [ "${__name_only}" = '1' ]; then
-    echo "${1}"
+    echo -e "\e[32mInfo\e[39m    - ${1}"
 fi
 }
 
@@ -650,7 +650,7 @@ fi
 ###############################################################
 
 __warn () {
-if [ "${__very_verbose}" = '1' ]; then
+if [ "${__very_verbose}" = '1' ] || [ "${__should_warn}" = '1' ]; then
 if ! [ "${__name_only}" = '1' ]; then
     echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway" 1>&2
 fi
@@ -697,8 +697,7 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ]; then
     else
 
         if [ "${2}" = 'end' ]; then
-            echo
-            echo "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds"
+            __force_announce "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds"
         elif ! [ "${2}" = 'start' ]; then
             echo "Invalid input to __time, disabling timer."
             __time='0'
