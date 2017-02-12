@@ -8,6 +8,7 @@ From this directory, run:
 ```
 sudo mkdir -p /usr/share/smelt  
 sudo ln -s "$(pwd)/make-pack.sh" "/usr/share/smelt/smelt.sh"  
+sudo ln -s "/usr/share/smelt/smelt.sh" "/usr/bim/smelt"  
 sudo ln -s "$(pwd)/functions.sh" "/usr/share/smelt/smelt_functions.sh"  
 sudo ln -s "$(pwd)/render.sh" "/usr/share/smelt/smelt_render.sh"  
 ```
