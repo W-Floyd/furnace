@@ -281,8 +281,6 @@ fi
 
 if [ -z "${__tmp_dir}" ]; then
     __tmp_dir="/tmp/texpack${__pid}"
-#else
-#    __warn "Using custom tempory directory '${__tmp_dir}'"
 fi
 
 # Location of catalogue file
@@ -370,7 +368,7 @@ if [ -d "${__tmp_dir}" ]; then
 fi
 
 # Make the temporary directory
-mkdir "${__tmp_dir}"
+mkdir -p "${__tmp_dir}"
 
 ###############################################################
 # If not only doing xml
