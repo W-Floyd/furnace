@@ -236,18 +236,20 @@ __time "Set variables" start
 # Fill the blanks that the config didn't fill
 ###############################################################
 
+# set pack name if not set already
 if [ -z "${__name}" ]; then
     __name="$(basename "${__working_dir}")"
     __force_warn "Pack name not defined, defaulting to ${__name}"
 fi
 
+# set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
     __tmp_dir="/tmp/texpack${__pid}"
 else
     __warn "Using custom temporary directory '${__tmp_dir}'"
 fi
 
-# Location of catalogue file
+# set catalogue if not set already
 if [ -z "${__catalogue}" ]; then
     __catalogue='catalogue.xml'
     if ! [ -e "${__catalogue}" ]; then
@@ -263,10 +265,15 @@ if ! [ -e "${__catalogue}" ]; then
     __error "Missing catalogue"
 fi
 
+# set quick if not set already
 if [ -z "${__quick}" ]; then
     __warn "Quick/Slow mode not set, defaulting to quick"
     export __quick='1'
 fi
+
+###############################################################
+# Derived variables
+###############################################################
 
 # Rendered folder name
 __pack="${__name}-${__size}px"
@@ -285,6 +292,10 @@ else
 
 # end mobile if statement
 fi
+
+###############################################################
+# Print pack name
+###############################################################
 
 # if we're only supposed to print the pack name
 if [ "${__name_only}" = '1' ]; then
