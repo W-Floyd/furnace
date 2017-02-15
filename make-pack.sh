@@ -12,6 +12,7 @@ __debug='0'
 __silent='0'
 __should_warn='0'
 __use_custom_size='0'
+__dry='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -20,7 +21,7 @@ __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
 __usage () {
 echo "$0 <OPTIONS> <SIZE>
 
-Makes the texture pack at the specified size(s) (or using
+Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
 important.
 
@@ -32,7 +33,7 @@ Options:
   -s  --slow            Use Inkscape instead of rsvg-convert
   -t  --time            Time functions (for debugging)
   -d  --debug           Use debugging mode
-  -l  --lengthy         Very verbose output (for debugging)
+  -l  --lengthy         Very verbose debugging mode
   -f  --force           Discard pre-rendered data
   -q  --quiet           No output
   -w  --warn            Show warnings\
@@ -120,6 +121,10 @@ while ! [ "${#}" = '0' ]; do
             __should_warn='1'
             ;;
 
+        "--dry")
+            __dry='1'
+            ;;
+
         [0-9]*)
             if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
                 __use_custom_size='1'
@@ -154,6 +159,8 @@ __sizes="32
 512"
 fi
 
+__sizes="$(echo "${__sizes}" | sort -n | uniq)"
+
 __render_and_pack () {
 
 __force_announce "Processing size ${1}"
@@ -184,13 +191,20 @@ if [ "${__should_warn}" = '1' ]; then
     __options="${__options} -w"
 fi
 
+if [ "${__dry}" = '1' ]; then
+    __options="${__options} --dry"
+fi
+
 if [ "${__very_verbose_pack}" = '1' ]; then
-    "${__smelt_render_bin}" ${__options} -vv -p "${1}" || __error "Render encountered errors"
+    "${__smelt_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
 elif [ "${__verbose}" = '1' ]; then
     "${__smelt_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 else
     "${__smelt_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 fi
+
+if [ "${__dry}" = '0' ]; then
+
 
 if [ -a "${2}.zip" ]; then
     rm "${2}.zip"
@@ -218,6 +232,8 @@ fi
 
 if [ -d "${2}_mobile" ]; then
     rm -r "${2}_mobile"
+fi
+
 fi
 
 }

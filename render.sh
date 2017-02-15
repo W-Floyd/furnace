@@ -18,6 +18,7 @@ __name_only='0'
 __mobile='0'
 __time='0'
 __should_warn='0'
+__dry='0'
 
 ###############################################################
 # Setting up functions
@@ -45,7 +46,7 @@ Options:
   -v  --verbose         Verbose
   -p  --process-id      Using PID as given after
   -d  --debug           Debugging mode
-  -l  --lengthy         Very verbose output (for debugging)
+  -l  --lengthy         Very verbose debugging mode
   -x  --xml-only        Only process xml files
   -n  --name-only       Print output folder name
   -m  --mobile          Make mobile resource pack
@@ -134,12 +135,7 @@ while ! [ "${#}" = '0' ]; do
                 "-l" | "--lengthy")
                     __verbose='1'
                     __very_verbose='1'
-# If we're supposed to be in debugging mode and be very verbose
-                    if [ "${__debug}" = '1' ]; then
-                        if [ "${__very_verbose}" = '1' ]; then
-                            __start_debugging
-                        fi
-                    fi
+                    __start_debugging
                     ;;
 
 # tell the script to use a specified PID (this is taken care of
@@ -194,6 +190,11 @@ while ! [ "${#}" = '0' ]; do
 # whether to warn
                 "-w" | "--warn")
                     __should_warn='1'
+                    ;;
+
+# hidden option to do a dry run (to test options and output)
+                "--dry")
+                    __dry='1'
                     ;;
 
 # general catch all for any number input that isn't for the PID
@@ -345,6 +346,10 @@ elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${
 fi
 
 __time "Set variables" end
+
+if [ "${__dry}" = '1' ]; then
+    exit
+fi
 
 ###############################################################
 # If not only doing xml
@@ -1243,15 +1248,9 @@ while [ -s "${__render_list}" ]; do
 # announce that we are processing the given config
                 __force_announce "Processing \".${__config//.\/xml/}\""
 
-                __render_num="$(echo "${__render_num}+1" | bc)"
+                __render_num="$((__render_num+1))"
 
                 __config_isolated_dir="${__isolated_dir}/${__render_num}"
-
-#                mkdir -p "${__config_isolated_dir}"
-
-#                cp -r ./ "${__config_isolated_dir}"
-
-#                __pushd "${__config_isolated_dir}"
 
 # copy the config script out so we can use it
                 cp "${__config_script}" ./
@@ -1262,10 +1261,6 @@ while [ -s "${__render_list}" ]; do
 
 # remove the script now we're done with it
                 rm "$(basename "${__config_script}")"
-
-#                __popd
-
-#                cp "${__config_isolated_dir}/${__orig_config_name}" "${__orig_config}"
 
             fi
 
