@@ -47,7 +47,7 @@ Options:
   -p  --process-id      Using PID as given after
   -d  --debug           Debugging mode
   -l  --lengthy         Very verbose debugging mode
-  -x  --xml-only        Only process xml files
+  -x  --xml-only        Only process XML files
   -n  --name-only       Print output folder name
   -m  --mobile          Make mobile resource pack
   -s  --slow            Use slower render engine (Inkscape)
@@ -156,9 +156,9 @@ while ! [ "${#}" = '0' ]; do
                     fi
                     ;;
 
-# only process xml files
+# only process XML files
                 "-x" | "--xml-only")
-                    __force_announce "Only processing xml files"
+                    __force_announce "Only processing XML files"
                     __xml_only='1'
                     ;;
 
@@ -167,7 +167,7 @@ while ! [ "${#}" = '0' ]; do
                     __name_only='1'
                     ;;
 
-# whether to make mobile reousource pack
+# whether to make mobile resource pack
                 "-m" | "--mobile")
                     __mobile='1'
                     ;;
@@ -244,7 +244,7 @@ fi
 if [ -z "${__tmp_dir}" ]; then
     __tmp_dir="/tmp/texpack${__pid}"
 else
-    __warn "Using custom tempory directory '${__tmp_dir}'"
+    __warn "Using custom temporary directory '${__tmp_dir}'"
 fi
 
 # Location of catalogue file
@@ -271,7 +271,7 @@ fi
 # Rendered folder name
 __pack="${__name}-${__size}px"
 
-# if we're supossed to make a mobile pack,
+# if we're supposed to make a mobile pack,
 if [ "${__mobile}" = '1' ]; then
 
 # set a special end pack folder
@@ -315,7 +315,7 @@ else
     __has_inkscape='0'
 fi
 
-# ceck rsvg-convert
+# check rsvg-convert
 if which rsvg-convert &> /dev/null; then
     __has_rsvg_convert='1'
 
@@ -326,22 +326,21 @@ fi
 
 # if both inkscape and rsvg-convert don't exist, say so and exit
 if [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '0' ]; then
-    echo "Missing both inkscape and rsvg-convert. Please install either/both to continue."
-    echo "Please install 'librsvg-devel' to obtain rsvg-convert, and 'inkscape' for Inkscape"
-    exit 1
+    __error "Missing both inkscape and rsvg-convert. Please install either/both to continue.
+Please install 'librsvg-devel' to obtain rsvg-convert, and 'inkscape' for Inkscape"
 
 # if inkscape exists, but rsvg-convert doesn't exist, and we're
 # wanting to use rsvg-convert, say so and force inkscape
 elif [ "${__has_inkscape}" = '1' ] && [ "${__has_rsvg_convert}" = '0' ] && [ "${__quick}" = '1' ]; then
-    __warn "Missing rsvg-convert. Cannot continue in quick mode.
+    __force_warn "Missing rsvg-convert. Cannot continue in quick mode.
 Please install 'librsvg-devel', defaulting to inkscape"
     export __quick='0'
 
 # if rsvg-convert exists, but inkscape doesn't exist, and we're
 # wanting to use inkscape, say so and force rsvg-convert
 elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${__quick}" = '0' ]; then
-    echo "Missing Inkscape. Must continue in quick mode."
-    echo "Please install 'inkscape'. Defaulting to rsvg-convert."
+    __force_warn "Missing Inkscape. Must continue in quick mode.
+Please install 'inkscape'. Defaulting to rsvg-convert."
     export __quick='1'
 fi
 
@@ -472,7 +471,7 @@ __new_catalogue_hash="$(md5sum "${__catalogue}")"
 if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ]; then
 
 # say so
-    __announce "No changes to xml catalogue."
+    __announce "No changes to XML catalogue."
 
 # tell the script to re-use the xml files
     __re_use_xml='1'
@@ -661,7 +660,7 @@ __time "Inherited and created dependencies" end
 else
 
 # Let the user know we're re-using xml
-__announce "Re-using xml files."
+__announce "Re-using XML files."
 
 # End if statement whether to split xml again or not
 fi
@@ -886,7 +885,7 @@ touch "${__shared_source_list_hash}"
 # Get to the source directory
 __pushd ./src
 
-# Hash source files into designated file, exluding xml files
+# Hash source files into designated file, excluding xml files
 __hash_folder "${__source_hash_new}" xml
 
 # Get back to main directory
@@ -895,7 +894,7 @@ __popd
 # Get to old xml directory again
 __pushd "./${__pack}"
 
-# Hash source files into designated file, exluding xml files
+# Hash source files into designated file, excluding xml files
 __hash_folder "${__source_hash_old}" xml
 
 while read -r __file; do
@@ -1235,9 +1234,8 @@ while [ -s "${__render_list}" ]; do
             while read -r __dep; do
 
                 if ! [ -e "${__dep}" ]; then
-                    echo
-                    echo "Missing dependency \"${__dep}\""
-                    echo "Proceeding without \"${__config}\""
+                    __force_warn "Missing dependency \"${__dep}\"
+Proceeding without \"${__config}\""
                     __failed='1'
                 fi
 
@@ -1371,7 +1369,7 @@ if [ "${__mobile}" = '1' ]; then
 # get into the end pack folder
     __pushd "${__pack_end}"
 
-# excecute the mobile script folder
+# execute the mobile script folder
     "./${__smelt_make_mobile_bin}" || __error "Make mobile script failed"
 
 # remove the mobile script folder

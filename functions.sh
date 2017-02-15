@@ -410,7 +410,7 @@ mv "${1}"_ "${1}"
 #
 ###############################################################
 
-# Slower optionaly piped input version
+# Slower optionally piped input version
 #__get_range () {
 #if ! [ "$#" = '1' ] && ! [ "$#" = '2' ]; then
 #    echo "Incorrect number of options"
@@ -446,7 +446,7 @@ grep -n '[</|<]'"${2}"'>' < "${1}" | sed 's/\:.*//' |  sed 'N;s/\n/,/'
 #
 ###############################################################
 
-# Slower optionaly piped input version
+# Slower optionally piped input version
 #__read_range () {
 #if ! [ "$#" = '1' ] && ! [ "$#" = '2' ]; then
 #    echo "Incorrect number of options"
@@ -478,12 +478,12 @@ sed -e "${2}"'!d' "${1}" | sed -e 's/^	*//' -e 's/^ *//'
 #
 # Get Value
 # Gets the value/s of <FIELD_NAME> from <DATASET>
-# Meant to be used on separated datasets
+# Meant to be used on separated data-sets
 #
 ###############################################################
 
 
-# Slower optionaly piped input version
+# Slower optionally piped input version
 #__get_value () {
 #if ! [ "$#" = '1' ] && ! [ "$#" = '2' ]; then
 #    echo "Incorrect number of options"
@@ -533,7 +533,7 @@ perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
 # __emergency_exit
 #
 # Prints the last known command and exits, to be used when a
-# commmand fails
+# command fails
 #
 # Example:
 # cd "${__dir}" || __emergency_exit
@@ -691,7 +691,7 @@ exit 1
 # __time <MESSAGE> <start/end>
 #
 # Time
-# Times between two occurances of the function, as set by start
+# Times between two occurrences of the function, as set by start
 # or end.
 #
 ###############################################################
