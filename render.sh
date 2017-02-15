@@ -1348,6 +1348,18 @@ __time "Made cleaned folder" end
 # Make mobile pack if asked to
 ###############################################################
 
+# if a mobile pack is supposed to be made, and the mobile script
+# doesn't exist
+if [ "${__mobile}" = '1' ] && ! [ -e "${__smelt_make_mobile_bin}" ]; then
+
+# complain
+    __force_warn "Missing mobile script system, will not make mobile pack"
+
+# disable mobile pack
+    __mobile='0'
+
+fi
+
 # if a mobile pack is supposed to be made
 if [ "${__mobile}" = '1' ]; then
 
@@ -1364,15 +1376,6 @@ if [ "${__mobile}" = '1' ]; then
 
 # copy the cleaned folder to the end pack folder
     cp -r "${__pack_cleaned}" "${__pack_end}"
-
-# if the mobile script doesn't exist,
-    if ! [ -e "${__smelt_make_mobile_bin}" ]; then
-
-# complain
-        __error "Missing mobile script system"
-
-# end if statement whether the mobile script exists
-    fi
 
 # copy the script to the end pack folder
     cp "${__smelt_make_mobile_bin}" "${__pack_end}/$(basename "${__smelt_make_mobile_bin}")"
