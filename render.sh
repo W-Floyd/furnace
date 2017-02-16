@@ -1246,7 +1246,7 @@ while [ -s "${__render_list}" ]; do
 
                 if ! [ -e "${__dep}" ]; then
                     __force_warn "Missing dependency \"${__dep}\"
-Proceeding without \"${__config}\""
+Won't create \".${__config//.\/xml/}\""
                     __failed='1'
                 fi
 

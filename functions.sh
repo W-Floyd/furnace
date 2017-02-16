@@ -609,6 +609,64 @@ popd 1> /dev/null
 
 ###############################################################
 #
+# __strip_ansi
+#
+# Strips ANSI codes from *piped* input
+#
+###############################################################
+
+__strip_ansi () {
+cat | perl -pe 's/\e\[?.*?[\@-~]//g'
+}
+
+###############################################################
+#
+# __print_pad
+#
+# Prints the given number of spaces
+#
+###############################################################
+
+__print_pad () {
+    seq 1 "${1}" | while read -r __line; do
+        echo -n ' '
+    done
+}
+
+###############################################################
+#
+# __format_text <LEADER> <TEXT> <TRAILER>
+#
+# Pads text to a set length, so multiline warnings, info and
+# errors can be made
+###############################################################
+
+__format_text () {
+echo -ne "${1}"
+__desired_size='10'
+__leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
+__clipped_size=$((__desired_size-__leader_size-3))
+__front_pad="$(__print_pad "${__clipped_size}") - "
+echo -ne "${__front_pad}"
+__pad=''
+if [ "$(echo "${2}" | wc -l)" -gt '1' ]; then
+    echo "${2}" | head -n -1 | while read -r __line; do
+        if [ -z "${__pad}" ]; then
+            echo -e "${__pad}${__line}"
+            __pad="$(__print_pad "${__desired_size}")"
+        else
+            echo -e "${__pad}${__line}"
+        fi
+    done
+    __pad="$(__print_pad "${__desired_size}")"
+    echo -e "${__pad}$(echo "${2}" | tail -n 1)${3}"
+else
+    echo -e "${2}${3}"
+fi
+}
+
+###############################################################
+#
 # __force_announce <MESSAGE>
 #
 # Announce
@@ -618,7 +676,7 @@ popd 1> /dev/null
 
 __force_announce () {
 if ! [ "${__name_only}" = '1' ]; then
-    echo -e "\e[32mInfo\e[39m    - ${1}"
+    __format_text "\e[32mInfo\e[39m" "${1}" ""
 fi
 }
 
@@ -650,7 +708,7 @@ fi
 
 __force_warn () {
 if ! [ "${__name_only}" = '1' ]; then
-    echo -e "\e[93mWarning\e[39m - ${@}, continuing anyway" 1>&2
+    __format_text "\e[93mWarning\e[39m" "${1}" ", continuing anyway." 1>&2
 fi
 }
 
@@ -682,7 +740,7 @@ fi
 ###############################################################
 
 __error () {
-echo -e "\e[31mError\e[39m   - ${@}, exiting" 1>&2
+__format_text "\e[31mError\e[39m" "${1}" ", exiting." 1>&2
 exit 1
 }
 
