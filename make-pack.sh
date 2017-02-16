@@ -250,18 +250,28 @@ for __size in ${__sizes}; do
 
     if [ "${__time}" = '1' ]; then
 
-        __time "Rendered size '${__size}'" start
-        __render_and_pack "${__size}" "${__packfile}"
+        __time "Rendered size ${__size}" start
 
-        echo
+        if [ "${__silent}" = '1' ]; then
+            __render_and_pack "${__size}" "${__packfile}" &> /dev/null
+        else
+            __render_and_pack "${__size}" "${__packfile}"
+            echo
+        fi
 
-        __time "Rendered size '${__size}'" end
+        __time "Rendered size ${__size}" end
 
-        echo
+        if [ "${__silent}" = '0' ]; then
+            echo
+        fi
 
     else
 
-        __render_and_pack "${__size}" "${__packfile}"
+        if [ "${__silent}" = '1' ]; then
+            __render_and_pack "${__size}" "${__packfile}" &> /dev/null
+        else
+            __render_and_pack "${__size}" "${__packfile}"
+        fi
 
     fi
 
@@ -284,15 +294,7 @@ done
 
 __time "Rendered all" start
 
-if [ "${__silent}" = '1' ]; then
-
-    __loop &> /dev/null
-
-else
-
-    __loop
-
-fi
+__loop
 
 __time "Rendered all" end
 
