@@ -19,6 +19,7 @@ __mobile='0'
 __time='0'
 __should_warn='0'
 __dry='0'
+PS4='Line ${LINENO}: '
 
 ###############################################################
 # Setting up functions
@@ -58,8 +59,11 @@ Options:
 }
 
 __start_debugging () {
-    PS4='Line ${LINENO}: '
     set -x
+}
+
+__stop_debugging () {
+    set +x
 }
 
 ###############################################################
@@ -523,7 +527,7 @@ for __range in $(__get_range "${__catalogue}" ITEM); do
 
 # Make the correct directory for dumping the xml into an
 # appropriately named file
-    mkdir -p "$(__odir "${__xml_current}/${__item_name}")"
+    mkdir -p "$(dirname "${__xml_current}/${__item_name}")"
 
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
@@ -608,7 +612,7 @@ while read -r __xml; do
         __dep_list="${__dep_list_folder}/${__xml}"
 
 # Make the directory for the dep list if need be
-        mkdir -p "$(__odir "${__dep_list}")"
+        mkdir -p "$(dirname "${__dep_list}")"
 
         touch "${__dep_list}"
 
@@ -1134,17 +1138,20 @@ mv "${__render_list}_" "${__render_list}"
 
 __tmp_time start
 
+#__start_debugging
+
 # for every ITEM that is *not* in the render list
 grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __xml; do
 
+# set cleaned xml name
     __xml_name="${__xml//.\//}"
 
+# if a rendered file for it exists
     if [ -e "${__working_dir}/${__pack}/${__xml_name}" ]; then
 
-# otherwise if file exists, add to a list of properly processed
-# files and copy file across,
+# add to a list of properly processed files and copy file across
 
-        mkdir -p "$(__odir "${__working_dir}/${__pack_new}/${__xml_name}")"
+        mkdir -p "$(dirname "${__working_dir}/${__pack_new}/${__xml_name}")"
         cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}"
         echo "${__xml}" >> "${__rendered_list}"
 
@@ -1158,6 +1165,8 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 
 # Finish loop
 done
+
+#__stop_debugging
 
 __tmp_time end
 
