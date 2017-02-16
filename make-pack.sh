@@ -250,9 +250,14 @@ for __size in ${__sizes}; do
 
     if [ "${__time}" = '1' ]; then
 
+        __time "Rendered size '${__size}'" start
+        __render_and_pack "${__size}" "${__packfile}"
+
         echo
+
+        __time "Rendered size '${__size}'" end
+
         echo
-        time __render_and_pack "${__size}" "${__packfile}"
 
     else
 
@@ -277,7 +282,7 @@ for __size in ${__sizes}; do
 done
 }
 
-__time "Rendered" start
+__time "Rendered all" start
 
 if [ "${__silent}" = '1' ]; then
 
@@ -289,6 +294,6 @@ else
 
 fi
 
-__time "Rendered" end
+__time "Rendered all" end
 
 exit

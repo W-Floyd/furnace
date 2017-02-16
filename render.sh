@@ -1136,10 +1136,6 @@ done
 sort "${__render_list}" | uniq > "${__render_list}_"
 mv "${__render_list}_" "${__render_list}"
 
-__tmp_time start
-
-#__start_debugging
-
 # for every ITEM that is *not* in the render list
 grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __xml; do
 
@@ -1165,10 +1161,6 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 
 # Finish loop
 done
-
-#__stop_debugging
-
-__tmp_time end
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
