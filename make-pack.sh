@@ -68,6 +68,7 @@ while ! [ "${#}" = '0' ]; do
 
         "v" | "--verbose")
             __verbose='1'
+            __silent='0'
             ;;
 
         "l" | "--lengthy")
@@ -101,6 +102,7 @@ while ! [ "${#}" = '0' ]; do
 
         "q" | "--quiet")
             __silent='1'
+            __verbose='0'
             ;;
 
         "w" | "--warn")
