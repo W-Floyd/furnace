@@ -1118,7 +1118,12 @@ __popd
 cat "${__check_list}" >> "${__list_file_proc}"
 
 # Make a backup of the process list for debugging
-cp "${__list_file_proc}" "${__list_file_proc}_original"
+if [ "${__debug}" = '1' ]; then
+    cp "${__list_file_proc}" "${__list_file_proc}_original"
+fi
+
+sort "${__list_file_proc}" | uniq > "${__list_file_proc}_"
+mv "${__list_file_proc}_" "${__list_file_proc}"
 
 # As long as the process list is not empty,
 while [ -s "${__list_file_proc}" ]; do
