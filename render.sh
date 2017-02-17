@@ -393,7 +393,7 @@ __announce "Using PID ${__pid}."
 # Announce mobile if set on
 if [ "${__mobile}" = '1' ]; then
 
-    __announce "Making mobile resource pack."
+    __announce "Will make mobile resource pack."
 
 fi
 ###############################################################
@@ -599,7 +599,7 @@ __pushd ./src/xml/
 # For every xml file,
 while read -r __xml; do
 
-    __tmp_deps="$(__get_value "${__xml}" DEPENDS | sed '/^$/d')"
+    __tmp_deps="$(__get_value "${__xml}" DEPENDS | grep -v '^$')"
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
@@ -628,7 +628,7 @@ while read -r __xml; do
 
         { __get_value "${__xml}" CONFIG; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } >> "${__dep_list}"
 
-        for __dep in $(__get_value "${__xml}" DEPENDS); do
+        __get_value "${__xml}" DEPENDS | while read -r __dep; do
 
             if [ -e "${__dep}" ]; then
 
@@ -1064,12 +1064,16 @@ touch "${__check_list}"
 # Get into the dependency folder
 __pushd "${__dep_list_folder}"
 
+__tmp_time start
+
 # List files that depend on changed files
 while read -r __changed; do
     grep -rlx "${__changed}" | while read __file; do
         echo "./${__file}" >> "${__list_file_proc}"
     done
 done < "${__changed_both}"
+
+__tmp_time end
 
 # List all deps
 find . -type f -exec cat {} + | sort | uniq > "${__all_deps}"
@@ -1367,33 +1371,27 @@ cp -r "${__pack}" "${__pack_cleaned}"
 # get into the cleaned folder
 __pushd "${__pack_cleaned}"
 
-if [ "${__break_loop}" = '1' ]; then
+__tmp_time start
 
 # for every file to clean
 while read -r __file; do
 
+# if it exists
     if [ -e "${__file}" ]; then
 
 # remove it
-    rm "${__file}"
+        rm "${__file}" &
+
+    else
+
+        __force_warn "File '${__file}' for cleanup does not exist"
 
     fi
 
 # finish loop
 done < "${__cleanup_all}"
 
-else
-
-# for every file to clean
-while read -r __file; do
-
-# remove it
-    rm "${__file}"
-
-# finish loop
-done < "${__cleanup_all}"
-
-fi
+__tmp_time end
 
 # remove xml and conf from cleaned pack
 rm -r ./xml
