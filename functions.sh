@@ -780,6 +780,27 @@ fi
 }
 
 ###############################################################
+#
+# __log2 <NUMBER>
+#
+# Log base 2
+# Finds the log2 of a number, or rounds up to the next power of
+# 2
+#
+# Shamelessly stolen from:
+# https://bobcopeland.com/blog/2010/09/log2-in-bash/
+#
+###############################################################
+
+__log2 () {
+    local x=0
+    for (( y=$1-1 ; $y > 0; y >>= 1 )) ; do
+        let x=$x+1
+    done
+    echo $x
+}
+
+###############################################################
 # Export functions
 ###############################################################
 #
