@@ -28,8 +28,6 @@ It is highly recommended that fresh packs are rendered upon significant script c
 
 At one point I had to compile a newer version of Imagemagick from source to make some compositing work. If you get odd results, that may be the issue. This *seems* to have been solved by setting some options on all image operations.
 
-If you cancel a partial render, there will be an initial delay as the xml catalogue is parsed. Will see if I can do anything about that.
-
 Sizes 1024px and above are known not to be loaded in Minecraft, and so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px segfaults when I run out of memory (16gb RAM + 4gb swap).
 
 Documentation could be better - I may eventually clean things up.
