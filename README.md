@@ -30,6 +30,8 @@ At one point I had to compile a newer version of Imagemagick from source to make
 
 Sizes 1024px and above are known not to be loaded in Minecraft, and so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px segfaults when I run out of memory (16gb RAM + 4gb swap).
 
+If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or get errors about missing dependencies, forcefully re-render to fix it.
+
 Documentation could be better - I may eventually clean things up.
 
 See https://github.com/W-Floyd/Angl-Resource-Pack for the reference resource pack from which you can reference.
