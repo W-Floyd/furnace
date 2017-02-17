@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PS4='Line ${LINENO}: '
+
 __sizes=''
 __verbose='0'
 __very_verbose_pack='0'
@@ -49,75 +51,59 @@ else
     source 'config.sh' || __error "Config file has an error"
 fi
 
-################################################################
-
-# Location of catalogue file
-if [ -z "${__catalogue}" ]; then
-    __catalogue='catalogue.xml'
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Catalogue '${__catalogue}' is missing"
-    fi
-else
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Custom catalogue '${__catalogue}' is missing"
-    fi
-fi
-
-if ! [ -d 'src' ]; then
-    __error "Source file directory 'src' is missing"
-fi
-
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
 
 # then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
 
+    __check_input () {
+
     case "${1}" in
 
-        "-h" | "--help" | "-?")
+        "h" | "--help" | "?")
             __usage
-            exit
+            exit 77
             ;;
 
-        "-v" | "--verbose")
+        "v" | "--verbose")
             __verbose='1'
             ;;
 
-        "-l" | "--lengthy")
+        "l" | "--lengthy")
             __verbose='1'
             __very_verbose_pack='1'
             ;;
 
-        "-i" | "--install")
+        "i" | "--install")
             __install='1'
             ;;
 
-        "-m" | "--mobile")
+        "m" | "--mobile")
             __mobile='1'
             ;;
 
-        "-s" | "--slow")
+        "s" | "--slow")
             __quick='0'
             ;;
 
-        "-t" | "--time")
+        "t" | "--time")
             __time='1'
             ;;
 
-        "-d" | "--debug")
+        "d" | "--debug")
             __debug='1'
             ;;
 
-        "-f" | "--force")
+        "f" | "--force")
             __force='1'
             ;;
 
-        "-q" | "--quiet")
+        "q" | "--quiet")
             __silent='1'
             ;;
 
-        "-w" | "--warn")
+        "w" | "--warn")
             __should_warn='1'
             ;;
 
@@ -140,16 +126,67 @@ ${1}"
         *)
             __warn "Unknown option '${1}'"
             __usage
-            exit 1
+            exit 77
             ;;
 
     esac
+
+    }
+
+    if echo "${1}" | grep '^--' &> /dev/null; then
+
+        __check_input "${1}"
+
+    elif echo "${1}" | grep '^-' &> /dev/null; then
+
+        for __letter in $(echo "${1}" | cut -c 2- | sed 's/./& /g'); do
+
+            __check_input "${__letter}"
+
+        done
+
+    else
+        __check_input "${1}"
+    fi
+
+    if [ "${?}" = '77' ]; then
+        exit
+    fi
 
     shift
 
 done
 
 fi
+
+################################################################
+
+# Location of catalogue file
+if [ -z "${__catalogue}" ]; then
+    __catalogue='catalogue.xml'
+    if ! [ -e "${__catalogue}" ]; then
+        __custom_error "Catalogue '${__catalogue}' is missing"
+        echo
+        __usage
+        exit 1
+    fi
+else
+    if ! [ -e "${__catalogue}" ]; then
+        __custom_error "Custom catalogue '${__catalogue}' is missing"
+        echo
+        __usage
+        exit 1
+    fi
+fi
+
+if ! [ -d 'src' ]; then
+    __custom_error "Source file directory 'src' is missing"
+    echo
+    __usage
+    exit 1
+fi
+
+################################################################
 
 if [ -z "${__sizes}" ]; then
 __sizes="32
