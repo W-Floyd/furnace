@@ -326,7 +326,9 @@ for __size in ${__sizes}; do
 
     fi
 
-    echo
+    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ]; then
+        echo
+    fi
 
 done
 }
