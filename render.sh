@@ -1191,6 +1191,8 @@ __announce "Starting to render."
 
 __isolated_dir="${__tmp_dir}/isolated"
 
+__break_loop='0'
+
 __render_num='0'
 
 __time "Rendered" start
@@ -1200,8 +1202,20 @@ __start_time="$(date +%s)"
 # get into the pack folder, ready to render
 __pushd "${__pack}"
 
+__set_break_loop () {
+__break_loop='1'
+}
+
+__hard_exit () {
+__force_warn "Hard stopping rendering, you will probably want to force re-render this."
+}
+
+# trap ctrl c in case the user is stupid
+# doesn't always work, please use 'q' instead
+trap __set_break_loop SIGINT
+
 # while the render list has lines to process,
-while [ -s "${__render_list}" ]; do
+while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
 # set the original name of the config file
     __orig_config="$(head -n 1 "${__render_list}")"
@@ -1212,7 +1226,7 @@ while [ -s "${__render_list}" ]; do
     __orig_config_name="${__orig_config//.\//}"
 
 # set the formatted name of the config file
-    __config="./xml/${__orig_config//.\//}"
+    __config="./xml/${__orig_config_name}"
 
 # if the dependencies are not yet to be rendered, then
     if ! grep -qFxf "${__dep_list_folder}/${__orig_config_name}" "${__render_list}"; then
@@ -1267,7 +1281,9 @@ Won't create \".${__config//.\/xml/}\""
 
 # execute the script, given the determined size and options set
 # in the config
-                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)"
+                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
+
+                wait
 
 # remove the script now we're done with it
                 rm "$(basename "${__config_script}")"
@@ -1275,6 +1291,12 @@ Won't create \".${__config//.\/xml/}\""
             fi
 
 # end loop for when a config script is present
+        fi
+
+# often enough breaking the loop also breaks an image this will
+# delete the image if it exists, since it's unreliable
+        if [ "${__break_loop}" = '1' ] && [ -e "./${__orig_config_name}" ]; then
+            rm "./${__orig_config_name}"
         fi
 
 # if the config still has dependencies that need to be rendered
@@ -1288,6 +1310,9 @@ Won't create \".${__config//.\/xml/}\""
 
 # finish render loop
 done
+
+# untrap ctrl c, so we don't get ourselves into trouble some day
+trap - SIGINT
 
 # get out of the render directory
 __popd
@@ -1327,6 +1352,23 @@ cp -r "${__pack}" "${__pack_cleaned}"
 # get into the cleaned folder
 __pushd "${__pack_cleaned}"
 
+if [ "${__break_loop}" = '1' ]; then
+
+# for every file to clean
+while read -r __file; do
+
+    if [ -e "${__file}" ]; then
+
+# remove it
+    rm "${__file}"
+
+    fi
+
+# finish loop
+done < "${__cleanup_all}"
+
+else
+
 # for every file to clean
 while read -r __file; do
 
@@ -1335,6 +1377,8 @@ while read -r __file; do
 
 # finish loop
 done < "${__cleanup_all}"
+
+fi
 
 # remove xml and conf from cleaned pack
 rm -r ./xml
