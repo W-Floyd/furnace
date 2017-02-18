@@ -347,7 +347,7 @@ for __size in ${__sizes}; do
 
     fi
 
-    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ]; then
+    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ]; then
         echo
     fi
 
