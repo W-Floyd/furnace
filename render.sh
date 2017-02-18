@@ -1064,16 +1064,8 @@ touch "${__check_list}"
 # Get into the dependency folder
 __pushd "${__dep_list_folder}"
 
-__tmp_time start
-
 # List files that depend on changed files
-while read -r __changed; do
-    grep -rlx "${__changed}" | while read __file; do
-        echo "./${__file}" >> "${__list_file_proc}"
-    done
-done < "${__changed_both}"
-
-__tmp_time end
+grep -rlxf "${__changed_both}" | sed 's#^#./#' >> "${__list_file_proc}"
 
 # List all deps
 find . -type f -exec cat {} + | sort | uniq > "${__all_deps}"
@@ -1102,11 +1094,7 @@ touch "${__check_list}_"
 __pushd "${__dep_list_folder}"
 
 # List any files that depend on the check list
-while read __file; do
-    grep -rlx "${__file}" | while read __dep; do
-        echo "./${__dep}" >> "${__check_list}_"
-    done
-done < "${__check_list}"
+grep -rlxf "${__check_list}" | sed 's#^#./#' >> "${__check_list}_"
 
 # Get back to source directory
 __popd
