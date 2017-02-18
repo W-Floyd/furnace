@@ -1143,11 +1143,15 @@ done
 sort "${__render_list}" | uniq > "${__render_list}_"
 mv "${__render_list}_" "${__render_list}"
 
+__tmp_time start
+
 # for every ITEM that is *not* in the render list
 grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __xml; do
 
 # set cleaned xml name
     __xml_name="${__xml//.\//}"
+
+    __tmp_function () {
 
 # if a rendered file for it exists
     if [ -e "${__working_dir}/${__pack}/${__xml_name}" ]; then
@@ -1166,8 +1170,16 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 # Done with if statement
     fi
 
+    }
+
+    __tmp_function &
+
 # Finish loop
 done
+
+wait
+
+__tmp_time end
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
@@ -1359,8 +1371,6 @@ cp -r "${__pack}" "${__pack_cleaned}"
 # get into the cleaned folder
 __pushd "${__pack_cleaned}"
 
-__tmp_time start
-
 # for every file to clean
 while read -r __file; do
 
@@ -1378,8 +1388,6 @@ while read -r __file; do
 
 # finish loop
 done < "${__cleanup_all}"
-
-__tmp_time end
 
 # remove xml and conf from cleaned pack
 rm -r ./xml
