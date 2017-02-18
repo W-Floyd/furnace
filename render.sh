@@ -1143,15 +1143,13 @@ done
 sort "${__render_list}" | uniq > "${__render_list}_"
 mv "${__render_list}_" "${__render_list}"
 
-__tmp_time start
-
 # for every ITEM that is *not* in the render list
 grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __xml; do
 
+    __tmp_function () {
+
 # set cleaned xml name
     __xml_name="${__xml//.\//}"
-
-    __tmp_function () {
 
 # if a rendered file for it exists
     if [ -e "${__working_dir}/${__pack}/${__xml_name}" ]; then
@@ -1178,8 +1176,6 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 done
 
 wait
-
-__tmp_time end
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
