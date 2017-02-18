@@ -323,7 +323,6 @@ for __size in ${__sizes}; do
             __render_and_pack "${__size}" "${__packfile}" &> /dev/null
         else
             __render_and_pack "${__size}" "${__packfile}"
-            echo
         fi
 
         __force_time "Rendered size ${__size}" end
@@ -352,10 +351,6 @@ for __size in ${__sizes}; do
 
     cp "${__packfile}.zip" "${__dest}"
 
-    fi
-
-    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ]; then
-        echo
     fi
 
 done
