@@ -15,6 +15,7 @@ __silent='0'
 __should_warn='0'
 __use_custom_size='0'
 __dry='0'
+__compress='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -38,7 +39,8 @@ Options:
   -l  --lengthy         Very verbose debugging mode
   -f  --force           Discard pre-rendered data
   -q  --quiet           No output
-  -w  --warn            Show warnings\
+  -w  --warn            Show warnings
+  -c  --compress        Actually compress zip files\
 "
 }
 
@@ -107,6 +109,10 @@ while ! [ "${#}" = '0' ]; do
 
         "w" | "--warn")
             __should_warn='1'
+            ;;
+
+        "c" | "--compress")
+            __compress='1'
             ;;
 
         "--dry")
@@ -255,13 +261,33 @@ fi
 
 __pushd "${2}_cleaned"
 
-zip -qZ store -r "../${2}" ./
+if [ "${__compress}" = '1' ]; then
+
+    __force_announce "Compressing resource pack"
+
+    zip -q -9 -r "../${2}" ./
+
+else
+
+    zip -qZ store -r "../${2}" ./
+
+fi
 
 __popd
 
 if [ "${__mobile}" = '1' ]; then
     __pushd "${2}_mobile"
-    zip -qZ store -r "../${2}_mobile" ./
+
+    if [ "${__compress}" = '1' ]; then
+
+        zip -q -9 -r "../${2}" ./
+
+    else
+
+        zip -qZ store -r "../${2}" ./
+
+    fi
+
     __popd
 fi
 
