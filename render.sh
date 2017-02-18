@@ -1043,6 +1043,10 @@ touch "${__all_deps}"
 __check_list="${__tmp_dir}/check_list"
 touch "${__check_list}"
 
+# List of files to copy across
+__copy_list="${__tmp_dir}/copy_list"
+touch "${__copy_list}"
+
 # TODO - Make a more efficient method of doing this
 
 ################################################################
@@ -1151,22 +1155,44 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 # if a rendered file for it exists
     if [ -e "${__working_dir}/${__pack}/${__xml_name}" ]; then
 
-# add to a list of properly processed files and copy file across
+        wait
 
-        mkdir -p "$(dirname "${__working_dir}/${__pack_new}/${__xml_name}")"
-        cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null || __force_warn "File './${__xml_name} does not exist even though we just checked"
-        echo "./${__xml_name}" >> "${__rendered_list}"
+        echo "${__xml_name}" >> "${__copy_list}" &
 
 # if the file does not exist, re-render
     else
 
-        echo "./${__xml_name}" >> "${__render_list}"
+        wait
+
+        echo "./${__xml_name}" >> "${__render_list}" &
 
 # Done with if statement
     fi
 
 # Finish loop
 done
+
+wait
+
+while read -r __xml_name; do
+
+    dirname "${__working_dir}/${__pack_new}/${__xml_name}"
+
+done < "${__copy_list}" | sort | uniq | while read -r __dir; do
+
+    mkdir -p "${__dir}"
+
+done
+
+while read -r __xml_name; do
+
+    { cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null || __force_warn "File './${__xml_name} does not exist even though we just checked"; } &
+
+    echo "./${__xml_name}" >> "${__rendered_list}"
+
+done < "${__copy_list}"
+
+wait
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
