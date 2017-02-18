@@ -176,23 +176,17 @@ if [ -z "${__catalogue}" ]; then
     __catalogue='catalogue.xml'
     if ! [ -e "${__catalogue}" ]; then
         __custom_error "Catalogue '${__catalogue}' is missing"
-        echo
-        __usage
         exit 1
     fi
 else
     if ! [ -e "${__catalogue}" ]; then
         __custom_error "Custom catalogue '${__catalogue}' is missing"
-        echo
-        __usage
         exit 1
     fi
 fi
 
 if ! [ -d 'src' ]; then
     __custom_error "Source file directory 'src' is missing"
-    echo
-    __usage
     exit 1
 fi
 
@@ -320,7 +314,7 @@ for __size in ${__sizes}; do
         __force_time "Rendered size ${__size}" start
 
         if [ "${__silent}" = '1' ]; then
-            __render_and_pack "${__size}" "${__packfile}" &> /dev/null
+            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
         else
             __render_and_pack "${__size}" "${__packfile}"
         fi
@@ -334,7 +328,7 @@ for __size in ${__sizes}; do
     else
 
         if [ "${__silent}" = '1' ]; then
-            __render_and_pack "${__size}" "${__packfile}" &> /dev/null
+            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
         else
             __render_and_pack "${__size}" "${__packfile}"
         fi
@@ -351,6 +345,10 @@ for __size in ${__sizes}; do
 
     cp "${__packfile}.zip" "${__dest}"
 
+    fi
+
+    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ]; then
+        echo
     fi
 
 done

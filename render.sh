@@ -151,7 +151,6 @@ while ! [ "${#}" = '0' ]; do
                 "-d" | "--debug")
                     __force_announce "Debugging mode enabled"
                     __debug='1'
-                    __verbose='1'
 # If we're supposed to be in debugging mode and be very verbose
                     if [ "${__debug}" = '1' ]; then
                         if [ "${__very_verbose}" = '1' ]; then
@@ -1210,9 +1209,7 @@ __break_loop='0'
 
 __render_num='0'
 
-__time "Rendered" start
-
-__start_time="$(date +%s)"
+__time "Rendered ${__size}px" start
 
 # get into the pack folder, ready to render
 __pushd "${__pack}"
@@ -1332,17 +1329,13 @@ trap - SIGINT
 # get out of the render directory
 __popd
 
-__time "Rendered" end
-
 ###############################################################
 # Final stats
 ###############################################################
 
-# set the end time for rendering
-__end_time="$(date +%s)"
-
 __announce "Done rendering!"
-__announce "Rendered ${__size}px in $((__end_time-__start_time)) seconds"
+
+__time "Rendered ${__size}px" end
 
 ###############################################################
 # Make cleaned folder
