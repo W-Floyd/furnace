@@ -1145,8 +1145,6 @@ mv "${__render_list}_" "${__render_list}"
 # for every ITEM that is *not* in the render list
 grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __xml; do
 
-    __tmp_function () {
-
 # set cleaned xml name
     __xml_name="${__xml//.\//}"
 
@@ -1156,25 +1154,19 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 # add to a list of properly processed files and copy file across
 
         mkdir -p "$(dirname "${__working_dir}/${__pack_new}/${__xml_name}")"
-        cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}"
-        echo "${__xml}" >> "${__rendered_list}"
+        cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null || __force_warn "File './${__xml_name} does not exist even though we just checked"
+        echo "./${__xml_name}" >> "${__rendered_list}"
 
 # if the file does not exist, re-render
     else
 
-        echo "${__xml}" >> "${__render_list}"
+        echo "./${__xml_name}" >> "${__render_list}"
 
 # Done with if statement
     fi
 
-    }
-
-    __tmp_function &
-
 # Finish loop
 done
-
-wait
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
