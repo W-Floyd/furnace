@@ -744,16 +744,20 @@ exit 1
 
 ###############################################################
 #
-# __time <MESSAGE> <start/end>
+# __force_time <MESSAGE> <start/end>
 #
-# Time
+# Force Time
 # Times between two occurrences of the function, as set by start
-# or end.
+# or end, only if time is on.
 #
 ###############################################################
 
-__time () {
+__force_time () {
 __message="$(echo "${1}" | md5sum | sed 's/ .*//')"
+
+if [ -z "${2}" ] || [ -z "${1}" ]; then
+    __force_warn "Missing option in time function."
+else
 
 if [ "${2}" = 'start' ]; then
     export "__function_start_time${__message}"="$(date +%s.%N)"
@@ -770,11 +774,28 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ]; then
         if [ "${2}" = 'end' ]; then
             __force_announce "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds"
         elif ! [ "${2}" = 'start' ]; then
-            __force_warn "Invalid input to __time, disabling timer."
-            __time='0'
+            __force_warn "Invalid input to __time, '${2}'"
         fi
 
     fi
+fi
+
+fi
+}
+
+###############################################################
+#
+# __time <MESSAGE> <start/end>
+#
+# Time
+# Times between two occurrences of the function, as set by start
+# or end, only if verbose is on.
+#
+###############################################################
+
+__time () {
+if [ "${__verbose}" = '1' ]; then
+    __force_time "${1}" "${2}"
 fi
 }
 

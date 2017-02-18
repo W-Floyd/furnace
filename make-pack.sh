@@ -47,6 +47,8 @@ Options:
 # get functions from file
 source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
 
+__force_time "Rendered all" start
+
 if ! [ -e 'config.sh' ]; then
     __warn "No config file was found, using default values"
 else
@@ -315,7 +317,7 @@ for __size in ${__sizes}; do
 
     if [ "${__time}" = '1' ]; then
 
-        __time "Rendered size ${__size}" start
+        __force_time "Rendered size ${__size}" start
 
         if [ "${__silent}" = '1' ]; then
             __render_and_pack "${__size}" "${__packfile}" &> /dev/null
@@ -324,7 +326,7 @@ for __size in ${__sizes}; do
             echo
         fi
 
-        __time "Rendered size ${__size}" end
+        __force_time "Rendered size ${__size}" end
 
         if [ "${__silent}" = '0' ]; then
             echo
@@ -359,10 +361,8 @@ for __size in ${__sizes}; do
 done
 }
 
-__time "Rendered all" start
-
 __loop
 
-__time "Rendered all" end
+__force_time "Rendered all" end
 
 exit

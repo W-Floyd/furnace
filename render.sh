@@ -81,7 +81,7 @@ fi
 
 ###############################################################
 # Read options
-__time "Read options" start
+__force_time "Read options" start
 ###############################################################
 
 # If there are are options,
