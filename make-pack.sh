@@ -16,6 +16,7 @@ __should_warn='0'
 __use_custom_size='0'
 __dry='0'
 __compress='0'
+__clean_xml='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -40,7 +41,8 @@ Options:
   -f  --force           Discard pre-rendered data
   -q  --quiet           No output
   -w  --warn            Show warnings
-  -c  --compress        Actually compress zip files\
+  -c  --compress        Actually compress zip files
+  -x  --force-xml       Force resplitting of xml files\
 "
 }
 
@@ -117,6 +119,11 @@ while ! [ "${#}" = '0' ]; do
             __compress='1'
             ;;
 
+        "x" | "--force-xml")
+            __force_warn "Cleaning split xml files"
+            __clean_xml='1'
+            ;;
+
         "--dry")
             __dry='1'
             ;;
@@ -188,6 +195,10 @@ fi
 if ! [ -d 'src' ]; then
     __custom_error "Source file directory 'src' is missing"
     exit 1
+fi
+
+if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then
+    rm -r './src/xml/'
 fi
 
 ################################################################
