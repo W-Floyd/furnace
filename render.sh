@@ -529,17 +529,18 @@ for __range in $(__get_range "${__catalogue}" ITEM); do
 
 # TODO
 # Optimize xml functions more
-# Currently way too slow (though better than before)
 
 # Get the NAME of this ITEM
     __item_name="$(__get_value "${__read_range_file}" NAME)"
 
 # Make the correct directory for dumping the xml into an
 # appropriately named file
+
     mkdir -p "$(dirname "${__xml_current}/${__item_name}")"
 
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
+
     mv "${__read_range_file}" "${__xml_current}/${__item_name}"
 
 # Finish loop, but don't block the loop until it finishes
@@ -617,11 +618,25 @@ while read -r __xml; do
 
     if [ -e "${__xml}" ]; then
 
-# Set the location for the dep list
         __dep_list="${__dep_list_folder}/${__xml}"
 
+        dirname "${__dep_list}"
+
+    fi
+
+done < "${__dep_list_tsort}" | sort | uniq | while read -r __dir; do
+
 # Make the directory for the dep list if need be
-        mkdir -p "$(dirname "${__dep_list}")"
+    mkdir -p "${__dir}"
+
+done
+
+while read -r __xml; do
+
+    if [ -e "${__xml}" ]; then
+
+# Set the location for the dep list
+        __dep_list="${__dep_list_folder}/${__xml}"
 
         touch "${__dep_list}"
 
@@ -639,7 +654,7 @@ while read -r __xml; do
 
         touch "${__dep_list}_"
 
-        sort "${__dep_list}" | uniq | sed '/^$/d' > "${__dep_list}_"
+        sort "${__dep_list}" | uniq | grep -v '^$' > "${__dep_list}_"
 
         mv "${__dep_list}_" "${__dep_list}"
 
