@@ -1236,8 +1236,6 @@ mv "${__pack_new}" "${__pack}"
 __announce "Starting to render."
 ###############################################################
 
-__isolated_dir="${__tmp_dir}/isolated"
-
 __break_loop='0'
 
 __render_num='0'
@@ -1316,10 +1314,6 @@ Won't create \".${__config//.\/xml/}\""
 
 # announce that we are processing the given config
                 __force_announce "Processing \".${__config//.\/xml/}\""
-
-                __render_num="$((__render_num+1))"
-
-                __config_isolated_dir="${__isolated_dir}/${__render_num}"
 
 # copy the config script out so we can use it
                 cp "${__config_script}" ./
