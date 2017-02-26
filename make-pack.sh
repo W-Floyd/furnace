@@ -17,6 +17,7 @@ __use_custom_size='0'
 __dry='0'
 __compress='0'
 __clean_xml='0'
+__do_not_render='0'
 
 __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
@@ -46,16 +47,22 @@ Options:
 "
 }
 
+################################################################
+
 # get functions from file
 source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
 
-__force_time "Rendered all" start
+################################################################
 
 if ! [ -e 'config.sh' ]; then
-    __warn "No config file was found, using default values"
+    __force_warn "No config file was found, using default values"
 else
     source 'config.sh' || __error "Config file has an error"
 fi
+
+################################################################
+
+__force_time "Rendered all" start
 
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
@@ -182,23 +189,29 @@ fi
 if [ -z "${__catalogue}" ]; then
     __catalogue='catalogue.xml'
     if ! [ -e "${__catalogue}" ]; then
-        __custom_error "Catalogue '${__catalogue}' is missing"
-        exit 1
+        __error "Catalogue '${__catalogue}' is missing"
     fi
 else
     if ! [ -e "${__catalogue}" ]; then
-        __custom_error "Custom catalogue '${__catalogue}' is missing"
-        exit 1
+        __error "Custom catalogue '${__catalogue}' is missing"
     fi
 fi
 
 if ! [ -d 'src' ]; then
-    __custom_error "Source file directory 'src' is missing"
-    exit 1
+    __error "Source file directory 'src' is missing"
 fi
 
 if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then
     rm -r './src/xml/'
+fi
+
+if [ -z "${__vector_source}" ]; then
+    __vector_source='1'
+    __force_warn "Vector/Raster mode not set, defaulting to vector"
+fi
+
+if [ "${__vector_source}" = '0' ] && [ -z "${__native_size}" ]; then
+    __error "Rescaling mode enabled, but no native size has been specified"
 fi
 
 ################################################################
@@ -213,9 +226,7 @@ fi
 
 __sizes="$(echo "${__sizes}" | sort -n | uniq)"
 
-__render_and_pack () {
-
-__force_announce "Processing size ${1}"
+__just_render () {
 
 __options="${1}"
 
@@ -247,12 +258,26 @@ if [ "${__dry}" = '1' ]; then
     __options="${__options} --dry"
 fi
 
+if [ "${__do_not_render}" = '1' ]; then
+    __options="${__options} --do-not-render"
+fi
+
 if [ "${__very_verbose_pack}" = '1' ]; then
     "${__smelt_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
 elif [ "${__verbose}" = '1' ]; then
     "${__smelt_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 else
     "${__smelt_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
+fi
+
+}
+
+__render_and_pack () {
+
+__force_announce "Processing size ${1}"
+
+if [ "${__do_not_render}" = '0' ]; then
+    __just_render "${1}"
 fi
 
 if [ "${__dry}" = '0' ]; then
@@ -310,8 +335,17 @@ fi
 
 }
 
-__loop () {
-for __size in ${__sizes}; do
+__find_changed () {
+
+"${__smelt_render_bin}" --list-changed "${1}" | while read -r __changed; do
+    echo "${__changed}"
+done
+
+}
+
+__sub_loop () {
+
+    __size="${1}"
 
     __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
 
@@ -361,11 +395,104 @@ for __size in ${__sizes}; do
     if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ]; then
         echo
     fi
-
-done
 }
 
-__loop
+if [ "${__vector_source}" = '1' ]; then
+
+    for __size in ${__sizes}; do
+        __sub_loop "${__size}"
+    done
+
+else
+
+    __sub_loop "${__native_size}"
+
+    __native_packfile="$("${__smelt_render_bin}" --name-only "${__native_size}")"
+
+    for __size in ${__sizes}; do
+        if [ "${__size}" -lt "${__native_size}" ]; then
+
+            __time "Processed size ${__size}" start
+
+            __changed_list="$(__find_changed "${__size}")"
+            __changed_image_list=''
+
+            __find_changed_images () {
+
+            echo "${__changed_list}" | while read -r __changed; do
+
+                if [ "$(__get_value "./src/xml/${__changed//.\//}" IMAGE)" = 'YES' ] && [ -z "$(__get_value "./src/xml/${__changed//.\//}" SIZE)" ] && [ "$(__get_value "./src/xml/${__changed//.\//}" KEEP)" = 'YES' ]; then
+                    echo "${__changed}"
+                fi
+
+            done
+
+            }
+
+            __announce "Finding changed images."
+
+            __time "Found changed images" start
+
+            __changed_image_list="$(__find_changed_images)"
+
+            __time "Found changed images" end
+
+            __announce "Processing files that do not resize."
+
+            __do_not_render='1'
+
+            __time "Processed other files" start
+
+            echo
+            __just_render "${__size}"
+
+            __time "Processed other files" end
+
+            echo
+
+            __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
+
+            __announce "Resizing to ${__size}px."
+
+            __time "Resized" start
+
+            echo "${__changed_image_list}" | grep -v "^$" | while read -r __changed; do
+                if [ -d "${__packfile}" ]; then
+                    __pushd "${__packfile}"
+                    if [ -e "${__changed}" ]; then
+                        rm "${__changed}"
+                    fi
+                    __popd
+                    __pushd "${__native_packfile}"
+                    if [ -e "${__changed}" ]; then
+                        __force_announce "Resizing \"${__changed}\""
+                        __popd
+                        __resize "$(echo "${__size}/${__native_size}" | bc -l | sed 's/0*$//')" "${__native_packfile}/${__changed//.\//}" "${__packfile}/${__changed//.\//}"
+                    else
+                        __force_warn "File \"${__changed}\" for resizing does not exist"
+                        __popd
+                    fi
+                fi
+            done
+
+            __time "Resized" end
+
+            __announce "Finalizing size \"${__size}\""
+
+            __time "Finalized render" start
+
+            __sub_loop "${__size}"
+
+            __time "Finalized render" end
+
+            __time "Processed size ${__size}" end
+
+        fi
+
+    done
+
+fi
+
 
 __force_time "Rendered all" end
 

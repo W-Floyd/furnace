@@ -29,19 +29,19 @@ sed 's|\(.*\)\(\.\)\(.*\)|\3|' <<< "$1"
 
 ###############################################################
 #
-# __render <RES> <FILE.svg>
+# __vector_render <RES> <FILE.svg>
 #
-# Render Image
+# Render Vector Image
 # Renders the specified .svg to a .png of the same name
 #
 ###############################################################
 
-__render () {
+__vector_render () {
 if [ -z "${__quick}" ]; then
     __quick='1'
-    echo "__quick has not been set correctly. Defaulting to rsvg-convert."
+    __force_warn "__quick has not been set correctly. Defaulting to rsvg-convert"
 fi
-__dpi="$(echo "(96*${1})/128" | bc -l | rev | sed 's/0*//' | rev)"
+__dpi="$(echo "(96*${1})/128" | bc -l | sed 's/0*$//')"
 if [ "${__quick}" = '1' ]; then
 # GOD awful hack to catch svg size, TODO
 # FIX THIS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -77,7 +77,26 @@ __optimize () {
 if [ "$(__oext "${1}")" = 'png' ]; then
     optipng "${1}"
 else
-    echo "File ${1} cannot be optimized."
+    __force_warn "File ${1} cannot be optimized."
+fi
+}
+
+################################################################
+#
+# __resize <SCALE> </dir/to/src/IMAGE.png> </dir/to/dest/IMAGE.png>
+#
+# Rescale Image
+# Accepts a scale, source and dest PNG files as inputs, rescales
+# to the given scale (0-1.0). Will ignore if given file is not a
+# '.png' file.
+#
+################################################################
+
+__resize () {
+if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
+    convert "${2}" -define png:color-type=6 -scale "$(echo "${1}*100" | bc -l | sed 's/0*$//')%" "${3}"
+else
+    __force_warn "File ${2} cannot be resized."
 fi
 }
 
@@ -660,7 +679,7 @@ fi
 ###############################################################
 
 __force_announce () {
-if ! [ "${__name_only}" = '1' ]; then
+if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
     __format_text "\e[32mInfo\e[39m" "${1}" ""
 fi
 }
@@ -692,7 +711,7 @@ fi
 ###############################################################
 
 __force_warn () {
-if ! [ "${__name_only}" = '1' ]; then
+if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
     __format_text "\e[93mWarning\e[39m" "${1}" ", continuing anyway." 1>&2
 fi
 }
@@ -709,7 +728,7 @@ fi
 
 __warn () {
 if [ "${__very_verbose}" = '1' ] || [ "${__should_warn}" = '1' ]; then
-if ! [ "${__name_only}" = '1' ]; then
+if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
     __force_warn "${@}"
 fi
 fi
@@ -765,7 +784,7 @@ elif [ "${2}" = 'end' ]; then
     export "__function_end_time${__message}"="$(date +%s.%N)"
 fi
 
-if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ]; then
+if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
     if [ -z "${2}" ]; then
         __force_warn "No input to __time function, disabling timer."
         __time='0'

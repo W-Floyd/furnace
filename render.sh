@@ -19,6 +19,8 @@ __mobile='0'
 __time='0'
 __should_warn='0'
 __dry='0'
+__list_changed='0'
+__do_not_render='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -198,6 +200,15 @@ while ! [ "${#}" = '0' ]; do
 # hidden option to do a dry run (to test options and output)
                 "--dry")
                     __dry='1'
+                    ;;
+
+# hidden option to list changed files only
+                "--list-changed")
+                    __list_changed='1'
+                    ;;
+
+                "--do-not-render")
+                    __do_not_render='1'
                     ;;
 
 # general catch all for any number input that isn't for the PID
@@ -705,7 +716,7 @@ __announce "Re-using XML files."
 fi
 
 ###############################################################
-# If only xml splitting
+# If not only xml splitting
 if [ "${__xml_only}" = '0' ]; then
 
 ###############################################################
@@ -1217,6 +1228,10 @@ cp "${__render_list}" "${__render_list}_backup"
 
 __time "Checked for items to re/process" end
 
+if [ "${__list_changed}" = '1' ]; then
+    cat "${__render_list}"
+else
+
 ###############################################################
 # Copy all source, xml and conf scripts
 __announce "Setting up files for processing."
@@ -1247,10 +1262,6 @@ __pushd "${__pack}"
 
 __set_break_loop () {
 __break_loop='1'
-}
-
-__hard_exit () {
-__force_warn "Hard stopping rendering, you will probably want to force re-render this."
 }
 
 # trap ctrl c in case the user is stupid
@@ -1300,32 +1311,48 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
             __failed='0'
 
-            while read -r __dep; do
+            __should_render='0'
 
-                if ! [ -e "${__dep}" ]; then
-                    __force_warn "Missing dependency \"${__dep}\"
+            if [ "${__do_not_render}" = '0' ]; then
+
+                __should_render='1'
+
+            elif ! [ "$(__get_value "${__config}" IMAGE)" = 'YES' ] || ! [ -z "$(__get_value "${__config}" SIZE)" ]; then
+
+                __should_render='1'
+
+            fi
+
+            if [ "${__should_render}" = '1' ]; then
+
+                while read -r __dep; do
+
+                    if ! [ -e "${__dep}" ]; then
+                        __force_warn "Missing dependency \"${__dep}\"
 Won't create \".${__config//.\/xml/}\""
-                    __failed='1'
-                fi
+                        __failed='1'
+                    fi
 
-            done < "${__dep_list_folder}/${__orig_config_name}"
+                done < "${__dep_list_folder}/${__orig_config_name}"
 
-            if [ "${__failed}" = '0' ]; then
+                if [ "${__failed}" = '0' ]; then
 
 # announce that we are processing the given config
-                __force_announce "Processing \".${__config//.\/xml/}\""
+                    __force_announce "Processing \".${__config//.\/xml/}\""
 
 # copy the config script out so we can use it
-                cp "${__config_script}" ./
+                    cp "${__config_script}" ./
 
 # execute the script, given the determined size and options set
 # in the config
-                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
+                    eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
 
-                wait
+                    wait
 
 # remove the script now we're done with it
-                rm "$(basename "${__config_script}")"
+                    rm "$(basename "${__config_script}")"
+
+                fi
 
             fi
 
@@ -1398,7 +1425,11 @@ while read -r __file; do
 
     else
 
-        __force_warn "File '${__file}' for cleanup does not exist"
+        if [ "${__do_not_render}" = '0' ]; then
+
+            __force_warn "File '${__file}' for cleanup does not exist"
+
+        fi
 
     fi
 
@@ -1468,6 +1499,10 @@ fi
 
 ###############################################################
 # End if only xml splitting
+fi
+
+###############################################################
+# End if listing changed files
 fi
 
 # copy the catalogue into the src xml folder

@@ -27,6 +27,7 @@ At the most basic level, a catalogue must contain entries like so:
 		<SIZE></SIZE>
 		<OPTIONS>dirt</OPTIONS>
 		<KEEP>YES</KEEP>
+		<IMAGE>YES>/IMAGE>
 		<DEPENDS></DEPENDS>
 		<CLEANUP>./assets/minecraft/textures/blocks/dirt.svg</CLEANUP>
 		<COMMON>Dirt</COMMON>
@@ -46,6 +47,8 @@ The fields are as follow:
 **OPTIONS** describes any options to pass to the script. Placed after SIZE, as SIZE is passed as an option to all CONFIG scripts.
 
 **KEEP** describes whether the produced file is intended for inclusion in the final resource pack. YES or NO answer. So if you are processing a working only file (an overlay, for instance), this is set to NO. Otherwise, YES.
+
+**IMAGE** describes whether the produced file is an image or not, for use in rescaling from a large size.
 
 **DEPENDS** describes any files this file **directly** relies on. For instance, if your script pulls in a file derived from wool, the colour file, nor wool overlay are required, only the directly used file. The render script extrapolates this information for use, so there is no need to do it ourselves. It **shouldn't** break things, but it's bad form, and not tested.
 
