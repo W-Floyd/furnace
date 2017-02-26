@@ -1109,7 +1109,7 @@ grep -Fxvf "${__list_file}" "${__all_deps}" > "${__check_list}"
 __pushd ./src
 
 # Slim check list to only files which do not exist
-while read __file; do
+while read -r __file; do
     if ! [ -e "${__file}" ]; then
         echo "${__file}" >> "${__check_list}_"
     fi
@@ -1252,8 +1252,6 @@ __announce "Starting to render."
 ###############################################################
 
 __break_loop='0'
-
-__render_num='0'
 
 __time "Rendered ${__size}px" start
 
