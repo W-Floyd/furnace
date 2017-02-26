@@ -7,6 +7,9 @@ compgen -A variable > /tmp/tmpvars
 # Name of the pack, defaults to folder name if missing
 __name='Pack'
 
+# Default render sizes
+__sizes='1 2 4 8 16 32 64 128 256 512 1024 2048 4096'
+
 # Temporary directory to use. Defaults to /tmp/texpack${__pid}
 # if missing
 __tmp_dir="$(pwd)/tmp/${__pid}"

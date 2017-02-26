@@ -5,6 +5,7 @@ The config file specifies certain variables. It is actually a bash script, in or
 
 The following variables may be set:  
 __name  
+__sizes  
 __tmp_dir  
 __catalogue  
 __smelt\_make\_mobile_bin  
@@ -23,7 +24,7 @@ At the most basic level, a catalogue must contain entries like so:
 ```
 	<ITEM>
 		<NAME>./assets/minecraft/textures/blocks/dirt.png</NAME>
-		<CONFIG>./conf/basic_block.sh</CONFIG>
+		<CONFIG>./conf/vector_basic_block.sh</CONFIG>
 		<SIZE></SIZE>
 		<OPTIONS>dirt</OPTIONS>
 		<KEEP>YES</KEEP>
