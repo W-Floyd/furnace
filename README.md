@@ -11,6 +11,7 @@ sudo ln -s "$(pwd)/make-pack.sh" "/usr/share/smelt/smelt.sh"
 sudo ln -s "/usr/share/smelt/smelt.sh" "/usr/bin/smelt"  
 sudo ln -s "$(pwd)/functions.sh" "/usr/share/smelt/smelt_functions.sh"  
 sudo ln -s "$(pwd)/render.sh" "/usr/share/smelt/smelt_render.sh"  
+sudo ln -s "$(pwd)/completed.sh" "/usr/share/smelt/smelt_completed.sh"  
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
 ```
 

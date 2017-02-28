@@ -18,9 +18,11 @@ __dry='0'
 __compress='0'
 __clean_xml='0'
 __do_not_render='0'
+__list_completed='0'
 
-__smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
-__smelt_render_bin='/usr/share/smelt/smelt_render.sh'
+export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
+export __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
+export __smelt_completed_bin='/usr/share/smelt/smelt_completed.sh'
 
 # Print help
 __usage () {
@@ -43,7 +45,10 @@ Options:
   -q  --quiet           No output
   -w  --warn            Show warnings
   -c  --compress        Actually compress zip files
-  -x  --force-xml       Force resplitting of xml files\
+  -x  --force-xml       Force resplitting of xml files
+
+      --completed       List completed textures, according to
+                        the COMMON field in the catalogue.\
 "
 }
 
@@ -135,6 +140,10 @@ while ! [ "${#}" = '0' ]; do
             __dry='1'
             ;;
 
+        "--completed")
+            __list_completed='1'
+            ;;
+
         [0-9]*)
             if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
                 __use_custom_size='1'
@@ -195,6 +204,11 @@ else
     if ! [ -e "${__catalogue}" ]; then
         __error "Custom catalogue '${__catalogue}' is missing"
     fi
+fi
+
+if [ "${__list_completed}" = '1' ]; then
+    "${__smelt_completed_bin}" "${__catalogue}"
+    exit
 fi
 
 if ! [ -d 'src' ]; then

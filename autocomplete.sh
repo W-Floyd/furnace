@@ -2,7 +2,7 @@ _smelt () {
     local cur
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    opts="--help --verbose --install --mobile --slow --time --debug --lengthy --force --quiet --warn --compress --force-xml"
+    opts="--help --verbose --install --mobile --slow --time --debug --lengthy --force --quiet --warn --compress --force-xml --completed"
 
 
     case "${cur}" in
