@@ -647,7 +647,7 @@ __print_pad () {
 
 __format_text () {
 echo -ne "${1}"
-__desired_size='10'
+__desired_size='7'
 __leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
 __clipped_size=$((__desired_size-__leader_size-3))
 __front_pad="$(__print_pad "${__clipped_size}") - "
@@ -680,7 +680,7 @@ fi
 
 __force_announce () {
 if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __format_text "\e[32mInfo\e[39m" "${1}" ""
+    __format_text "\e[32mINFO\e[39m" "${1}" ""
 fi
 }
 
@@ -712,7 +712,7 @@ fi
 
 __force_warn () {
 if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __format_text "\e[93mWarning\e[39m" "${1}" ", continuing anyway." 1>&2
+    __format_text "\e[93mWARN\e[39m" "${1}" ", continuing anyway." 1>&2
 fi
 }
 
@@ -744,7 +744,7 @@ fi
 ###############################################################
 
 __custom_error () {
-__format_text "\e[31mError\e[39m" "${1}" ", exiting." 1>&2
+__format_text "\e[31mERRO\e[39m" "${1}" ", exiting." 1>&2
 }
 
 ###############################################################
