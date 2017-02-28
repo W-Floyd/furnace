@@ -24,6 +24,7 @@ export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
 export __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
 export __smelt_completed_bin='/usr/share/smelt/smelt_completed.sh'
+export __catalogue='catalogue.xml'
 
 # Print help
 __usage () {
@@ -195,25 +196,17 @@ fi
 
 ################################################################
 
-# Location of catalogue file
-if [ -z "${__catalogue}" ]; then
-    __catalogue='catalogue.xml'
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Catalogue '${__catalogue}' is missing"
-    fi
-else
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Custom catalogue '${__catalogue}' is missing"
-    fi
+if ! [ -d './src' ] && ! [ -e "${__catalogue}" ]; then
+    __error "Not a resource pack project folder"
+elif ! [ -e "${__catalogue}" ]; then
+    __error "Catalogue '${__catalogue}' is missing"
+elif ! [ -d 'src' ]; then
+    __error "Source file directory 'src' is missing"
 fi
 
 if [ "${__list_completed}" = '1' ]; then
     "${__smelt_completed_bin}" "${__catalogue}"
     exit
-fi
-
-if ! [ -d 'src' ]; then
-    __error "Source file directory 'src' is missing"
 fi
 
 if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then

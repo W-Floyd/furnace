@@ -7,7 +7,6 @@ The following variables may be set:
 __name  
 __sizes  
 __tmp_dir  
-__catalogue  
 __smelt\_make\_mobile_bin  
 __quick  
 

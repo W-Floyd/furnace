@@ -263,22 +263,6 @@ else
     __warn "Using custom temporary directory '${__tmp_dir}'"
 fi
 
-# set catalogue if not set already
-if [ -z "${__catalogue}" ]; then
-    __catalogue='catalogue.xml'
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Catalogue '${__catalogue}' is missing"
-    fi
-else
-    if ! [ -e "${__catalogue}" ]; then
-        __error "Custom catalogue '${__catalogue}' is missing"
-    fi
-fi
-
-if ! [ -e "${__catalogue}" ]; then
-    __error "Missing catalogue"
-fi
-
 # set quick if not set already
 if [ -z "${__quick}" ]; then
     __warn "Quick/Slow mode not set, defaulting to quick"
