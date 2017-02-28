@@ -21,6 +21,7 @@ __do_not_render='0'
 __list_completed='0'
 
 export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
+export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
 export __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
 export __smelt_completed_bin='/usr/share/smelt/smelt_completed.sh'
 

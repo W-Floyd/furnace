@@ -9,7 +9,8 @@ From this directory, run:
 sudo mkdir -p /usr/share/smelt  
 sudo ln -s "$(pwd)/make-pack.sh" "/usr/share/smelt/smelt.sh"  
 sudo ln -s "/usr/share/smelt/smelt.sh" "/usr/bin/smelt"  
-sudo ln -s "$(pwd)/functions.sh" "/usr/share/smelt/smelt_functions.sh"  
+sudo ln -s "$(pwd)/functions.sh" "/usr/share/smelt/smelt\_functions.sh"  
+sudo ln -s "$(pwd)/image\_functions.sh" "/usr/share/smelt/smelt\_image\_functions.sh"  
 sudo ln -s "$(pwd)/render.sh" "/usr/share/smelt/smelt_render.sh"  
 sudo ln -s "$(pwd)/completed.sh" "/usr/share/smelt/smelt_completed.sh"  
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
@@ -30,9 +31,9 @@ It is highly recommended that fresh packs are rendered upon significant script c
 
 At one point I had to compile a newer version of Imagemagick from source to make some compositing work. If you get odd results, that may be the issue. This *seems* to have been solved by setting some options on all image operations.
 
-Sizes 1024px and above are known not to be loaded in Minecraft, and so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px segfaults when I run out of memory (16gb RAM + 4gb swap).
+Sizes 2048px and above are known not to be loaded in Minecraft at all, and 1024px has not always loaded for me, so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px segfaults when I run out of memory (16gb RAM + 4gb swap).
 
-If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or get errors about missing dependencies, forcefully re-render to fix it.
+If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or get errors about missing dependencies, forcefully re-render to fix it. Using a cancelled render is never recommended!
 
 Documentation could be better - I may eventually clean things up.
 

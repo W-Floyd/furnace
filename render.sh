@@ -4,8 +4,6 @@
 # Defaults
 ###############################
 
-__smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
-
 __size='128'
 __verbose='0'
 __very_verbose='0'
@@ -28,7 +26,7 @@ PS4='Line ${LINENO}: '
 ###############################################################
 
 # get functions from file
-source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
+source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions '${__smelt_image_functions_bin}'"; }
 
 # temporary timer for quick timing
 __time_var='temporary timer'
