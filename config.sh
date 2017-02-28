@@ -1,3 +1,4 @@
+#smeltconfig#
 echo 'something to use a pipe' | rev > /dev/null
 compgen -A variable > /tmp/tmpvars
 ################################################################

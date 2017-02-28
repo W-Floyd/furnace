@@ -64,7 +64,11 @@ source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functio
 if ! [ -e 'config.sh' ]; then
     __force_warn "No config file was found, using default values"
 else
-    source 'config.sh' || __error "Config file has an error"
+    if [ "$(head -n 1 'config.sh')" = '#smeltconfig#' ]; then
+        source 'config.sh' || __error "Config file has an error"
+    else
+        __error "Config does not have correct header \"#smeltconfig#\""
+    fi
 fi
 
 ################################################################
