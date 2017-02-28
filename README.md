@@ -14,6 +14,7 @@ sudo ln -s "$(pwd)/image\_functions.sh" "/usr/share/smelt/smelt\_image\_function
 sudo ln -s "$(pwd)/render.sh" "/usr/share/smelt/smelt_render.sh"  
 sudo ln -s "$(pwd)/completed.sh" "/usr/share/smelt/smelt_completed.sh"  
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
+sudo ln -s "$(pwd)/conf" '/usr/share/smelt/conf'  
 ```
 
 Requires:

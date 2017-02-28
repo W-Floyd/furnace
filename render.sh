@@ -28,6 +28,8 @@ PS4='Line ${LINENO}: '
 # get functions from file
 source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions '${__smelt_image_functions_bin}'"; }
 
+__standard_conf_dir='/usr/share/smelt/conf'
+
 # temporary timer for quick timing
 __time_var='temporary timer'
 __tmp_time () {
@@ -649,7 +651,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        { __get_value "${__xml}" CONFIG; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } >> "${__dep_list}"
+        { __get_value "${__xml}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#"; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } >> "${__dep_list}"
 
         __get_value "${__xml}" DEPENDS | while read -r __dep; do
 
@@ -1299,8 +1301,8 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 # end size check
         fi
 
-# get the name of the config script
-        __config_script="$(__get_value "${__config}" CONFIG)"
+# get the name of the config script, and replace any macro locations
+        __config_script="$(__get_value "${__config}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#")"
 
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
