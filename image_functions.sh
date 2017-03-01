@@ -69,7 +69,7 @@ fi
 
 __resize () {
 if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
-    convert "${2}" -define png:color-type=6 -scale "$(echo "${1}*100" | bc -l | sed 's/0*$//')%" "${3}"
+    convert "${2}" -define png:color-type=6 -scale "$(echo "${1}*100" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
 else
     __force_warn "File ${2} is not a PNG image and cannot be resized"
 fi

@@ -19,6 +19,8 @@ __compress='0'
 __clean_xml='0'
 __do_not_render='0'
 __list_completed='0'
+__list_changed='0'
+__last_size='0'
 
 export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
@@ -48,16 +50,16 @@ Options:
   -w  --warn            Show warnings
   -c  --compress        Actually compress zip files
   -x  --force-xml       Force resplitting of xml files
-
       --completed       List completed textures, according to
-                        the COMMON field in the catalogue.\
+                        the COMMON field in the catalogue.
+      --changed         List ITEMS changed since last render.\
 "
 }
 
 ################################################################
 
 # get functions from file
-source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions '${__smelt_functions_bin}'"; exit 1; }
+source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions \"${__smelt_functions_bin}\""; exit 1; }
 
 ################################################################
 
@@ -150,6 +152,10 @@ while ! [ "${#}" = '0' ]; do
             __list_completed='1'
             ;;
 
+        "--changed")
+            __list_changed='1'
+            ;;
+
         [0-9]*)
             if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
                 __use_custom_size='1'
@@ -163,7 +169,7 @@ ${1}"
             ;;
 
         *)
-            __warn "Unknown option '${1}'"
+            __warn "Unknown option \"${1}\""
             __usage
             exit 77
             ;;
@@ -203,9 +209,9 @@ fi
 if ! [ -d './src' ] && ! [ -e "${__catalogue}" ]; then
     __error "Not a resource pack project folder"
 elif ! [ -e "${__catalogue}" ]; then
-    __error "Catalogue '${__catalogue}' is missing"
+    __error "Catalogue \"${__catalogue}\" is missing"
 elif ! [ -d 'src' ]; then
-    __error "Source file directory 'src' is missing"
+    __error "Source file directory \"src\" is missing"
 fi
 
 if [ "${__list_completed}" = '1' ]; then
@@ -217,15 +223,6 @@ if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then
     rm -r './src/xml/'
 fi
 
-if [ -z "${__vector_source}" ]; then
-    __vector_source='1'
-    __force_warn "Vector/Raster mode not set, defaulting to vector"
-fi
-
-if [ "${__vector_source}" = '0' ] && [ -z "${__native_size}" ]; then
-    __error "Rescaling mode enabled, but no native size has been specified"
-fi
-
 ################################################################
 
 if [ -z "${__sizes}" ]; then
@@ -235,6 +232,8 @@ __sizes="32
 256
 512"
 fi
+
+__final_size="$(tr ' ' '\n' <<< "${__sizes}" | tail -n1)"
 
 __sizes="$(echo "${__sizes}" | sort -n | uniq)"
 
@@ -286,11 +285,9 @@ fi
 
 __render_and_pack () {
 
-__force_announce "Processing size ${1}"
+__force_announce "Processing \"${1}\""
 
-if [ "${__do_not_render}" = '0' ]; then
-    __just_render "${1}"
-fi
+__just_render "${1}"
 
 if [ "${__dry}" = '0' ]; then
 
@@ -347,164 +344,75 @@ fi
 
 }
 
-__find_changed () {
-
-"${__smelt_render_bin}" --list-changed "${1}" | while read -r __changed; do
-    echo "${__changed}"
-done
-
-}
-
 __sub_loop () {
 
-    __size="${1}"
+__size="${1}"
 
-    __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
+__packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
 
-    if ! [ "$?" = 0 ]; then
-        echo "${__packfile}"
-        exit 1
-    fi
+if ! [ "$?" = 0 ]; then
+    echo "${__packfile}"
+    exit 1
+fi
 
-    if [ "${__time}" = '1' ]; then
+if [ "${__time}" = '1' ]; then
 
-        __force_time "Rendered size ${__size}" start
+    __force_time "Rendered size ${__size}" start
 
-        if [ "${__silent}" = '1' ]; then
-            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
-        else
-            __render_and_pack "${__size}" "${__packfile}"
-        fi
-
-        __force_time "Rendered size ${__size}" end
-
-        if [ "${__silent}" = '0' ]; then
-            echo
-        fi
-
+    if [ "${__silent}" = '1' ]; then
+        __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
     else
-
-        if [ "${__silent}" = '1' ]; then
-            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
-        else
-            __render_and_pack "${__size}" "${__packfile}"
-        fi
-
+        __render_and_pack "${__size}" "${__packfile}"
     fi
 
-    __dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
+    __force_time "Rendered size ${__size}" end
 
-    if [ "${__install}" = '1' ]; then
+    if [ "${__silent}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
+        echo
+    fi
 
-    if [ -a "${__dest}" ] ; then
+else
+
+    if [ "${__silent}" = '1' ]; then
+        __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
+    else
+        __render_and_pack "${__size}" "${__packfile}"
+    fi
+
+fi
+
+__dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
+
+if [ "${__install}" = '1' ]; then
+
+    if [ -e "${__dest}" ] ; then
         rm "${__dest}"
     fi
 
     cp "${__packfile}.zip" "${__dest}"
 
-    fi
-
-    if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ]; then
-        echo
-    fi
-}
-
-if [ "${__vector_source}" = '1' ]; then
-
-    for __size in ${__sizes}; do
-        __sub_loop "${__size}"
-    done
-
-else
-
-    __sub_loop "${__native_size}"
-
-    __native_packfile="$("${__smelt_render_bin}" --name-only "${__native_size}")"
-
-    for __size in ${__sizes}; do
-        if [ "${__size}" -lt "${__native_size}" ]; then
-
-            __time "Processed size ${__size}" start
-
-            __changed_list="$(__find_changed "${__size}")"
-            __changed_image_list=''
-
-            __find_changed_images () {
-
-            echo "${__changed_list}" | while read -r __changed; do
-
-                if [ "$(__get_value "./src/xml/${__changed//.\//}" IMAGE)" = 'YES' ] && [ -z "$(__get_value "./src/xml/${__changed//.\//}" SIZE)" ] && [ "$(__get_value "./src/xml/${__changed//.\//}" KEEP)" = 'YES' ]; then
-                    echo "${__changed}"
-                fi
-
-            done
-
-            }
-
-            __announce "Finding changed images."
-
-            __time "Found changed images" start
-
-            __changed_image_list="$(__find_changed_images)"
-
-            __time "Found changed images" end
-
-            __announce "Processing files that do not resize."
-
-            __do_not_render='1'
-
-            __time "Processed other files" start
-
-            echo
-            __just_render "${__size}"
-
-            __time "Processed other files" end
-
-            echo
-
-            __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
-
-            __announce "Resizing to ${__size}px."
-
-            __time "Resized" start
-
-            echo "${__changed_image_list}" | grep -v "^$" | while read -r __changed; do
-                if [ -d "${__packfile}" ]; then
-                    __pushd "${__packfile}"
-                    if [ -e "${__changed}" ]; then
-                        rm "${__changed}"
-                    fi
-                    __popd
-                    __pushd "${__native_packfile}"
-                    if [ -e "${__changed}" ]; then
-                        __force_announce "Resizing \"${__changed}\""
-                        __popd
-                        __resize "$(echo "${__size}/${__native_size}" | bc -l | sed 's/0*$//')" "${__native_packfile}/${__changed//.\//}" "${__packfile}/${__changed//.\//}"
-                    else
-                        __force_warn "File \"${__changed}\" for resizing does not exist"
-                        __popd
-                    fi
-                fi
-            done
-
-            __time "Resized" end
-
-            __announce "Finalizing size \"${__size}\""
-
-            __time "Finalized render" start
-
-            __sub_loop "${__size}"
-
-            __time "Finalized render" end
-
-            __time "Processed size ${__size}" end
-
-        fi
-
-    done
-
 fi
 
+if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
+    echo
+fi
+
+}
+
+for __size in ${__sizes}; do
+    if [ "${__size}" = "${__final_size}" ]; then
+        __last_size='1'
+    fi
+
+    if [ "${__list_changed}" = '1' ]; then
+        "${__smelt_render_bin}" --list-changed "${__size}"
+        if [ "${__last_size}" = '0' ]; then
+            echo
+        fi
+    else
+        __sub_loop "${__size}"
+    fi
+done
 
 __force_time "Rendered all" end
 

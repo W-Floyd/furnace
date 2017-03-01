@@ -18,7 +18,6 @@ __time='0'
 __should_warn='0'
 __dry='0'
 __list_changed='0'
-__do_not_render='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -26,7 +25,7 @@ PS4='Line ${LINENO}: '
 ###############################################################
 
 # get functions from file
-source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions '${__smelt_image_functions_bin}'"; }
+source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions \"${__smelt_image_functions_bin}\""; }
 
 __standard_conf_dir='/usr/share/smelt/conf'
 
@@ -207,10 +206,6 @@ while ! [ "${#}" = '0' ]; do
                     __list_changed='1'
                     ;;
 
-                "--do-not-render")
-                    __do_not_render='1'
-                    ;;
-
 # general catch all for any number input that isn't for the PID
 # which is set as the render size,
                 [0-9]*)
@@ -260,7 +255,7 @@ fi
 if [ -z "${__tmp_dir}" ]; then
     __tmp_dir="/tmp/texpack${__pid}"
 else
-    __warn "Using custom temporary directory '${__tmp_dir}'"
+    __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
 
 # set quick if not set already
@@ -1044,6 +1039,7 @@ sort "${__unchanged_source}" "${__unchanged_xml}" | uniq > "${__unchanged_both}"
 # Where files to be processed are listed
 __list_file_proc="${__tmp_dir}/listing_processing"
 touch "${__list_file_proc}"
+cat "${__changed_both}" >> "${__list_file_proc}"
 
 # Where all dependencies are listed
 __all_deps="${__tmp_dir}/all_deps"
@@ -1213,7 +1209,18 @@ cp "${__render_list}" "${__render_list}_backup"
 __time "Checked for items to re/process" end
 
 if [ "${__list_changed}" = '1' ]; then
-    cat "${__render_list}"
+
+    __changed="$(cat "${__render_list}")"
+
+    if [ -z "${__changed}" ]; then
+        __force_announce "No changes to \"${__size}\""
+    else
+        __force_announce "Changes to \"${__size}\":"
+        echo "${__changed}" | while read -r __change; do
+            __force_announce "File \"${__change}\" has changed."
+        done
+    fi
+
 else
 
 ###############################################################
@@ -1293,48 +1300,51 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
             __failed='0'
 
-            __should_render='0'
+            while read -r __dep; do
 
-            if [ "${__do_not_render}" = '0' ]; then
-
-                __should_render='1'
-
-            elif ! [ "$(__get_value "${__config}" IMAGE)" = 'YES' ] || ! [ -z "$(__get_value "${__config}" SIZE)" ]; then
-
-                __should_render='1'
-
-            fi
-
-            if [ "${__should_render}" = '1' ]; then
-
-                while read -r __dep; do
-
-                    if ! [ -e "${__dep}" ]; then
-                        __force_warn "Missing dependency \"${__dep}\"
+                if ! [ -e "${__dep}" ]; then
+                    __force_warn "Missing dependency \"${__dep}\"
 Won't create \".${__config//.\/xml/}\""
-                        __failed='1'
-                    fi
+                    __failed='1'
+                fi
 
-                done < "${__dep_list_folder}/${__orig_config_name}"
+            done < "${__dep_list_folder}/${__orig_config_name}"
 
-                if [ "${__failed}" = '0' ]; then
+            if [ "${__failed}" = '0' ]; then
 
 # announce that we are processing the given config
-                    __force_announce "Processing \".${__config//.\/xml/}\""
+                __force_announce "Processing \".${__config//.\/xml/}\""
 
 # copy the config script out so we can use it
-                    cp "${__config_script}" ./
+                cp "${__config_script}" ./
 
 # execute the script, given the determined size and options set
 # in the config
-                    eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
+                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
 
-                    wait
+                wait
 
-# remove the script now we're done with it
-                    rm "$(basename "${__config_script}")"
+                if [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
+
+                    __native_size="$(__get_value "${__config}" NATIVESIZE)"
+
+                    if ! [ -z "${__native_size}" ]; then
+
+                        __force_announce "Resizing \".${__config//.\/xml/}\" to ${__size}px"
+
+                        if [ "$(__oext "./${__orig_config_name}")" = 'png' ]; then
+                            __resize "$(echo "${__size}/${__native_size}" | bc)" "./${__orig_config_name}" "${__tmp_dir}/tmp_img.png"
+                            mv "${__tmp_dir}/tmp_img.png" "./${__orig_config_name}"
+                        else
+                            __force_warn "File \"./${__orig_config_name}\" is marked as an image, but is not a PNG file"
+                        fi
+
+                    fi
 
                 fi
+
+# remove the script now we're done with it
+                rm "$(basename "${__config_script}")"
 
             fi
 
@@ -1407,11 +1417,7 @@ while read -r __file; do
 
     else
 
-        if [ "${__do_not_render}" = '0' ]; then
-
-            __force_warn "File '${__file}' for cleanup does not exist"
-
-        fi
+        __force_warn "File \"${__file}\" for cleanup does not exist"
 
     fi
 
