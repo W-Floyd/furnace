@@ -253,7 +253,7 @@ fi
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
-    __tmp_dir="/tmp/texpack${__pid}"
+    __tmp_dir="/tmp/smelt/texpack${__pid}"
 else
     __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
@@ -1039,7 +1039,6 @@ sort "${__unchanged_source}" "${__unchanged_xml}" | uniq > "${__unchanged_both}"
 # Where files to be processed are listed
 __list_file_proc="${__tmp_dir}/listing_processing"
 touch "${__list_file_proc}"
-cat "${__changed_both}" >> "${__list_file_proc}"
 
 # Where all dependencies are listed
 __all_deps="${__tmp_dir}/all_deps"
@@ -1075,6 +1074,9 @@ __pushd "${__dep_list_folder}"
 
 # List files that depend on changed files
 grep -rlxf "${__changed_both}" | sed 's#^#./#' >> "${__list_file_proc}"
+
+# List ITEMS that have changed
+grep -Fxf "${__changed_both}" "${__new_xml_list}" >> "${__list_file_proc}"
 
 # List all deps
 find . -type f -exec cat {} + | sort | uniq > "${__all_deps}"
