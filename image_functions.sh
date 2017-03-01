@@ -13,12 +13,19 @@
 
 __vector_render () {
 if [ -z "${__quick}" ]; then
-    __quick='1'
+    export __quick='1'
     __force_warn "__quick has not been set correctly. Defaulting to rsvg-convert"
 fi
+
+if ! [ "$(__oext "${2}")" = 'svg' ]; then
+    __error "File \"${2}\" is not an svg file"
+fi
+
 __dpi="$(echo "(96*${1})/128" | bc -l | sed 's/0*$//')"
 if [ "${__quick}" = '1' ]; then
-# GOD awful hack to catch svg size, TODO
+# GOD awful hack to catch svg size, since rsvg-convert seems
+# buggy
+# TODO
 # FIX THIS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 rsvg-convert \
 --width="$(echo "($(grep "^   width=\"*\"" < "${2}" | sed -e 's/.*="//' -e 's/"$//')*${1})/128" | bc)" \
@@ -35,6 +42,47 @@ inkscape \
 convert "$(__mext "${2}")"".png" -define png:color-type=6 "$(__mext "${2}")"'_'".png"
 mv "$(__mext "${2}")"'_'".png" "$(__mext "${2}")"".png"
 fi
+}
+
+###############################################################
+#
+# __gimp_export <FILE.xcf>
+#
+# GIMP Export
+# Exports a given GIMP file to a PNG file of the same name
+#
+# Shamelessly stolen from:
+# http://stackoverflow.com/a/5846727/7578643
+#
+###############################################################
+
+__gimp_export () {
+
+if ! [ "$(__oext "${1}")" = 'xcf' ]; then
+    __error "File \"${1}\" is not a xcf file"
+fi
+
+__gimp_sub () {
+gimp -i --batch-interpreter=python-fu-eval -b - << EOF
+import gimpfu
+
+def convert(filename):
+    img = pdb.gimp_file_load(filename, filename)
+    new_name = filename.rsplit(".",1)[0] + ".png"
+    layer = pdb.gimp_image_merge_visible_layers(img, 1)
+
+    pdb.gimp_file_save(img, layer, new_name, new_name)
+    pdb.gimp_image_delete(img)
+
+convert('${1}')
+
+pdb.gimp_quit(1)
+EOF
+}
+
+# My instance of GIMP throws some errors no matter what, so
+__gimp_sub "${1}" &> /dev/null
+
 }
 
 ###############################################################
@@ -68,11 +116,13 @@ fi
 ################################################################
 
 __resize () {
+
 if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
     convert "${2}" -define png:color-type=6 -scale "$(echo "${1}*100" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
 else
     __force_warn "File ${2} is not a PNG image and cannot be resized"
 fi
+
 }
 
 ###############################################################

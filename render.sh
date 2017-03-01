@@ -1335,7 +1335,8 @@ Won't create \".${__config//.\/xml/}\""
                         __force_announce "Resizing \".${__config//.\/xml/}\" to ${__size}px"
 
                         if [ "$(__oext "./${__orig_config_name}")" = 'png' ]; then
-                            __resize "$(echo "${__size}/${__native_size}" | bc)" "./${__orig_config_name}" "${__tmp_dir}/tmp_img.png"
+                            __resize "$(echo "${__tmp_size}/${__native_size}" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')" "./${__orig_config_name}" "${__tmp_dir}/tmp_img.png"
+
                             mv "${__tmp_dir}/tmp_img.png" "./${__orig_config_name}"
                         else
                             __force_warn "File \"./${__orig_config_name}\" is marked as an image, but is not a PNG file"
