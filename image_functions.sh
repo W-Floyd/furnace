@@ -98,7 +98,7 @@ __gimp_sub "${1}" &> /dev/null
 
 __optimize () {
 if [ "$(__oext "${1}")" = 'png' ]; then
-    optipng -silent "${1}"
+    optipng -nc -strip all -silent "${1}"
 else
     __force_warn "File \"${1}\" cannot be optimized."
 fi
