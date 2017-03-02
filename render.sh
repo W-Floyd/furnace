@@ -1327,7 +1327,7 @@ Won't create \".${__config//.\/xml/}\""
             if [ "${__failed}" = '0' ]; then
 
 # announce that we are processing the given config
-                __force_announce "Processing \".${__config//.\/xml/}\""
+                __format_text "\e[36m${__size}\e[39m" "Processing \".${__config//.\/xml/}\"" ""
 
 # copy the config script out so we can use it
                 cp "${__config_script}" ./
@@ -1344,7 +1344,7 @@ Won't create \".${__config//.\/xml/}\""
 
                     if ! [ -z "${__native_size}" ]; then
 
-                        __force_announce "Resizing \".${__config//.\/xml/}\" to ${__size}px"
+                        __format_text "\e[36m${__size}\e[39m" "Resizing \".${__config//.\/xml/}\" to ${__size}px" ""
 
                         if [ "$(__oext "./${__orig_config_name}")" = 'png' ]; then
                             __resize "$(echo "${__tmp_size}/${__native_size}" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')" "./${__orig_config_name}" "${__tmp_dir}/tmp_img.png"
@@ -1358,7 +1358,7 @@ Won't create \".${__config//.\/xml/}\""
 
                     if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ]; then
 
-                        __force_announce "Optimizing \".${__config//.\/xml/}\""
+                        __format_text "\e[36m${__size}\e[39m" "Optimizing \".${__config//.\/xml/}\"" ""
 
                         __optimize "./${__orig_config_name}"
 
