@@ -1276,6 +1276,8 @@ trap __set_break_loop SIGINT
 # while the render list has lines to process,
 while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
+    __will_optimize='0'
+
 # set the original name of the config file
     __orig_config="$(head -n 1 "${__render_list}")"
 
