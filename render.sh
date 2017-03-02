@@ -648,7 +648,7 @@ while read -r __xml; do
 
         echo "${__tmp_var}" | while read -r __suspect_dep; do
 
-            if [ -e "./${__suspect_dep}" ]; then
+            if [ -e "./${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
                 cat "${__dep_list_folder}/${__suspect_dep}" >> "${__dep_list}"
 
