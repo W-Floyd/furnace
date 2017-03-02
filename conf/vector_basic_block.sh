@@ -2,7 +2,7 @@
 
 __pushd ./assets/minecraft/textures/blocks/
 
-__vector_render "$1" "${2}.svg"
+__vector_render "${1}" "${2}.svg"
 
 __popd
 

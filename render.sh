@@ -642,13 +642,15 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        { __get_value "${__xml}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#"; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } >> "${__dep_list}"
+        __tmp_var="$({ __get_value "${__xml}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#"; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | grep -v "^$")"
 
-        __get_value "${__xml}" DEPENDS | while read -r __dep; do
+        echo "${__tmp_var}" >> "${__dep_list}"
 
-            if [ -e "${__dep}" ]; then
+        echo "${__tmp_var}" | while read -r __suspect_dep; do
 
-                cat "${__dep_list_folder}/${__dep}" >> "${__dep_list}"
+            if [ -e "./${__suspect_dep}" ]; then
+
+                cat "${__dep_list_folder}/${__suspect_dep}" >> "${__dep_list}"
 
             fi
 
@@ -1334,7 +1336,7 @@ Won't create \".${__config//.\/xml/}\""
 
 # execute the script, given the determined size and options set
 # in the config
-                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" "$(__get_value "${__config}" OPTIONS)" &
+                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ') &
 
                 wait
 
