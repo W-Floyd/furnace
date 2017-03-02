@@ -19,6 +19,7 @@ __should_warn='0'
 __dry='0'
 __list_changed='0'
 __should_optimize='0'
+__no_optimize='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -61,7 +62,8 @@ Options:
   -q  --quick           Use quicker render engine (rsvg-convert)
   -t  --time            Time operations (for debugging)
   -w  --warn            Show warnings
-  -o  --optimize        Optimize final PNG files\
+  -o  --optimize        Optimize final PNG files
+      --no-optimize     Do not optimize final PNG files\
 "
 }
 
@@ -215,6 +217,11 @@ while ! [ "${#}" = '0' ]; do
 # whether to optimize images
                 "-o" | "--optimize")
                     __should_optimize='1'
+                    ;;
+
+                "--no-optimize")
+                    __warn "Forcing optimization off"
+                    __should_optimize='0'
                     ;;
 
 

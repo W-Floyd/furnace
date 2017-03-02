@@ -22,6 +22,7 @@ __list_completed='0'
 __list_changed='0'
 __last_size='0'
 __should_optimize='0'
+__no_optimize='0'
 
 export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
@@ -52,6 +53,7 @@ Options:
   -c  --compress        Actually compress zip files
   -x  --force-xml       Force resplitting of xml files
   -o  --optimize        Optimize final PNG files
+      --no-optimize     Do not optimize final PNG files
       --completed       List completed textures, according to
                         the COMMON field in the catalogue
       --changed         List ITEMS changed since last render\
@@ -160,6 +162,10 @@ while ! [ "${#}" = '0' ]; do
 
         "--changed")
             __list_changed='1'
+            ;;
+
+        "--no-optimize")
+            __no_optimize='1'
             ;;
 
         [0-9]*)
@@ -273,6 +279,10 @@ fi
 
 if [ "${__should_optimize}" = '1' ]; then
     __options="${__options} -o"
+fi
+
+if [ "${__no_optimize}" = '1' ]; then
+    __options="${__options} --no-optimize"
 fi
 
 if [ "${__dry}" = '1' ]; then
