@@ -23,6 +23,9 @@ __smelt_make_mobile_bin='./convert_to_mobile.sh'
 # Defaults to quick mode if missing
 __quick='1'
 
+# Whether or not the final images should be optimized
+__should_optimize='1'
+
 ################################################################
 # Stop customizing from here
 ################################################################

@@ -18,6 +18,7 @@ __time='0'
 __should_warn='0'
 __dry='0'
 __list_changed='0'
+__should_optimize='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -59,7 +60,8 @@ Options:
   -s  --slow            Use slower render engine (Inkscape)
   -q  --quick           Use quicker render engine (rsvg-convert)
   -t  --time            Time operations (for debugging)
-  -w  --warn            Show warnings\
+  -w  --warn            Show warnings
+  -o  --optimize        Optimize final PNG files\
 "
 }
 
@@ -209,6 +211,12 @@ while ! [ "${#}" = '0' ]; do
                 "--list-changed")
                     __list_changed='1'
                     ;;
+
+# whether to optimize images
+                "-o" | "--optimize")
+                    __should_optimize='1'
+                    ;;
+
 
 # general catch all for any number input that isn't for the PID
 # which is set as the render size,
@@ -1345,6 +1353,14 @@ Won't create \".${__config//.\/xml/}\""
                         else
                             __force_warn "File \"./${__orig_config_name}\" is marked as an image, but is not a PNG file"
                         fi
+
+                    fi
+
+                    if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ]; then
+
+                        __force_announce "Optimizing \".${__config//.\/xml/}\""
+
+                        __optimize "./${__orig_config_name}"
 
                     fi
 
