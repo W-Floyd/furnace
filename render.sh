@@ -24,6 +24,10 @@ PS4='Line ${LINENO}: '
 # Setting up functions
 ###############################################################
 
+if [ -z "${__smelt_image_functions_bin}" ]; then
+    export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
+fi
+
 # get functions from file
 source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions \"${__smelt_image_functions_bin}\""; }
 
@@ -1427,6 +1431,8 @@ while read -r __file; do
 # finish loop
 done < "${__cleanup_all}"
 
+wait
+
 # remove xml and conf from cleaned pack
 rm -r ./xml
 rm -r ./conf
@@ -1455,7 +1461,9 @@ fi
 # if a mobile pack is supposed to be made
 if [ "${__mobile}" = '1' ]; then
 
-    __time "Making mobile pack" start
+    __announce "Making mobile pack."
+
+    __time "Made mobile pack" start
 
 # if the end pack folder exists,
     if [ -d "${__pack_end}" ]; then
@@ -1484,7 +1492,7 @@ if [ "${__mobile}" = '1' ]; then
 # get back into the main directory
     __popd
 
-    __time "Making mobile pack" end
+    __time "Made mobile pack" end
 
 fi
 

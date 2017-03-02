@@ -321,11 +321,11 @@ if [ "${__mobile}" = '1' ]; then
 
     if [ "${__compress}" = '1' ]; then
 
-        zip -q -9 -r "../${2}" ./
+        zip -q -9 -r "../${2}_mobile" ./
 
     else
 
-        zip -qZ store -r "../${2}" ./
+        zip -qZ store -r "../${2}_mobile" ./
 
     fi
 
