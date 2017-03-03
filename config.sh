@@ -26,6 +26,12 @@ __quick='1'
 # Whether or not the final images should be optimized
 __should_optimize='1'
 
+# Largest size to optimize
+__max_optimize='512'
+
+# Whether or not to ignore the max optimize size
+__ignore_max_optimize='1'
+
 ################################################################
 # Stop customizing from here
 ################################################################

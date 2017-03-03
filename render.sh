@@ -19,7 +19,6 @@ __should_warn='0'
 __dry='0'
 __list_changed='0'
 __should_optimize='0'
-__no_optimize='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -43,7 +42,7 @@ __time "${__time_var}" "${1}"
 
 # print help
 __usage () {
-echo "$0 <OPTIONS> <SIZE>
+echo "${0} <OPTIONS> <SIZE>
 
 Renders the texture pack at the specified size (or default 128)
 Order of options and size are not important.

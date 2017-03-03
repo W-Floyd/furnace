@@ -23,6 +23,7 @@ __list_changed='0'
 __last_size='0'
 __should_optimize='0'
 __no_optimize='0'
+__ignore_max_optimize='0'
 
 export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
 export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
@@ -32,7 +33,7 @@ export __catalogue='catalogue.xml'
 
 # Print help
 __usage () {
-echo "$0 <OPTIONS> <SIZE>
+echo "${0} <OPTIONS> <SIZE>
 
 Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
@@ -53,10 +54,12 @@ Options:
   -c  --compress        Actually compress zip files
   -x  --force-xml       Force resplitting of xml files
   -o  --optimize        Optimize final PNG files
-      --no-optimize     Do not optimize final PNG files
-      --completed       List completed textures, according to
+  --no-optimize         Do not optimize final PNG files
+  --max-optimize=SIZE   Max size to optimize
+  --force-optimize      Optimize any size of final PNG files
+  --completed           List completed textures, according to
                         the COMMON field in the catalogue
-      --changed         List ITEMS changed since last render\
+  --changed             List ITEMS changed since last render\
 "
 }
 
@@ -168,6 +171,14 @@ while ! [ "${#}" = '0' ]; do
             __no_optimize='1'
             ;;
 
+        "--max-optimize="[0-9]*)
+            __max_optimize="$(echo "${1}" | sed 's/.*=//')"
+            ;;
+
+        "--force-optimize")
+            __ignore_max_optimize='1'
+            ;;
+
         [0-9]*)
             if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
                 __use_custom_size='1'
@@ -249,6 +260,27 @@ __final_size="$(tr ' ' '\n' <<< "${__sizes}" | tail -n1)"
 
 __sizes="$(echo "${__sizes}" | sort -n | uniq)"
 
+if [ -z "${__max_optimize}" ]; then
+    __default_max_optimize='512'
+    __max_optimize="${__default_max_optimize}"
+    if [ "${__should_optimize}" = '1' ] ; then
+        __should_warn_size='0'
+        for __test_size in "${__sizes}"; do
+            if ! [ "${__test_size}" -lt "${__default_max_optimize}" ]; then
+                __should_warn_size='1'
+                break
+            fi
+        done
+        if [ "${__should_warn_size}" = '1' ]; then
+            __force_warn "Default maximum optimization size is \"${__default_max_optimize}\", some sizes will not
+be optimized. Use --force-optimize to override this, or set a
+new maximum with --max-optimize=SIZE"
+        fi
+    fi
+fi
+
+echo "${__ignore_max_optimize}"
+
 __just_render () {
 
 __options="${1}"
@@ -281,7 +313,7 @@ if [ "${__should_optimize}" = '1' ]; then
     __options="${__options} -o"
 fi
 
-if [ "${__no_optimize}" = '1' ]; then
+if [ "${__no_optimize}" = '1' ] || [ "${__ignore_max_optimize}" = '0' -a "${1}" -gt "${__max_optimize}" ]; then
     __options="${__options} --no-optimize"
 fi
 
@@ -430,7 +462,13 @@ for __size in ${__sizes}; do
             echo
         fi
     else
+
+        if [ "${__size}" -gt "${__max_optimize}" ] && [ "${__ignore_max_optimize}" = '0' ] && [ "${__should_optimize}" = '1' ]; then
+            __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+        fi
+
         __sub_loop "${__size}"
+
     fi
 done
 
