@@ -470,6 +470,10 @@ __cleanup_file='cleanup'
 __cleanup_all="${__tmp_dir}/${__cleanup_file}"
 touch "${__cleanup_all}"
 
+__optimize_file='optimize_list'
+__optimize_list="${__tmp_dir}/${__optimize_file}"
+touch "${__optimize_list}"
+
 # if the xml folder does not exist,
 if ! [ -d ./src/xml/ ]; then
 
@@ -501,7 +505,7 @@ __popd
 __new_catalogue_hash="$(md5sum "${__catalogue}")"
 
 # if the new catalogue is the same as the old catalogue, then
-if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ]; then
+if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ] && [ -e "./src/xml/${__optimize_file}" ]; then
 
 # say so
     __announce "No changes to XML catalogue."
@@ -515,6 +519,8 @@ if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/
     mv "./src/xml/${__dep_list_name}" "${__tmp_dir}"
 
     mv "./src/xml/${__cleanup_file}" "${__cleanup_all}"
+
+    mv "./src/xml/${__optimize_file}" "${__optimize_list}"
 
 # end if statement whether the catalogues are the same
 fi
@@ -565,6 +571,24 @@ fi
 mv "${__xml_current}" './src/xml/'
 
 __time "Split XML" end
+
+###############################################################
+# Check for files to __optimize
+__announce "Checking for files to optimize."
+
+touch "${__optimize_list}"
+
+__time "Found files to optimize" start
+
+__pushd ./src/xml/
+
+# NOTE: We can shortcut with grep here since it should never be
+# written any other way than this
+grep -rlw '<IMAGE>YES</IMAGE>' | grep -F "$(grep -rlw '<KEEP>YES</KEEP>')" | sed 's#^#\./#' | sort | uniq > "${__optimize_list}"
+
+__popd
+
+__time "Found files to optimize" end
 
 ###############################################################
 # Inherit deps and cleanup
@@ -1073,6 +1097,24 @@ touch "${__check_list}"
 __copy_list="${__tmp_dir}/copy_list"
 touch "${__copy_list}"
 
+touch "./${__pack}/.${__optimize_file}"
+
+if [ "${__should_optimize}" = '1' ]; then
+# Make sure the files yet to be optimized are added to the list
+# of changed files
+
+    grep -Fxvf "./${__pack}/.${__optimize_file}" "${__optimize_list}" >> "${__changed_both}"
+
+else
+
+# Or make sure previously optimized files are redone, and not
+# optimized
+    cat "./${__pack}/.${__optimize_file}" >> "${__changed_both}"
+
+fi
+
+rm "./${__pack}/.${__optimize_file}"
+
 # TODO - Make a more efficient method of doing this
 
 ################################################################
@@ -1141,13 +1183,13 @@ __popd
 # Add check list to process list
 cat "${__check_list}" >> "${__list_file_proc}"
 
+sort "${__list_file_proc}" | uniq > "${__list_file_proc}_"
+mv "${__list_file_proc}_" "${__list_file_proc}"
+
 # Make a backup of the process list for debugging
 if [ "${__debug}" = '1' ]; then
     cp "${__list_file_proc}" "${__list_file_proc}_original"
 fi
-
-sort "${__list_file_proc}" | uniq > "${__list_file_proc}_"
-mv "${__list_file_proc}_" "${__list_file_proc}"
 
 # As long as the process list is not empty,
 while [ -s "${__list_file_proc}" ]; do
@@ -1547,6 +1589,18 @@ cp "${__dep_list_tsort}" "./src/xml/${__tsort_file}"
 cp -r "${__dep_list_folder}" "./src/xml/"
 
 cp "${__cleanup_all}" "./src/xml/${__cleanup_file}"
+
+cp "${__optimize_list}" "./src/xml/${__optimize_file}"
+
+if [ "${__should_optimize}" = '1' ]; then
+
+    cp "${__optimize_list}" "./${__pack}/.${__optimize_file}"
+
+else
+
+    echo '' > "./${__pack}/.${__optimize_file}"
+
+fi
 
 ###############################################################
 # General Cleanup
