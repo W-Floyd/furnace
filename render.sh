@@ -42,7 +42,7 @@ __time "${__time_var}" "${1}"
 
 # print help
 __usage () {
-echo "${0} <OPTIONS> <SIZE>
+echo "$(basename ${0}) <OPTIONS> <SIZE>
 
 Renders the texture pack at the specified size (or default 128)
 Order of options and size are not important.

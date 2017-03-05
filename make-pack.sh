@@ -33,7 +33,7 @@ export __catalogue='catalogue.xml'
 
 # Print help
 __usage () {
-echo "${0} <OPTIONS> <SIZE>
+echo "$(basename ${0}) <OPTIONS> <SIZE>
 
 Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
@@ -454,6 +454,8 @@ fi
 for __size in ${__sizes}; do
     if [ "${__size}" = "${__final_size}" ]; then
         __last_size='1'
+    else
+        __last_size='0'
     fi
 
     if [ "${__list_changed}" = '1' ]; then
