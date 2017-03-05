@@ -33,7 +33,7 @@ export __catalogue='catalogue.xml'
 
 # Print help
 __usage () {
-echo "$(basename ${0}) <OPTIONS> <SIZE>
+echo "$(basename "${0}") <OPTIONS> <SIZE>
 
 Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
@@ -268,12 +268,12 @@ if [ -z "${__max_optimize}" ]; then
     __max_optimize="${__default_max_optimize}"
     if [ "${__should_optimize}" = '1' ] ; then
         __should_warn_size='0'
-        for __test_size in "${__sizes}"; do
+        while read -r __test_size; do
             if ! [ "${__test_size}" -lt "${__default_max_optimize}" ]; then
                 __should_warn_size='1'
                 break
             fi
-        done
+        done <<< "${__sizes}"
         if [ "${__should_warn_size}" = '1' ]; then
             __force_warn "Default maximum optimization size is \"${__default_max_optimize}\", some sizes will not
 be optimized. Use --force-optimize to override this, or set a
