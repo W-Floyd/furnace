@@ -1001,7 +1001,11 @@ done < "${__shared_source_list}"
 
 else
 
-    __force_announce "No changes to source."
+    if [ "${__list_changed}" = '0' ]; then
+
+        __force_announce "No changes to source."
+
+    fi
 
     if [ -e "${__unchanged_source}" ]; then
 

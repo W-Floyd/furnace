@@ -279,8 +279,6 @@ new maximum with --max-optimize=SIZE"
     fi
 fi
 
-echo "${__ignore_max_optimize}"
-
 __just_render () {
 
 __options="${1}"
@@ -406,7 +404,7 @@ __size="${1}"
 
 __packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
 
-if ! [ "$?" = 0 ]; then
+if ! [ "${?}" = 0 ]; then
     echo "${__packfile}"
     exit 1
 fi
