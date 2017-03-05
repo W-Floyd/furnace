@@ -204,13 +204,19 @@ ${1}"
 
     }
 
-    if echo "${1}" | grep '^--' &> /dev/null; then
+    if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
 
         __check_input "${1}"
 
-    elif echo "${1}" | grep '^-' &> /dev/null; then
+    elif echo "${1}" | grep '^--.*' &> /dev/null; then
 
-        for __letter in $(echo "${1}" | cut -c 2- | sed 's/./& /g'); do
+        __check_input "${1}"
+
+    elif echo "${1}" | grep '^-.*' &> /dev/null; then
+
+        __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
+
+        for __letter in ${__letters}; do
 
             __check_input "${__letter}"
 
