@@ -171,8 +171,11 @@ while ! [ "${#}" = '0' ]; do
             __no_optimize='1'
             ;;
 
-        "--max-optimize="[0-9]*)
+        "--max-optimize=" | "--max-optimize="[0-9]*)
             __max_optimize="$(echo "${1}" | sed 's/.*=//')"
+            if [ -z "${__max_optimize}" ]; then
+                __error "No maximum optimize size was given"
+            fi
             ;;
 
         "--force-optimize")
@@ -192,7 +195,7 @@ ${1}"
             ;;
 
         *)
-            __warn "Unknown option \"${1}\""
+            __custom_error "Unknown option \"${1}\""
             __usage
             exit 77
             ;;
