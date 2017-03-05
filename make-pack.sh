@@ -313,6 +313,10 @@ if [ "${__should_optimize}" = '1' ]; then
     __options="${__options} -o"
 fi
 
+if [ "${__list_changed}" = '1' ]; then
+    __options="${__options} --list-changed"
+fi
+
 if [ "${__no_optimize}" = '1' ] || [ "${__ignore_max_optimize}" = '0' -a "${1}" -gt "${__max_optimize}" ]; then
     __options="${__options} --no-optimize"
 fi
@@ -459,7 +463,7 @@ for __size in ${__sizes}; do
     fi
 
     if [ "${__list_changed}" = '1' ]; then
-        "${__smelt_render_bin}" --list-changed "${__size}"
+        __just_render "${__size}"
         if [ "${__last_size}" = '0' ]; then
             echo
         fi
