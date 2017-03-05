@@ -1400,29 +1400,9 @@ Won't create \".${__config//.\/xml/}\""
 
                 wait
 
-                if [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
+                if [ "$(__get_value "${__config}" IMAGE)" = 'YES' ] && [ "${__will_optimize}" = '1' ]; then
 
-                    __native_size="$(__get_value "${__config}" NATIVESIZE)"
-
-                    if ! [ -z "${__native_size}" ]; then
-
-                        __format_text "\e[36m${__size}\e[39m" "Resizing \".${__config//.\/xml/}\" to ${__size}px" ""
-
-                        if [ "$(__oext "./${__orig_config_name}")" = 'png' ]; then
-                            __resize "$(echo "${__tmp_size}/${__native_size}" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')" "./${__orig_config_name}" "${__tmp_dir}/tmp_img.png"
-
-                            mv "${__tmp_dir}/tmp_img.png" "./${__orig_config_name}"
-                        else
-                            __force_warn "File \"./${__orig_config_name}\" is marked as an image, but is not a PNG file"
-                        fi
-
-                    fi
-
-                    if [ "${__will_optimize}" = '1' ]; then
-
-                        __optimize "./${__orig_config_name}"
-
-                    fi
+                    __optimize "./${__orig_config_name}"
 
                 fi
 
