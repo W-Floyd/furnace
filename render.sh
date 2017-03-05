@@ -631,16 +631,18 @@ __pushd ./src/xml/
 # For every xml file,
 while read -r __xml; do
 
-    __tmp_deps="$(__get_value "${__xml}" DEPENDS | grep -v '^$')"
+    __tmp_deps="$({ __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG; } | sort | uniq | grep -v '^$')"
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    for __line in ${__tmp_deps}; do
+    echo "${__tmp_deps}" | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
 # Finish loop
 done < "${__list_file}"
+
+cp "${__dep_list_tsort}" "${__dep_list_tsort}_original"
 
 tsort "${__dep_list_tsort}" | tac > "${__dep_list_tsort}_"
 

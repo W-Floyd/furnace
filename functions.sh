@@ -29,15 +29,20 @@ sed 's|\(.*\)\(\.\)\(.*\)|\3|' <<< "$1"
 
 ###############################################################
 #
-# __lsdir
+# __lsdir <DIR>
 #
 # List directories
-# Lists all directories in the current folder
+# Lists all directories in the current folder, or specified
+# folder
 #
 ###############################################################
 
 __lsdir () {
-find -maxdepth 1 -type d | grep -v '^\.$' | sed 's#^\./##' | sort
+if [ -z "${1}" ]; then
+    find . -maxdepth 1 -mindepth 1 -type d | sort
+else
+    find "${1}" -maxdepth 1 -mindepth 1 -type d | sort
+fi
 }
 
 ###############################################################
