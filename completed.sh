@@ -6,9 +6,8 @@ __catalogue="${1}"
 for __range in $(__get_range "${__catalogue}" ITEM); do
 
 __read_range "${__catalogue}" "${__range}" > "/tmp/readrangetmp"
-__get_value "/tmp/readrangetmp" KEEP > "/tmp/keeptmp"
 
-touch "/tmp/keeptmp" "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
+touch "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
 
 if [ "$(__get_value "/tmp/readrangetmp" KEEP)" = 'YES' ]; then
 
@@ -32,6 +31,6 @@ as well as ${__un_named} un-named items, with raw values:
 
 $(sort "/tmp/nametmp")"
 
-rm "/tmp/keeptmp" "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
+rm "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
 
 exit
