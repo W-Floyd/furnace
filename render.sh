@@ -1287,8 +1287,12 @@ if [ "${__list_changed}" = '1' ]; then
     else
         __force_announce "Changes to \"${__size}\":"
         echo "${__changed}" | while read -r __change; do
-            __force_announce "File \"${__change}\" has changed."
+            __format_text "\e[36m${__size}\e[39m" "File \"${__change}\" has changed." ""
         done
+    fi
+
+    if [ -d "${__pack_new}" ]; then
+        rm -r "${__pack_new}"
     fi
 
 else
