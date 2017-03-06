@@ -17,7 +17,12 @@ __tmp_dir="$(pwd)/tmp/${__pid}"
 
 # Script to use for mobile conversion. No default currently,
 # will disable mobile conversion if missing
-__smelt_make_mobile_bin='./convert_to_mobile.sh'
+#__smelt_make_mobile_bin='./convert_to_mobile.sh'
+
+# Custom functions to use. Please follow the same format as the
+# standard functions.sh file. May include both image functions
+# and any other you find you need when rendering images
+#__custom_function_bin='./functions.sh'
 
 # Whether or not to render in quick mode (if applicable).
 # Defaults to quick mode if missing
@@ -30,7 +35,7 @@ __should_optimize='1'
 __max_optimize='512'
 
 # Whether or not to ignore the max optimize size
-__ignore_max_optimize='1'
+#__ignore_max_optimize='1'
 
 ################################################################
 # Stop customizing from here

@@ -8,7 +8,11 @@ __name
 __sizes  
 __tmp_dir  
 __smelt\_make\_mobile_bin  
+__custom\_function\_bin  
 __quick  
+__should_optimize  
+__max_optimize  
+__ignore\_max\_optimize  
 
 The following variables may be used:
 __pid

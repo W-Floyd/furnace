@@ -29,8 +29,16 @@ if [ -z "${__smelt_image_functions_bin}" ]; then
     export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
 fi
 
+if ! [ -z "${__custom_function_bin}" ]; then
+    if [ -e "${__custom_function_bin}" ]; then
+        source "${__custom_function_bin}" &> /dev/null || "Failed to load custom functions \"${__custom_function_bin}\""
+    else
+        __error "Custom functions file \"${__custom_function_bin}\" is missing"
+    fi
+fi
+
 # get functions from file
-source "${__smelt_image_functions_bin}" &> /dev/null || { __error "Failed to load image functions \"${__smelt_image_functions_bin}\""; }
+source "${__smelt_image_functions_bin}" &> /dev/null || __error "Failed to load image functions \"${__smelt_image_functions_bin}\""
 
 __standard_conf_dir='/usr/share/smelt/conf'
 
