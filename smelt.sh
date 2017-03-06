@@ -25,10 +25,12 @@ __should_optimize='0'
 __no_optimize='0'
 __ignore_max_optimize='0'
 
-export __smelt_functions_bin='/usr/share/smelt/smelt_functions.sh'
-export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
-export __smelt_render_bin='/usr/share/smelt/smelt_render.sh'
-export __smelt_completed_bin='/usr/share/smelt/smelt_completed.sh'
+export __run_dir="$(dirname "$(readlink -f "${0}")")"
+
+export __smelt_functions_bin="${__run_dir}/smelt_functions.sh"
+export __smelt_image_functions_bin="${__run_dir}/smelt_image_functions.sh"
+export __smelt_render_bin="${__run_dir}/smelt_render.sh"
+export __smelt_completed_bin="${__run_dir}/smelt_completed.sh"
 export __catalogue='catalogue.xml'
 
 # Print help

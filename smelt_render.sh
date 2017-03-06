@@ -25,8 +25,12 @@ PS4='Line ${LINENO}: '
 # Setting up functions
 ###############################################################
 
+if [ -z "${__run_dir}" ]; then
+    __error "Running directory has not been set for some reason"
+fi
+
 if [ -z "${__smelt_image_functions_bin}" ]; then
-    export __smelt_image_functions_bin='/usr/share/smelt/smelt_image_functions.sh'
+    export __smelt_image_functions_bin="${__run_dir}/smelt_image_functions.sh"
 fi
 
 if ! [ -z "${__custom_function_bin}" ]; then
@@ -40,7 +44,7 @@ fi
 # get functions from file
 source "${__smelt_image_functions_bin}" &> /dev/null || __error "Failed to load image functions \"${__smelt_image_functions_bin}\""
 
-__standard_conf_dir='/usr/share/smelt/conf'
+__standard_conf_dir="${__run_dir}/conf"
 
 # temporary timer for quick timing
 __time_var='temporary timer'

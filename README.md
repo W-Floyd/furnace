@@ -3,18 +3,13 @@
 
 ![Logo](https://github.com/W-Floyd/smelt/raw/master/logo.png)
 
-From this directory, run:
+cd into an appropriate folder, then run:
 
 ```
-sudo mkdir -p /usr/share/smelt  
-sudo ln -s "$(pwd)/make-pack.sh" "/usr/share/smelt/smelt.sh"  
-sudo ln -s "/usr/share/smelt/smelt.sh" "/usr/bin/smelt"  
-sudo ln -s "$(pwd)/functions.sh" "/usr/share/smelt/smelt\_functions.sh"  
-sudo ln -s "$(pwd)/image\_functions.sh" "/usr/share/smelt/smelt\_image\_functions.sh"  
-sudo ln -s "$(pwd)/render.sh" "/usr/share/smelt/smelt_render.sh"  
-sudo ln -s "$(pwd)/completed.sh" "/usr/share/smelt/smelt_completed.sh"  
+git clone https://github.com/W-Floyd/smelt.git
+cd smelt
+sudo ln -s "$(pwd)/smelt.sh" "/usr/bin/smelt"  
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
-sudo ln -s "$(pwd)/conf" '/usr/share/smelt/conf'  
 ```
 
 Requires:
