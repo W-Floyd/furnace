@@ -477,7 +477,10 @@ for __size in ${__sizes}; do
     else
 
         if [ "${__size}" -gt "${__max_optimize}" ] && [ "${__ignore_max_optimize}" = '0' ] && [ "${__should_optimize}" = '1' ]; then
-            __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+
+            if [ "${__verbose}" = '1' ]; then
+                __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+            fi
         fi
 
         __sub_loop "${__size}"
