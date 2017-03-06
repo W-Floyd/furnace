@@ -1079,7 +1079,7 @@ touch "${__rendered_list}"
 # Combine and sort all changed source and changed xml files (also new)
 __changed_both="${__tmp_dir}/changed_all"
 touch "${__changed_both}"
-sort "${__changed_source}" "${__changed_xml}" "${__new_split_source_list}" "${__new_split_xml_list}" | uniq > "${__changed_both}"
+sort "${__changed_source}" "${__changed_xml}" "${__new_split_source_list}" "${__new_split_xml_list}" | uniq | grep -v '^$' > "${__changed_both}"
 
 # Combine and sort all unchanged source and unchanged xml files
 __unchanged_both="${__tmp_dir}/unchanged_both"
@@ -1137,6 +1137,20 @@ rm "./${__pack}/.${__optimize_file}"
 #
 ################################################################
 
+__pushd "${__pack}"
+
+while read -r __xml; do
+
+    if ! [ -e "${__xml}" ]; then
+
+        echo "${__xml}" >> "${__check_list}"
+
+    fi
+
+done < "${__list_file}"
+
+__popd
+
 # Get into the dependency folder
 __pushd "${__dep_list_folder}"
 
@@ -1153,7 +1167,7 @@ find . -type f -exec cat {} + | sort | uniq > "${__all_deps}"
 __popd
 
 # List any files in the dep list that are not on the file list
-grep -Fxvf "${__list_file}" "${__all_deps}" > "${__check_list}"
+grep -Fxvf "${__list_file}" "${__all_deps}" >> "${__check_list}"
 
 # Get into the source directory
 __pushd ./src
