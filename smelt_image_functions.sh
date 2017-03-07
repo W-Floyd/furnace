@@ -86,6 +86,87 @@ __gimp_sub "${1}" &> /dev/null
 }
 
 ###############################################################
+# Optimizer Functions
+###############################################################
+#
+# In all cases:
+# __optimize_<OPTIMIZER> <IMAGE.png>
+#
+# <OPTIMIZER> Optimize
+# Accepts a PNG file as an input, optimizes with <OPTIMIZER> and
+# replaces if smaller.
+#
+###############################################################
+
+# with -nc set, it is loaded perfectly by Minecraft
+__optimize_optipng () {
+optipng -nc -strip all -silent "${1}"
+}
+
+# untested in minecraft yet
+__optimize_pngcrush () {
+local __tmpname="/tmp/$$)"
+local __file="${1}"
+
+pngcrush -force -blacken "${__file}" "${__tmpname}" &> /dev/null
+
+__oldsize="$(stat "${__file}" -c %s)"
+__newsize="$(stat "${__tmpname}" -c %s)"
+
+if [ "${__newsize}" -lt "${__oldsize}" ]; then
+    mv "${__tmpname}" "${__file}"
+else
+    rm "${__tmpname}"
+fi
+}
+
+# untested in minecraft yet
+__optimize_zopflipng () {
+local __tmpname="/tmp/$$)"
+local __file="${1}"
+
+zopflipng -q --lossy_transparent --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
+
+__oldsize="$(stat "${__file}" -c %s)"
+__newsize="$(stat "${__tmpname}" -c %s)"
+
+if [ "${__newsize}" -lt "${__oldsize}" ]; then
+    mv "${__tmpname}" "${__file}"
+else
+    rm "${__tmpname}"
+fi
+}
+
+###############################################################
+#
+# __choose_optimizer
+#
+# Choose an optimizer
+# Chooses an optimizer from a list, based on order, then
+# availability
+#
+###############################################################
+
+__choose_optimizer () {
+local __possible_optimizers='optipng
+zopflipng
+pngcrush'
+
+while read -r __possible_optimizer; do
+
+    if __check_optimizer "${__possible_optimizer}"; then
+        __optimizer="${__possible_optimizer}"
+        break
+    fi
+
+done <<< "${__possible_optimizers}"
+
+if [ -z "${__optimizer}" ]; then
+    __error "No valid optimizer is available"
+fi
+}
+
+###############################################################
 #
 # __optimize <IMAGE.png>
 #
@@ -97,8 +178,19 @@ __gimp_sub "${1}" &> /dev/null
 ###############################################################
 
 __optimize () {
+
+if [ -z "${__optimizer}" ]; then
+    __choose_optimizer
+fi
+
 if [ "$(__oext "${1}")" = 'png' ]; then
-    optipng -nc -strip all -silent "${1}"
+
+    if __check_optimizer "${__optimizer}"; then
+        __optimize_${__optimizer} "${1}"
+    else
+        __error "Optimizer \"${__optimizer}\" is not valid"
+    fi
+
 else
     __force_warn "File \"${1}\" cannot be optimized."
 fi

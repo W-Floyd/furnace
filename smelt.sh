@@ -24,14 +24,13 @@ __last_size='0'
 __should_optimize='0'
 __no_optimize='0'
 __ignore_max_optimize='0'
+__re_optimize='0'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
+export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
 
-export __smelt_functions_bin="${__run_dir}/smelt_functions.sh"
-export __smelt_image_functions_bin="${__run_dir}/smelt_image_functions.sh"
-export __smelt_render_bin="${__run_dir}/smelt_render.sh"
-export __smelt_completed_bin="${__run_dir}/smelt_completed.sh"
-export __catalogue='catalogue.xml'
+# get set up
+source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
 
 # Print help
 __usage () {
@@ -42,45 +41,32 @@ default list of sizes). Order of options and size(s) are not
 important.
 
 Options:
-  -h  --help  -?        This help message
-  -v  --verbose         Be verbose
-  -i  --install         Install or update .minecraft folder copy
-  -m  --mobile          Make mobile resource pack as well
-  -s  --slow            Use Inkscape instead of rsvg-convert
-  -t  --time            Time functions (for debugging)
-  -d  --debug           Use debugging mode
-  -l  --lengthy         Very verbose debugging mode
-  -f  --force           Discard pre-rendered data
-  -q  --quiet           No output
-  -w  --warn            Show warnings
-  -c  --compress        Actually compress zip files
-  -x  --force-xml       Force resplitting of xml files
-  -o  --optimize        Optimize final PNG files
-  --no-optimize         Do not optimize final PNG files
-  --max-optimize=SIZE   Max size to optimize
-  --force-optimize      Optimize any size of final PNG files
-  --completed           List completed textures, according to
-                        the COMMON field in the catalogue
-  --changed             List ITEMS changed since last render\
+  -h  --help  -?            This help message
+  -v  --verbose             Be verbose
+  -i  --install             Install to ~/.minecraft folder
+  -m  --mobile              Make mobile resource pack as well
+  -s  --slow                Use Inkscape instead of rsvg-convert
+  -t  --time                Time functions (for debugging)
+  -d  --debug               Use debugging mode
+  -l  --lengthy             Very verbose debugging mode
+  -f  --force-render        Discard pre-rendered data
+  -q  --quiet               No output
+  -w  --warn                Show warnings
+  -c  --compress            Actually compress zip files
+  -x  --force-xml           Force resplitting of xml files
+  -o  --optimize            Optimize final PNG files
+  --no-optimize             Do not optimize final PNG files
+  --max-optimize <SIZE>     Max size to optimize
+  --force-optimize          Optimize any size of final PNG files
+  --force-max-optimize      Ensure max-optimize is obeyed
+  --re-optimize             Re-process and re-optimize files
+                            appropriately
+  --optimizer <OPTIMIZER>   Optimize with specified optimizer
+  --completed               List completed textures, according
+                            to the COMMON field in the catalogue
+  --changed                 List ITEMS changed since last render\
 "
 }
-
-################################################################
-
-# get functions from file
-source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions \"${__smelt_functions_bin}\""; exit 1; }
-
-################################################################
-
-if ! [ -e 'config.sh' ]; then
-    __force_warn "No config file was found, using default values"
-else
-    if [ "$(head -n 1 'config.sh')" = '#smeltconfig#' ]; then
-        source 'config.sh' || __error "Config file has an error"
-    else
-        __error "Config does not have correct header \"#smeltconfig#\""
-    fi
-fi
 
 ################################################################
 
@@ -131,7 +117,7 @@ while ! [ "${#}" = '0' ]; do
             __debug='1'
             ;;
 
-        "f" | "--force")
+        "f" | "--force-render")
             __force='1'
             ;;
 
@@ -173,15 +159,22 @@ while ! [ "${#}" = '0' ]; do
             __no_optimize='1'
             ;;
 
-        "--max-optimize=" | "--max-optimize="[0-9]*)
-            __max_optimize="$(echo "${1}" | sed 's/.*=//')"
-            if [ -z "${__max_optimize}" ]; then
-                __error "No maximum optimize size was given"
-            fi
+        "--max-optimize")
+            ;;
+
+        "--force-max-optimize")
+            __ignore_max_optimize='0'
             ;;
 
         "--force-optimize")
             __ignore_max_optimize='1'
+            ;;
+
+        "--re-optimize")
+            __re_optimize='1'
+            ;;
+
+        "--optimizer")
             ;;
 
         [0-9]*)
@@ -206,37 +199,77 @@ ${1}"
 
     }
 
-    if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
+    case "${__last_option}" in
 
-        __check_input "${1}"
+        "--max-optimize")
 
-    elif echo "${1}" | grep '^--.*' &> /dev/null; then
+            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
 
-        __check_input "${1}"
+                __max_optimize="${1}"
 
-    elif echo "${1}" | grep '^-.*' &> /dev/null; then
+            else
 
-        __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
+                __error "Given input is not a size"
 
-        for __letter in ${__letters}; do
+            fi
 
-            __check_input "${__letter}"
+            ;;
 
-        done
+        "--optimizer")
 
-    else
-        __check_input "${1}"
-    fi
+            if __check_optimizer "${1}"; then
 
-    if [ "${?}" = '77' ]; then
-        exit
-    fi
+                __optimizer="${1}"
+
+            else
+
+                __error "Given input is not a valid optimizer"
+
+            fi
+
+            ;;
+
+        *)
+
+            if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
+
+                __check_input "${1}"
+
+            elif echo "${1}" | grep '^--.*' &> /dev/null; then
+
+                __check_input "${1}"
+
+            elif echo "${1}" | grep '^-.*' &> /dev/null; then
+
+                __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
+
+                for __letter in ${__letters}; do
+
+                    __check_input "${__letter}"
+
+                done
+
+            else
+                __check_input "${1}"
+            fi
+
+            if [ "${?}" = '77' ]; then
+                exit
+            fi
+
+            ;;
+
+    esac
+
+    __last_option="${1}"
 
     shift
 
 done
 
 fi
+
+__last_option=''
 
 ################################################################
 
@@ -328,6 +361,10 @@ fi
 
 if [ "${__no_optimize}" = '1' ] || [ "${__ignore_max_optimize}" = '0' -a "${1}" -gt "${__max_optimize}" ]; then
     __options="${__options} --no-optimize"
+fi
+
+if [ "${__re_optimize}" = '1' ] && [ "${__should_optimize}" = '1' ]; then
+    __options="${__options} --re-optimize"
 fi
 
 if [ "${__dry}" = '1' ]; then
@@ -463,6 +500,11 @@ if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && !
 fi
 
 }
+
+if ! [ -z "${__optimizer}" ] && [ "${__should_optimize}" = '1' ] && [ "${__verbose}" = '1' ]; then
+    __announce "Using optimizer \"${__optimizer}\""
+    echo
+fi
 
 for __size in ${__sizes}; do
     if [ "${__size}" = "${__final_size}" ]; then

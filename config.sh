@@ -37,6 +37,12 @@ __max_optimize='512'
 # Whether or not to ignore the max optimize size
 #__ignore_max_optimize='1'
 
+# What optimizer to use. May be a custom optimizer, so long as a
+# function names __optimize_<OPTIMIZER> exists, and replaces the
+# given file. Defaults to an existing optimizer, selected from a
+# list and by availability
+#__optimizer='zopflipng'
+
 ################################################################
 # Stop customizing from here
 ################################################################

@@ -19,6 +19,7 @@ __should_warn='0'
 __dry='0'
 __list_changed='0'
 __should_optimize='0'
+__re_optimize='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -28,21 +29,6 @@ PS4='Line ${LINENO}: '
 if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
 fi
-
-if [ -z "${__smelt_image_functions_bin}" ]; then
-    export __smelt_image_functions_bin="${__run_dir}/smelt_image_functions.sh"
-fi
-
-if ! [ -z "${__custom_function_bin}" ]; then
-    if [ -e "${__custom_function_bin}" ]; then
-        source "${__custom_function_bin}" &> /dev/null || "Failed to load custom functions \"${__custom_function_bin}\""
-    else
-        __error "Custom functions file \"${__custom_function_bin}\" is missing"
-    fi
-fi
-
-# get functions from file
-source "${__smelt_image_functions_bin}" &> /dev/null || __error "Failed to load image functions \"${__smelt_image_functions_bin}\""
 
 __standard_conf_dir="${__run_dir}/conf"
 
@@ -235,6 +221,9 @@ while ! [ "${#}" = '0' ]; do
                     __should_optimize='0'
                     ;;
 
+                "--re-optimize")
+                    __re_optimize='1'
+                    ;;
 
 # general catch all for any number input that isn't for the PID
 # which is set as the render size,
@@ -1120,7 +1109,15 @@ if [ "${__should_optimize}" = '1' ]; then
 # Make sure the files yet to be optimized are added to the list
 # of changed files
 
-    grep -Fxvf "./${__pack}/.${__optimize_file}" "${__optimize_list}" >> "${__changed_both}"
+    if [ "${__re_optimize}" = '1' ]; then
+
+        cat "${__optimize_list}" >> "${__changed_both}"
+
+    else
+
+        grep -Fxvf "./${__pack}/.${__optimize_file}" "${__optimize_list}" >> "${__changed_both}"
+
+    fi
 
 else
 

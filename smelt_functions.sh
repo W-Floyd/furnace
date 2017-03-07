@@ -394,7 +394,7 @@ fi
 ###############################################################
 
 __custom_error () {
-__format_text "\e[31mERRO\e[39m" "${1}" ", exiting." 1>&2
+__format_text "\e[31mERRO\e[39m" "${1}" "${2}" 1>&2
 }
 
 ###############################################################
@@ -407,7 +407,7 @@ __format_text "\e[31mERRO\e[39m" "${1}" ", exiting." 1>&2
 ###############################################################
 
 __error () {
-__custom_error "${1}"
+__custom_error "${1}" ", exiting."
 exit 1
 }
 
@@ -487,6 +487,37 @@ __log2 () {
         let x=$x+1
     done
     echo $x
+}
+
+###############################################################
+#
+# __check_optimizer <OPTIMIZER>
+#
+# Check Optimizer
+# Checks that an optimizer exists, and an appropriate function
+# for it exists. Returns 0 on success, 1 on failure
+#
+###############################################################
+
+__check_optimizer () {
+if which "${1}" &> /dev/null && [ "$(type -t "__optimize_${1}")" = 'function' ]; then
+    return 0
+else
+    return 1
+fi
+}
+
+###############################################################
+#
+# __list_optimizers
+#
+# List Optimizers
+# Lists optimizers that exist, both custom and standard
+#
+###############################################################
+
+__list_optimizers () {
+compgen -A function | grep '^__optimize_' | sort | sed 's/__optimize_//'
 }
 
 ###############################################################
