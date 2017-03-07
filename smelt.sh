@@ -137,6 +137,7 @@ while ! [ "${#}" = '0' ]; do
 
         "--silent")
             __silent='1'
+            __quiet='1'
             ;;
 
         "w" | "--warn")
@@ -525,7 +526,7 @@ if [ "${__install}" = '1' ]; then
 
 fi
 
-if [ "${__silent}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
+if [ "${__quiet}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
     echo
 fi
 

@@ -1462,7 +1462,7 @@ Won't create \".${__config//.\/xml/}\""
                 __render_num=$((__render_num+1))
 
                 if [ "${__show_progress}" = '1' ]; then
-                    __format_text "\e[35mPROG\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
+                    __format_text "\e[36m${__size}\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
                 fi
 
                 wait
