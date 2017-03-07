@@ -1375,6 +1375,8 @@ trap __set_break_loop SIGINT
 # while the render list has lines to process,
 while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
+    __render_num=$((__render_num+1))
+
     __will_optimize='0'
 
 # set the original name of the config file
@@ -1463,8 +1465,6 @@ Won't create \".${__config//.\/xml/}\""
 
                 fi
                 } &
-
-                __render_num=$((__render_num+1))
 
                 if [ "${__show_progress}" = '1' ]; then
                     __format_text "\e[36m${__size}\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
