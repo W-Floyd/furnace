@@ -1375,8 +1375,6 @@ trap __set_break_loop SIGINT
 # while the render list has lines to process,
 while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
-    __render_num=$((__render_num+1))
-
     __will_optimize='0'
 
 # set the original name of the config file
@@ -1413,6 +1411,8 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
 # get the name of the config script, and replace any macro locations
         __config_script="$(__get_value "${__config}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#")"
+
+        __render_num=$((__render_num+1))
 
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
