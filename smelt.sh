@@ -11,6 +11,7 @@ __quick='1'
 __time='0'
 __force='0'
 __debug='0'
+__quiet='0'
 __silent='0'
 __should_warn='0'
 __use_custom_size='0'
@@ -25,6 +26,7 @@ __should_optimize='0'
 __no_optimize='0'
 __ignore_max_optimize='0'
 __re_optimize='0'
+__show_progress='1'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
@@ -50,7 +52,9 @@ Options:
   -d  --debug               Use debugging mode
   -l  --lengthy             Very verbose debugging mode
   -f  --force-render        Discard pre-rendered data
-  -q  --quiet               No output
+  -q  --quiet               No output unless specified
+      --silent              No output at all
+      --no-progress         Do not show a progress report
   -w  --warn                Show warnings
   -c  --compress            Actually compress zip files
   -x  --force-xml           Force resplitting of xml files
@@ -62,6 +66,7 @@ Options:
   --re-optimize             Re-process and re-optimize files
                             appropriately
   --optimizer <OPTIMIZER>   Optimize with specified optimizer
+  --name <NAME>             Name to use when processing a pack
   --completed               List completed textures, according
                             to the COMMON field in the catalogue
   --changed                 List ITEMS changed since last render\
@@ -87,9 +92,13 @@ while ! [ "${#}" = '0' ]; do
             exit 77
             ;;
 
+        "--no-progress")
+            __show_progress='0'
+            ;;
+
         "v" | "--verbose")
             __verbose='1'
-            __silent='0'
+            __quiet='0'
             ;;
 
         "l" | "--lengthy")
@@ -122,8 +131,12 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         "q" | "--quiet")
-            __silent='1'
+            __quiet='1'
             __verbose='0'
+            ;;
+
+        "--silent")
+            __silent='1'
             ;;
 
         "w" | "--warn")
@@ -177,6 +190,9 @@ while ! [ "${#}" = '0' ]; do
         "--optimizer")
             ;;
 
+        "--name")
+            ;;
+
         [0-9]*)
             if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
                 __use_custom_size='1'
@@ -226,6 +242,12 @@ ${1}"
                 __error "Given input is not a valid optimizer"
 
             fi
+
+            ;;
+
+        "--name")
+
+            __name="${1}"
 
             ;;
 
@@ -355,8 +377,16 @@ if [ "${__should_optimize}" = '1' ]; then
     __options="${__options} -o"
 fi
 
+if [ "${__show_progress}" = '1' ]; then
+    __options="${__options} --progress"
+fi
+
 if [ "${__list_changed}" = '1' ]; then
     __options="${__options} --list-changed"
+fi
+
+if [ "${__quiet}" = '1' ]; then
+        __options="${__options} --quiet"
 fi
 
 if [ "${__no_optimize}" = '1' ] || [ "${__ignore_max_optimize}" = '0' -a "${1}" -gt "${__max_optimize}" ]; then

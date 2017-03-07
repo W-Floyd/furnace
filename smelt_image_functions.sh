@@ -98,7 +98,7 @@ __gimp_sub "${1}" &> /dev/null
 #
 ###############################################################
 
-# with -nc set, it is loaded perfectly by Minecraft
+# with -nc set, it seems to be loaded perfectly by Minecraft
 __optimize_optipng () {
 optipng -nc -strip all -silent "${1}"
 }
@@ -120,7 +120,7 @@ else
 fi
 }
 
-# untested in minecraft yet
+# seems to be loaded perfectly by Minecraft
 __optimize_zopflipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"

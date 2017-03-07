@@ -20,6 +20,11 @@ _smelt () {
             return 0
             ;;
 
+        '--name')
+            COMPREPLY=($(compgen -W "$(basename "$(pwd)" | rev | sed -e 's/.*-//' -e 's/.*_//' -e 's/.*\.//' | rev)" -- "${cur}"))
+            return 0
+            ;;
+
     esac
 
     case "${cur}" in

@@ -5,6 +5,7 @@
 ###############################
 
 __size='128'
+__quiet='0'
 __verbose='0'
 __very_verbose='0'
 __force='0'
@@ -20,11 +21,15 @@ __dry='0'
 __list_changed='0'
 __should_optimize='0'
 __re_optimize='0'
+__show_progress='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
 # Setting up functions
 ###############################################################
+
+# get set up
+source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
 
 if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
@@ -47,6 +52,7 @@ Order of options and size are not important.
 
 Options:
   -h  --help  -?        This help message
+      --progress        Show a progress report
   -f  --force           Discard pre-rendered data
   -v  --verbose         Verbose
   -p  --process-id      Using PID as given after
@@ -60,7 +66,8 @@ Options:
   -t  --time            Time operations (for debugging)
   -w  --warn            Show warnings
   -o  --optimize        Optimize final PNG files
-      --no-optimize     Do not optimize final PNG files\
+      --no-optimize     Do not optimize final PNG files
+      --quiet           No output unless specified\
 "
 }
 
@@ -78,12 +85,6 @@ __stop_debugging () {
 
 # Master folder
 __working_dir="$(pwd)"
-
-if ! [ -e 'config.sh' ]; then
-    __warn "No config file was found, using default values"
-else
-    source 'config.sh' || __error "Config file has an error"
-fi
 
 ###############################################################
 # Read options
@@ -128,6 +129,15 @@ while ! [ "${#}" = '0' ]; do
                 "-h" | "--help" | "-?")
                     __usage
                     exit 0
+                    ;;
+
+# Whether or not to show a progress indicator
+                "--progress")
+                    __show_progress='1'
+                    ;;
+
+                "--quiet")
+                    __quiet='1'
                     ;;
 
 # let the script and user know it should and will force rendering,
@@ -1343,6 +1353,9 @@ __break_loop='0'
 
 __time "Rendered ${__size}px" start
 
+__process_count="$(cat "${__render_list}" | wc -l)"
+__render_num='0'
+
 # get into the pack folder, ready to render
 __pushd "${__pack}"
 
@@ -1421,23 +1434,38 @@ Won't create \".${__config//.\/xml/}\""
                     __leader="Processing"
                 fi
 
+                if [ "${__show_progress}" = '1' ] && ! [ "${__render_num}" = '0' ]; then
+# Clears last line
+                    tput cuu 1 && tput el
+                fi
+
 # announce that we are processing the given config
-                __format_text "\e[36m${__size}\e[39m" "${__leader} \".${__config//.\/xml/}\"" ""
+                if [ "${__quiet}" = '0' ]; then
+                    __format_text "\e[36m${__size}\e[39m" "${__leader} \".${__config//.\/xml/}\"" ""
+                fi
 
 # copy the config script out so we can use it
                 cp "${__config_script}" ./
 
 # execute the script, given the determined size and options set
 # in the config
-                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ') &
-
-                wait
+                {
+                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ')
 
                 if [ "$(__get_value "${__config}" IMAGE)" = 'YES' ] && [ "${__will_optimize}" = '1' ]; then
 
                     __optimize "./${__orig_config_name}"
 
                 fi
+                } &
+
+                __render_num=$((__render_num+1))
+
+                if [ "${__show_progress}" = '1' ]; then
+                    __format_text "\e[35mPROG\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
+                fi
+
+                wait
 
 # remove the script now we're done with it
                 rm "$(basename "${__config_script}")"
