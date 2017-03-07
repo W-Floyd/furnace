@@ -1354,6 +1354,11 @@ __break_loop='0'
 __time "Rendered ${__size}px" start
 
 __process_count="$(cat "${__render_list}" | wc -l)"
+
+if [ "${__process_count}" = '0' ] && [ "${__quiet}" = '1' ]; then
+    __bypass_announce "No changes to \"${__size}\""
+fi
+
 __render_num='0'
 
 # get into the pack folder, ready to render

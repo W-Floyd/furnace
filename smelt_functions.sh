@@ -325,16 +325,29 @@ fi
 
 ###############################################################
 #
+# __bypass_announce <MESSAGE>
+#
+# Bypass Announce
+# Echos a statement no matter what
+#
+###############################################################
+
+__bypass_announce () {
+__format_text "\e[32mINFO\e[39m" "${1}" ""
+}
+
+###############################################################
+#
 # __force_announce <MESSAGE>
 #
-# Announce
-# Echos a statement
+# Force Announce
+# Echos a statement, when __quiet is equal to 0
 #
 ###############################################################
 
 __force_announce () {
 if [ "${__quiet}" = '0' ]; then
-    __format_text "\e[32mINFO\e[39m" "${1}" ""
+    __bypass_announce "${1}"
 fi
 }
 
