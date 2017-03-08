@@ -125,7 +125,19 @@ __optimize_zopflipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
 
-zopflipng -q --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
+local __size="$(identify -format "%w*%h" "${__file}" | sed 's/$/\n/' | bc)"
+local __small='1024'
+local __large='262144'
+
+if ! [ "${__size}" -gt "${__small}" ]; then
+    local __options='-m'
+elif [ "${__size}" -gt "${__large}" ]; then
+    local __options='-q'
+else
+    local __options=''
+fi
+
+zopflipng ${__options} --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
 
 __oldsize="$(stat "${__file}" -c %s)"
 __newsize="$(stat "${__tmpname}" -c %s)"
