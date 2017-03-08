@@ -125,7 +125,7 @@ __optimize_zopflipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
 
-zopflipng -q --lossy_transparent --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
+zopflipng -q --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
 
 __oldsize="$(stat "${__file}" -c %s)"
 __newsize="$(stat "${__tmpname}" -c %s)"
