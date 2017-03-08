@@ -1441,7 +1441,11 @@ Won't create \".${__config//.\/xml/}\""
                     __leader="Processing"
                 fi
 
-                if [ "${__show_progress}" = '1' ] && ! [ "${__render_num}" = '0' ]; then
+                if [ "${__render_num}" = '1' ] && [ "${__show_progress}" = '1' ]; then
+                    echo
+                fi
+
+                if [ "${__show_progress}" = '1' ]; then
 # Clears last line
                     tput cuu 1 && tput el
                 fi
