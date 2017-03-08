@@ -4,6 +4,38 @@
 
 ###############################################################
 #
+# __pngchunks <FILE.png>
+#
+# Finds the chunks in a PNG file - currently being used to test
+# for changed colour profiles with zopflipng, since Minecraft is
+# borked, and doesn't like anything other than color_type 6
+#
+###############################################################
+
+__pngchunks () {
+identify -verbose "${1}" | pcregrep -M " Properties(\n|.)* Artifacts:" | sed -e '1d' -e '$d' | sed 's/ *//' | grep '^png'
+}
+
+###############################################################
+#
+# __minecraft_verify <FILE.png>
+#
+# Checks if an image has color_type's known not be to loaded
+# correctly by Minecraft. If all clear, returns 0, if failed, 1
+#
+###############################################################
+
+__minecraft_verify () {
+local __color_type="$(__pngchunks "${1}" | grep '^png:IHDR.color_type:' | sed 's/.* \(.\) .*/\1/')"
+if [ "${__color_type}" = '0' ] || [ "${__color_type}" = '4' ]; then
+    return 1
+else
+    return 0
+fi
+}
+
+###############################################################
+#
 # __vector_render <RES> <FILE.svg>
 #
 # Render Vector Image
@@ -98,20 +130,25 @@ __gimp_sub "${1}" &> /dev/null
 #
 ###############################################################
 
-# with -nc set, it seems to be loaded perfectly by Minecraft
+# with -nc set, it seems to be loaded perfectly by Minecraft,
+# because the color_type is retained
 __optimize_optipng () {
-optipng -nc -strip all -silent "${1}"
-}
-
-# untested in minecraft yet
-__optimize_pngcrush () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
 
-pngcrush -force -blacken "${__file}" "${__tmpname}" &> /dev/null
+local __size="$(identify -format "%w*%h" "${__file}" | sed 's/$/\n/' | bc)"
+local __small='1024'
+local __large='262144'
 
-__oldsize="$(stat "${__file}" -c %s)"
-__newsize="$(stat "${__tmpname}" -c %s)"
+if ! [ "${__size}" -gt "${__small}" ]; then
+    local __options='-o7'
+elif [ "${__size}" -gt "${__large}" ]; then
+    local __options='-o1'
+else
+    local __options='-o4'
+fi
+
+optipng ${__options} -strip all -nc -silent -force "${__file}" -out "${__tmpname}"
 
 if [ "${__newsize}" -lt "${__oldsize}" ]; then
     mv "${__tmpname}" "${__file}"
@@ -120,7 +157,31 @@ else
 fi
 }
 
-# seems to be loaded perfectly by Minecraft
+# Should be be okay with -noreduce, but is stupid and changes it
+# anyway, so it's checked for color_type correctness
+__optimize_pngcrush () {
+local __tmpname="/tmp/$$)"
+local __file="${1}"
+
+pngcrush -noreduce -force "${__file}" "${__tmpname}" &> /dev/null
+
+__oldsize="$(stat "${__file}" -c %s)"
+__newsize="$(stat "${__tmpname}" -c %s)"
+
+if [ "${__newsize}" -lt "${__oldsize}" ]; then
+    if __minecraft_verify "${__tmpname}"; then
+        mv "${__tmpname}" "${__file}"
+    else
+        rm "${__tmpname}"
+    fi
+else
+    rm "${__tmpname}"
+fi
+}
+
+# Is stupid and won't let us specify a color_type to force, so
+# we attempt to optimize anyway, then check the chunk, because
+# Minecraft is stupid and won't load greyscale images correctly
 __optimize_zopflipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
@@ -137,13 +198,17 @@ else
     local __options=''
 fi
 
-zopflipng ${__options} --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
+zopflipng ${__options} --keepchunks=gAMA --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
 
 __oldsize="$(stat "${__file}" -c %s)"
 __newsize="$(stat "${__tmpname}" -c %s)"
 
 if [ "${__newsize}" -lt "${__oldsize}" ]; then
-    mv "${__tmpname}" "${__file}"
+    if __minecraft_verify "${__tmpname}"; then
+        mv "${__tmpname}" "${__file}"
+    else
+        rm "${__tmpname}"
+    fi
 else
     rm "${__tmpname}"
 fi
