@@ -18,6 +18,7 @@ __use_custom_size='0'
 __dry='0'
 __compress='0'
 __clean_xml='0'
+__xml_only='0'
 __do_not_render='0'
 __list_completed='0'
 __list_changed='0'
@@ -58,6 +59,7 @@ Options:
   -w  --warn                Show warnings
   -c  --compress            Actually compress zip files
   -x  --force-xml           Force resplitting of xml files
+      --xml-only            Only split xml files
   -o  --optimize            Optimize final PNG files
   --no-optimize             Do not optimize final PNG files
   --max-optimize <SIZE>     Max size to optimize
@@ -76,6 +78,7 @@ Options:
 ################################################################
 
 __force_time "Rendered all" start
+__force_time "Processed XML" start
 
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
@@ -153,6 +156,10 @@ while ! [ "${#}" = '0' ]; do
             __clean_xml='1'
             ;;
 
+        "--xml-only")
+            __xml_only='1'
+            ;;
+
         "o" | "--optimize")
             __should_optimize='1'
             ;;
@@ -181,6 +188,7 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         "--force-optimize")
+            __should_optimize='1'
             __ignore_max_optimize='1'
             ;;
 
@@ -386,6 +394,10 @@ if [ "${__list_changed}" = '1' ]; then
     __options="${__options} --list-changed"
 fi
 
+if [ "${__xml_only}" = '1' ]; then
+    __options="${__options} --xml-only"
+fi
+
 if [ "${__quiet}" = '1' ]; then
         __options="${__options} --quiet"
 fi
@@ -537,32 +549,41 @@ if ! [ -z "${__optimizer}" ] && [ "${__should_optimize}" = '1' ] && [ "${__verbo
     echo
 fi
 
-for __size in ${__sizes}; do
-    if [ "${__size}" = "${__final_size}" ]; then
-        __last_size='1'
-    else
-        __last_size='0'
-    fi
+if [ "${__xml_only}" = '1' ]; then
+    __just_render 32
+else
 
-    if [ "${__list_changed}" = '1' ]; then
-        __just_render "${__size}"
-        if [ "${__last_size}" = '0' ]; then
-            echo
+    for __size in ${__sizes}; do
+        if [ "${__size}" = "${__final_size}" ]; then
+            __last_size='1'
+        else
+            __last_size='0'
         fi
-    else
 
-        if [ "${__size}" -gt "${__max_optimize}" ] && [ "${__ignore_max_optimize}" = '0' ] && [ "${__should_optimize}" = '1' ]; then
-
-            if [ "${__verbose}" = '1' ]; then
-                __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+        if [ "${__list_changed}" = '1' ]; then
+            __just_render "${__size}"
+            if [ "${__last_size}" = '0' ]; then
+                echo
             fi
+        else
+
+            if [ "${__size}" -gt "${__max_optimize}" ] && [ "${__ignore_max_optimize}" = '0' ] && [ "${__should_optimize}" = '1' ]; then
+
+                if [ "${__verbose}" = '1' ]; then
+                    __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+                fi
+            fi
+
+            __sub_loop "${__size}"
+
         fi
+    done
+fi
 
-        __sub_loop "${__size}"
-
-    fi
-done
-
-__force_time "Rendered all" end
+if [ "${__xml_only}" = '0' ]; then
+    __force_time "Rendered all" end
+else
+    __force_time "Processed XML" end
+fi
 
 exit

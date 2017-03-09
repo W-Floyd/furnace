@@ -136,19 +136,7 @@ __optimize_optipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
 
-local __size="$(identify -format "%w*%h" "${__file}" | sed 's/$/\n/' | bc)"
-local __small='1024'
-local __large='262144'
-
-if ! [ "${__size}" -gt "${__small}" ]; then
-    local __options='-o7'
-elif [ "${__size}" -gt "${__large}" ]; then
-    local __options='-o1'
-else
-    local __options='-o4'
-fi
-
-optipng ${__options} -strip all -nc -silent -force "${__file}" -out "${__tmpname}"
+optipng -strip all -nc -silent -force "${__file}" -out "${__tmpname}"
 
 local __oldsize="$(stat "${__file}" -c %s)"
 local __newsize="$(stat "${__tmpname}" -c %s)"
@@ -189,19 +177,7 @@ __optimize_zopflipng () {
 local __tmpname="/tmp/$$)"
 local __file="${1}"
 
-local __size="$(identify -format "%w*%h" "${__file}" | sed 's/$/\n/' | bc)"
-local __small='1024'
-local __large='262144'
-
-if ! [ "${__size}" -gt "${__small}" ]; then
-    local __options='-m'
-elif [ "${__size}" -gt "${__large}" ]; then
-    local __options='-q'
-else
-    local __options=''
-fi
-
-zopflipng ${__options} --keepchunks=gAMA --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
+zopflipng -q --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
 
 local __oldsize="$(stat "${__file}" -c %s)"
 local __newsize="$(stat "${__tmpname}" -c %s)"

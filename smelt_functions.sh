@@ -456,7 +456,7 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_change
     else
 
         if [ "${2}" = 'end' ]; then
-            __format_text "\e[32mTime\e[39m" "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds" ""
+            __format_text "\e[32mTIME\e[39m" "${1} in $(echo "$(eval 'echo '"\$__function_end_time${__message}"'')-$(eval 'echo '"\$__function_start_time${__message}"'')" | bc) seconds" ""
         elif ! [ "${2}" = 'start' ]; then
             __force_warn "Invalid input to __time, '${2}'"
         fi

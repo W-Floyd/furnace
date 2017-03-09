@@ -6,14 +6,14 @@ compgen -A variable > /tmp/tmpvars
 ################################################################
 
 # Name of the pack, defaults to folder name if missing
-__name='Pack'
+#__name='Pack'
 
 # Default render sizes
-__sizes='1 2 4 8 16 32 64 128 256 512 1024 2048 4096'
+#__sizes='1 2 4 8 16 32 64 128 256 512 1024 2048 4096'
 
 # Temporary directory to use. Defaults to /tmp/texpack${__pid}
 # if missing
-__tmp_dir="$(pwd)/tmp/${__pid}"
+#__tmp_dir="$(pwd)/tmp/${__pid}"
 
 # Script to use for mobile conversion. No default currently,
 # will disable mobile conversion if missing
@@ -26,21 +26,25 @@ __tmp_dir="$(pwd)/tmp/${__pid}"
 
 # Whether or not to render in quick mode (if applicable).
 # Defaults to quick mode if missing
-__quick='1'
+#__quick='1'
 
 # Whether or not the final images should be optimized
-__should_optimize='1'
+# Defaults to no optimization if missing
+#__should_optimize='1'
 
 # Largest size to optimize
-__max_optimize='512'
+# Defaults to 512 if missing
+#__max_optimize='512'
 
 # Whether or not to ignore the max optimize size
+# Defaults to off if missing
 #__ignore_max_optimize='1'
 
 # What optimizer to use. May be a custom optimizer, so long as a
 # function named __optimize_<OPTIMIZER> exists, and replaces the
 # given file. Defaults to an existing optimizer, selected from a
-# list and by availability
+# list and by availability. If available, optipng is first on
+# the list, due to compatability
 #__optimizer='zopflipng'
 
 ################################################################

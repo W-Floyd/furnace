@@ -1641,6 +1641,8 @@ cp "${__cleanup_all}" "./src/xml/${__cleanup_file}"
 
 cp "${__optimize_list}" "./src/xml/${__optimize_file}"
 
+if [ "${__xml_only}" = '0' ]; then
+
 if [ "${__should_optimize}" = '1' ]; then
 
     cp "${__optimize_list}" "./${__pack}/.${__optimize_file}"
@@ -1648,6 +1650,8 @@ if [ "${__should_optimize}" = '1' ]; then
 else
 
     echo '' > "./${__pack}/.${__optimize_file}"
+
+fi
 
 fi
 
