@@ -205,8 +205,8 @@ fi
 
 __choose_optimizer () {
 local __possible_optimizers='optipng
-zopflipng
-pngcrush'
+pngcrush
+zopflipng'
 
 while read -r __possible_optimizer; do
 
