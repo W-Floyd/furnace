@@ -214,9 +214,9 @@ exit 1
 
 __hash_folder () {
 if [ -z "${2}" ]; then
-__listing="$(find . -type f)"
+local __listing="$(find . -type f)"
 else
-__listing="$(find . -not -path "./${2}/*" -type f)"
+local __listing="$(find . -not -path "./${2}/*" -type f)"
 fi
 if ! [ -z "${__listing}" ]; then
     md5sum ${__listing} > "${1}"
@@ -301,22 +301,22 @@ __print_pad () {
 
 __format_text () {
 echo -ne "${1}"
-__desired_size='7'
-__leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
-__clipped_size=$((__desired_size-__leader_size-3))
-__front_pad="$(__print_pad "${__clipped_size}") - "
+local __desired_size='7'
+local __leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
+local __clipped_size=$((__desired_size-__leader_size-3))
+local __front_pad="$(__print_pad "${__clipped_size}") - "
 echo -ne "${__front_pad}"
-__pad=''
+local __pad=''
 if [ "$(echo "${2}" | wc -l)" -gt '1' ]; then
     echo "${2}" | head -n -1 | while read -r __line; do
         if [ -z "${__pad}" ]; then
             echo -e "${__pad}${__line}"
-            __pad="$(__print_pad "${__desired_size}")"
+            local __pad="$(__print_pad "${__desired_size}")"
         else
             echo -e "${__pad}${__line}"
         fi
     done
-    __pad="$(__print_pad "${__desired_size}")"
+    local __pad="$(__print_pad "${__desired_size}")"
     echo -e "${__pad}$(echo "${2}" | tail -n 1)${3}"
 else
     echo -e "${2}${3}"
@@ -437,7 +437,7 @@ exit 1
 ###############################################################
 
 __force_time () {
-__message="$(echo "${1}" | md5sum | sed 's/ .*//')"
+local __message="$(echo "${1}" | md5sum | sed 's/ .*//')"
 
 if [ -z "${2}" ] || [ -z "${1}" ]; then
     __force_warn "Missing option in time function."

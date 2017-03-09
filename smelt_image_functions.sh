@@ -150,6 +150,9 @@ fi
 
 optipng ${__options} -strip all -nc -silent -force "${__file}" -out "${__tmpname}"
 
+local __oldsize="$(stat "${__file}" -c %s)"
+local __newsize="$(stat "${__tmpname}" -c %s)"
+
 if [ "${__newsize}" -lt "${__oldsize}" ]; then
     mv "${__tmpname}" "${__file}"
 else
@@ -165,8 +168,8 @@ local __file="${1}"
 
 pngcrush -noreduce -force "${__file}" "${__tmpname}" &> /dev/null
 
-__oldsize="$(stat "${__file}" -c %s)"
-__newsize="$(stat "${__tmpname}" -c %s)"
+local __oldsize="$(stat "${__file}" -c %s)"
+local __newsize="$(stat "${__tmpname}" -c %s)"
 
 if [ "${__newsize}" -lt "${__oldsize}" ]; then
     if __minecraft_verify "${__tmpname}"; then
@@ -200,8 +203,8 @@ fi
 
 zopflipng ${__options} --keepchunks=gAMA --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
 
-__oldsize="$(stat "${__file}" -c %s)"
-__newsize="$(stat "${__tmpname}" -c %s)"
+local __oldsize="$(stat "${__file}" -c %s)"
+local __newsize="$(stat "${__tmpname}" -c %s)"
 
 if [ "${__newsize}" -lt "${__oldsize}" ]; then
     if __minecraft_verify "${__tmpname}"; then
@@ -466,7 +469,7 @@ composite -define png:color-type=6 -compose xor "${2}" "${1}" "${3}"
 ###############################################################
 
 __fade () {
-__tmptrans=$(echo '1/'"${3}" | bc)
+local __tmptrans=$(echo '1/'"${3}" | bc)
 convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -define png:color-type=6 "${2}"
 }
 
@@ -482,12 +485,12 @@ convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -defin
 
 __tile () {
 if ! [ -z "${4}" ]; then
-	__spacer="${4}"
+	local __spacer="${4}"
 else
-	__spacer=0
+	local __spacer=0
 fi
 
-__imgseq=$(for __tile in $(seq 1 "$(echo "${2}" | sed 's/x/\*/' | bc)"); do echo -n "${1} "; done)
+local __imgseq=$(for __tile in $(seq 1 "$(echo "${2}" | sed 's/x/\*/' | bc)"); do echo -n "${1} "; done)
 
 montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
 
@@ -537,31 +540,31 @@ convert "${1}" -crop "${2}x${2}+$(echo "${3}*${2}" | bc)+$(echo "${4}*${2}" | bc
 __rotate () {
 case "${2}" in
 	"0")
-		__angle="0"
+		local __angle="0"
 		;;
 	"1")
-		__angle="90"
+		local __angle="90"
 		;;
 	"2")
-		__angle="180"
+		local __angle="180"
 		;;
 	"3")
-		__angle="270"
+		local __angle="270"
 		;;
 	"4")
-		__angle="360"
+		local __angle="360"
 		;;
 	"-1")
-		__angle="270"
+		local __angle="270"
 		;;
 	"-2")
-		__angle="180"
+		local __angle="180"
 		;;
 	"-3")
-		__angle="90"
+		local __angle="90"
 		;;
 	"-4")
-		__angle="360"
+		local __angle="360"
 		;;
 esac
 
