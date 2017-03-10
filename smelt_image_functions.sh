@@ -486,6 +486,9 @@ fi
 # (e.g. '2x3'), second last is the spacer (e.g. '2'), last is
 # the output image.
 #
+# Example:
+# __custom_tile dirt.png grass.png plank.png plank.png 2x2 1 mash.png
+#
 ###############################################################
 
 __custom_tile () {
