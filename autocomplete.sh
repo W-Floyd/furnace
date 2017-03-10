@@ -8,6 +8,7 @@ _smelt () {
 
     case ${prev} in
         -'?'|-h|--help)
+            return 0
             ;;
 
         '--max-optimize')
