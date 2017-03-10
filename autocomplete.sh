@@ -4,7 +4,7 @@ _smelt () {
 
     rundir="$(dirname "$(readlink -f "$(which ${1})")")"
     helper="${rundir}/smelt_helper.sh"
-    sizes=$(for num in $(seq 5 12); do echo "2^${num}" | bc; done)
+    sizes=$(seq 5 10 | sed 's/^/2^/' | bc)
 
     case ${prev} in
         -'?'|-h|--help)
