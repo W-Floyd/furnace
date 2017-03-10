@@ -27,7 +27,7 @@ It is highly recommended that fresh packs are rendered upon significant script c
 
 At one point I had to compile a newer version of Imagemagick from source to make some compositing work. If you get odd results, that may be the issue. This *seems* to have been solved by setting some options on all image operations.
 
-Sizes 2048px and above are known not to be loaded in Minecraft at all, and 1024px has not always loaded for me, so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px segfaults when I run out of memory (16gb RAM + 4gb swap).
+Sizes above 1024px and above are known not to be loaded in Minecraft at all, and even 1024px has not always loaded for me, so 512px is the largest default size. 4096px is the largest size I have sucessfully processed, as 8192px is killed when I run out of memory (16gb RAM + 4gb swap). Even 4096px runs out of memory when processing some demo images. Really though, why anyone needs anything larger than 4096px is beyond me - a single texture is larger than a 4K screen.
 
 If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or get errors about missing dependencies, forcefully re-render to fix it. Using a cancelled render is never recommended!
 

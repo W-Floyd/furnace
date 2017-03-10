@@ -460,6 +460,7 @@ convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -defin
 ###############################################################
 
 __tile () {
+
 if ! [ -z "${4}" ]; then
 	local __spacer="${4}"
 else
@@ -469,6 +470,34 @@ fi
 local __imgseq=$(for __tile in $(seq 1 "$(echo "${2}" | sed 's/x/\*/' | bc)"); do echo -n "${1} "; done)
 
 montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
+
+}
+
+###############################################################
+#
+# __custom_tile <FILE1> <FILE2> ... <GRID> <SPACER> <OUTPUT>
+#
+# Custom Tile
+# Tiles images. Takes input files. Third last option is grid
+# (e.g. '2x3'), second last is the spacer (e.g. '2'), last is
+# the output image.
+#
+###############################################################
+
+__custom_tile () {
+if [ "${#}" -lt '4' ]; then
+    __error "Not enough options specified for __custom_tile"
+fi
+
+local __num_options="${#}"
+
+local __output="$(eval "echo \"\$$((__num_options))"\")"
+local __spacer="$(eval "echo \"\$$((__num_options-1))"\")"
+local __grid="$(eval "echo \"\$$((__num_options-2))"\")"
+
+local __imgseq="$(for __num in $(seq 1 "$((__num_options-3))"); do echo -n "$(eval "echo \"\$$((__num))"\") "; done)"
+
+montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
 
 }
 

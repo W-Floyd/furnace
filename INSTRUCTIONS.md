@@ -10,17 +10,17 @@ __tmp_dir
 __smelt\_make\_mobile_bin  
 __custom\_function\_bin  
 __quick  
+__render_optional  
 __should_optimize  
 __max_optimize  
 __ignore\_max\_optimize  
+__optimizer  
 
 The following variables may be used:
 __pid
 
 # catalogue.xml
 ## Required
-
-Note: catalogue.xml is the default name, but may be any name specified in the config.sh
 
 At the most basic level, a catalogue must contain entries like so:  
 
@@ -34,6 +34,7 @@ At the most basic level, a catalogue must contain entries like so:
 		<IMAGE>YES</IMAGE>
 		<DEPENDS></DEPENDS>
 		<CLEANUP>./assets/minecraft/textures/blocks/dirt.svg</CLEANUP>
+		<OPTIONAL>NO</OPTIONAL>
 		<COMMON>Dirt</COMMON>
 	</ITEM>
 ```
@@ -57,5 +58,7 @@ The fields are as follow:
 **DEPENDS** describes any files this file **directly** relies on. For instance, if your script pulls in a file derived from wool, the colour file, nor wool overlay are required, only the directly used file. The render script extrapolates this information for use, so there is no need to do it ourselves. It **shouldn't** break things, but it's bad form, and not tested.
 
 **CLEANUP** describes the source files to delete upon completion of the resource pack. Again, formatted relative to the top folder of the resource pack. For images composed entirely from pre-rendered images, this will be blank.
+
+**OPTIONAL** describes if the file is an optional render, useful for demo images.
 
 **COMMON** describes the common name of the texture. This is optional, and might be hard to fill in at times. Only useful on KEEP files.

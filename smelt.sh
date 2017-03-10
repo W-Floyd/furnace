@@ -10,6 +10,7 @@ __mobile='0'
 __quick='1'
 __time='0'
 __force='0'
+__render_optional='0'
 __debug='0'
 __quiet='0'
 __silent='0'
@@ -41,7 +42,7 @@ echo "$(basename "${0}") <OPTIONS> <SIZE>
 
 Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
-important.
+important, other than options which take secondary inputs.
 
 Options:
   -h  --help  -?            This help message
@@ -53,12 +54,14 @@ Options:
   -d  --debug               Use debugging mode
   -l  --lengthy             Very verbose debugging mode
   -f  --force-render        Discard pre-rendered data
+      --optional            Render optional items
+      --no-optional         Do not render optional items
   -q  --quiet               No output unless specified
       --silent              No output at all
       --no-progress         Do not show a progress report
   -w  --warn                Show warnings
   -c  --compress            Actually compress zip files
-  -x  --force-xml           Force resplitting of xml files
+  -x  --force-xml           Force re-splitting of xml files
       --xml-only            Only split xml files
   -o  --optimize            Optimize final PNG files
   --no-optimize             Do not optimize final PNG files
@@ -131,6 +134,14 @@ while ! [ "${#}" = '0' ]; do
 
         "f" | "--force-render")
             __force='1'
+            ;;
+
+        "--optional")
+            __render_optional='1'
+            ;;
+
+        "--no-optional")
+            __render_optional='0'
             ;;
 
         "q" | "--quiet")
@@ -416,6 +427,10 @@ fi
 
 if [ "${__do_not_render}" = '1' ]; then
     __options="${__options} --do-not-render"
+fi
+
+if [ "${__render_optional}" = '1' ]; then
+    __options="${__options} --optional"
 fi
 
 if [ "${__very_verbose_pack}" = '1' ]; then

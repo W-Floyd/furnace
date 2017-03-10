@@ -22,6 +22,7 @@ __list_changed='0'
 __should_optimize='0'
 __re_optimize='0'
 __show_progress='0'
+__render_optional='0'
 PS4='Line ${LINENO}: '
 
 ###############################################################
@@ -67,7 +68,10 @@ Options:
   -w  --warn            Show warnings
   -o  --optimize        Optimize final PNG files
       --no-optimize     Do not optimize final PNG files
-      --quiet           No output unless specified\
+      --quiet           No output unless specified
+      --optional        Actually render any optional files,
+                        though they still won't be included
+      \
 "
 }
 
@@ -233,6 +237,10 @@ while ! [ "${#}" = '0' ]; do
 
                 "--re-optimize")
                     __re_optimize='1'
+                    ;;
+
+                "--optional")
+                    __render_optional='1'
                     ;;
 
 # general catch all for any number input that isn't for the PID
@@ -1307,6 +1315,16 @@ sort "${__render_list}" | uniq > "${__render_list}_"
 
 mv "${__render_list}_" "${__render_list}"
 
+while read -r __xml_name; do
+
+    dirname "${__working_dir}/${__pack_new}/${__xml_name}"
+
+done < "${__render_list}" | sort | uniq | while read -r __dir; do
+
+    mkdir -p "${__dir}"
+
+done
+
 cp "${__render_list}" "${__render_list}_backup"
 
 __time "Checked for items to re/process" end
@@ -1348,6 +1366,24 @@ mv "${__pack_new}" "${__pack}"
 # Render loop
 __announce "Starting to render."
 ###############################################################
+
+__pushd "${__pack}"
+
+touch "${__render_list}_"
+
+if [ "${__render_optional}" = '0' ]; then
+    cat "${__render_list}" | while read -r __item; do
+        __config="./xml/${__item//.\//}"
+        if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
+            echo "${__item}" >> "${__render_list}_"
+        fi
+    done
+    mv "${__render_list}_" "${__render_list}"
+else
+    rm "${__render_list}_"
+fi
+
+__popd
 
 __break_loop='0'
 
@@ -1550,7 +1586,25 @@ while read -r __file; do
 
     else
 
-        __force_warn "File \"${__file}\" for cleanup does not exist"
+        __pushd "${__working_dir}/${__pack}"
+
+        __warn_missing_cleanup () {
+        __force_warn "File \"${1}\" for cleanup does not exist"
+        }
+
+        if [ -e "./xml/${__file//.\//}" ]; then
+
+            if [ "$(__get_value "./xml/${__file//.\//}" OPTIONAL)" = 'YES' ] && [ "${__render_optional}" = '1' ]; then
+                __warn_missing_cleanup "${__file}"
+            fi
+
+        else
+
+            __warn_missing_cleanup "${__file}"
+
+        fi
+
+        __popd
 
     fi
 
@@ -1562,6 +1616,12 @@ wait
 # remove xml and conf from cleaned pack
 rm -r ./xml
 rm -r ./conf
+
+find -type d | while read -r __dir; do
+    if ! [ "$(ls -A "${__dir}/")" ]; then
+        rmdir "${__dir}"
+    fi
+done
 
 # get back to the right directory
 __popd

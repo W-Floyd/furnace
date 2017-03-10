@@ -28,6 +28,10 @@ compgen -A variable > /tmp/tmpvars
 # Defaults to quick mode if missing
 #__quick='1'
 
+# Whether or not to render optional images (usually demo images)
+# Defaults to off if missing
+#__render_optional='0'
+
 # Whether or not the final images should be optimized
 # Defaults to no optimization if missing
 #__should_optimize='1'
