@@ -242,7 +242,7 @@ fi
 if [ "$(__oext "${1}")" = 'png' ]; then
 
     if __check_optimizer "${__optimizer}"; then
-        __optimize_${__optimizer} "${1}"
+        "__optimize_${__optimizer}" "${1}"
     else
         __error "Optimizer \"${__optimizer}\" is not valid"
     fi

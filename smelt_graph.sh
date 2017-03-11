@@ -4,7 +4,7 @@ if ! which neato &> /dev/null; then
     __error "\"neato\" could not be found, please install the graphviz package"
 fi
 
-__graph_tmp_dir="/tmp/smelt/graph${__pid}"
+__graph_tmp_dir="/tmp/smelt/graph${$}"
 mkdir -p "${__graph_tmp_dir}"
 
 __output="${4}.${1}"
@@ -49,54 +49,62 @@ fi
 
 __popd
 
-__dep_list="${__files}
-${__dep_list}"
+if ! [ -z "${__dep_list}" ]; then
 
-__dep_list="$(echo "${__dep_list}" | grep -v '^$')"
+    __dep_list="${__files}
+    ${__dep_list}"
 
-echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
+    __dep_list="$(echo "${__dep_list}" | grep -v '^$')"
 
-__tmp_func () {
+    echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
 
-__deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG | __stdconf; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
+    __tmp_func () {
 
-if ! [ -z "${__deps}" ]; then
+    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG | __stdconf; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
 
-    while read -r __dep; do
-        if ! [ "${__dep}" = "${__name}" ]; then
-            echo "    \"${__dep}\" -> \"${__name}\";"
-        fi
-    done <<< "${__deps}" | sort | uniq >> "${__graph}"
+    if ! [ -z "${__deps}" ]; then
 
-fi
-
-}
-
-for __range in $(__get_range "${__catalogue}" ITEM); do
-
-    __read_range "${__catalogue}" "${__range}" > "${__graph_tmp_dir}/readrangetmp"
-
-    __name="$(__get_value "${__graph_tmp_dir}/readrangetmp" NAME)"
-
-    if [ "${__use_files}" = '1' ]; then
-
-        if ! [ -z "$(echo "${__name}" | grep -F "${__dep_list}")" ]; then
-            __tmp_func
-        fi
-
-    else
-
-        if [ "$(__get_value "${__graph_tmp_dir}/readrangetmp" KEEP)" = 'YES' ]; then
-            __tmp_func
-        fi
+        while read -r __dep; do
+            if ! [ "${__dep}" = "${__name}" ]; then
+                echo "    \"${__dep}\" -> \"${__name}\";"
+            fi
+        done <<< "${__deps}" | sort | uniq >> "${__graph}"
 
     fi
 
-done
+    }
 
-echo '}' >> "${__graph}"
+    for __range in $(__get_range "${__catalogue}" ITEM); do
 
-cat "${__graph}" | neato -T${1} -o "${__output}"
+        __read_range "${__catalogue}" "${__range}" > "${__graph_tmp_dir}/readrangetmp"
+
+        __name="$(__get_value "${__graph_tmp_dir}/readrangetmp" NAME)"
+
+        if [ "${__use_files}" = '1' ]; then
+
+            if echo "${__name}" | grep -Fxq "${__dep_list}"; then
+                __tmp_func
+            fi
+
+        else
+
+            if [ "$(__get_value "${__graph_tmp_dir}/readrangetmp" KEEP)" = 'YES' ]; then
+                __tmp_func
+            fi
+
+        fi
+
+    done
+
+    echo '}' >> "${__graph}"
+
+    neato "-T${1}" -o "${__output}" < "${__graph}"
+
+else
+
+    __custom_error "No valid items specified."
+
+fi
 
 rm -r "${__graph_tmp_dir}"
 

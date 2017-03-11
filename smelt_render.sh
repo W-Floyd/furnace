@@ -1368,12 +1368,12 @@ __pushd "${__pack}"
 touch "${__render_list}_"
 
 if [ "${__render_optional}" = '0' ]; then
-    cat "${__render_list}" | while read -r __item; do
+    while read -r __item; do
         __config="./xml/${__item//.\//}"
         if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
             echo "${__item}" >> "${__render_list}_"
         fi
-    done
+    done < "${__render_list}"
     mv "${__render_list}_" "${__render_list}"
 else
     rm "${__render_list}_"
@@ -1385,7 +1385,7 @@ __break_loop='0'
 
 __time "Rendered ${__size}px" start
 
-__process_count="$(cat "${__render_list}" | wc -l)"
+__process_count="$(wc -l < "${__render_list}")"
 
 if [ "${__process_count}" = '0' ] && [ "${__quiet}" = '1' ]; then
     __bypass_announce "No changes to \"${__size}\""
@@ -1613,7 +1613,7 @@ wait
 rm -r ./xml
 rm -r ./conf
 
-find -type d | while read -r __dir; do
+find . -type d | while read -r __dir; do
     if ! [ "$(ls -A "${__dir}/")" ]; then
         rmdir "${__dir}"
     fi
