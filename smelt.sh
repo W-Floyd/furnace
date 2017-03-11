@@ -22,6 +22,7 @@ __clean_xml='0'
 __xml_only='0'
 __do_not_render='0'
 __list_completed='0'
+__graph_deps='0'
 __list_changed='0'
 __last_size='0'
 __should_optimize='0'
@@ -74,7 +75,16 @@ Options:
   --name <NAME>             Name to use when processing a pack
   --completed               List completed textures, according
                             to the COMMON field in the catalogue
-  --changed                 List ITEMS changed since last render\
+  --changed                 List ITEMS changed since last render
+  --graph <ITEM>            Render an svg graph of the
+                            dependency tree. Optional input is
+                            the comma and/or new-line separated
+                            list of ITEMs to be the subject of
+                            the graph. For a full graph, use ''.
+                            Output is 'graph.<FORMAT>'
+  --graph-format <FORMAT>   Specifies the format to graph to.
+                            When --graph is used instead,
+                            defaults to SVG.\
 "
 }
 
@@ -183,9 +193,18 @@ while ! [ "${#}" = '0' ]; do
             __list_completed='1'
             ;;
 
+        "--graph")
+            __graph_deps='1'
+            ;;
+
+        "--graph-format")
+            __graph_deps='1'
+            ;;
+
         "--changed")
             __list_changed='1'
             ;;
+
 
         "--no-optimize")
             __no_optimize='1'
@@ -268,7 +287,20 @@ ${1}"
         "--name")
 
             __name="${1}"
+            ;;
 
+        "--graph")
+
+            if echo "${1}" | grep '^-.*' &> /dev/null; then
+                __error "File option must come after graph option"
+            fi
+
+            __graph_files="$(echo "${1}" | tr ',' '\n')"
+            ;;
+
+        "--graph-format")
+
+            __graph_format="${1}"
             ;;
 
         *)
@@ -323,9 +355,30 @@ elif ! [ -d 'src' ]; then
     __error "Source file directory \"src\" is missing"
 fi
 
+# set pack name if not set already
+if [ -z "${__name}" ]; then
+    __name="$(basename "${__working_dir}")"
+    __force_warn "Pack name not defined, defaulting to ${__name}"
+fi
+
 if [ "${__list_completed}" = '1' ]; then
     "${__smelt_completed_bin}" "${__catalogue}"
     exit
+fi
+
+if [ "${__graph_deps}" = '1' ]; then
+    "${__smelt_render_bin}" --xml-only 1> /dev/null
+
+    if [ -z "${__graph_files}" ]; then
+        __graph_files=''
+    fi
+
+    if [ -z "${__graph_format}" ]; then
+        __graph_format='svg'
+    fi
+
+    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}"
+    exit 0
 fi
 
 if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then

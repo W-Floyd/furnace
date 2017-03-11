@@ -279,6 +279,18 @@ cat | perl -pe 's/\e\[?.*?[\@-~]//g'
 
 ###############################################################
 #
+# ... | __stdconf
+#
+# Replaces %stdconf% with the appropriate pointer
+#
+###############################################################
+
+__stdconf () {
+cat | sed "s#%stdconf%#${__standard_conf_dir}#"
+}
+
+###############################################################
+#
 # __print_pad
 #
 # Prints the given number of spaces

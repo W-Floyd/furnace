@@ -2,6 +2,8 @@ export __smelt_functions_bin="${__run_dir}/smelt_functions.sh"
 export __smelt_image_functions_bin="${__run_dir}/smelt_image_functions.sh"
 export __smelt_render_bin="${__run_dir}/smelt_render.sh"
 export __smelt_completed_bin="${__run_dir}/smelt_completed.sh"
+export __smelt_graph_bin="${__run_dir}/smelt_graph.sh"
+export __standard_conf_dir="${__run_dir}/conf"
 export __catalogue='catalogue.xml'
 
 # get functions from file

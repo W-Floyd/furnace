@@ -36,8 +36,6 @@ if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
 fi
 
-__standard_conf_dir="${__run_dir}/conf"
-
 # temporary timer for quick timing
 __time_var='temporary timer'
 __tmp_time () {
@@ -281,12 +279,6 @@ __time "Set variables" start
 ###############################################################
 # Fill the blanks that the config didn't fill
 ###############################################################
-
-# set pack name if not set already
-if [ -z "${__name}" ]; then
-    __name="$(basename "${__working_dir}")"
-    __force_warn "Pack name not defined, defaulting to ${__name}"
-fi
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
@@ -693,7 +685,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        __tmp_var="$({ __get_value "${__xml}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#"; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | grep -v "^$")"
+        __tmp_var="$({ __get_value "${__xml}" CONFIG | __stdconf; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | grep -v "^$")"
 
         echo "${__tmp_var}" >> "${__dep_list}"
 
@@ -1446,7 +1438,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
         fi
 
 # get the name of the config script, and replace any macro locations
-        __config_script="$(__get_value "${__config}" CONFIG | sed "s#%stdconf%#${__standard_conf_dir}#")"
+        __config_script="$(__get_value "${__config}" CONFIG | __stdconf)"
 
         __render_num=$((__render_num+1))
 
