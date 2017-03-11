@@ -98,6 +98,6 @@ echo '}' >> "${__graph}"
 
 cat "${__graph}" | neato -T${1} -o "${__output}"
 
-#rm -r "${__graph_tmp_dir}"
+rm -r "${__graph_tmp_dir}"
 
 exit
