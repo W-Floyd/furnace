@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if ! which neato &> /dev/null; then
-    __error "\"neato\" could not be found, please install the graphviz package"
+if ! which sfdp &> /dev/null; then
+    __error "\"sfdp\" could not be found, please install the graphviz package"
 fi
 
 __graph_tmp_dir="/tmp/smelt/graph${__pid}"
