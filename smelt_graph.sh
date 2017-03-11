@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if ! which sfdp &> /dev/null; then
-    __error "\"sfdp\" could not be found, please install the graphviz package"
+if ! which neato &> /dev/null; then
+    __error "\"neato\" could not be found, please install the graphviz package"
 fi
 
 __graph_tmp_dir="/tmp/smelt/graph${__pid}"
@@ -29,7 +29,7 @@ echo \
 'digraph pack {
     overlap=scalexy;
     splines=true;
-    sep="0.5";
+    sep="0.3";
     node [style=filled, shape=record];' > "${__graph}"
 
 __pushd './src/xml/tmp_deps/'
@@ -96,7 +96,7 @@ done
 
 echo '}' >> "${__graph}"
 
-cat "${__graph}" | sfdp -T${1} -o "${__output}"
+cat "${__graph}" | neato -T${1} -o "${__output}"
 
 #rm -r "${__graph_tmp_dir}"
 
