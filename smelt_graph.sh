@@ -56,27 +56,27 @@ __dep_list="$(echo "${__dep_list}" | grep -v '^$')"
 
 echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
 
+__tmp_func () {
+
+__deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG | __stdconf; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
+
+if ! [ -z "${__deps}" ]; then
+
+    while read -r __dep; do
+        if ! [ "${__dep}" = "${__name}" ]; then
+            echo "    \"${__dep}\" -> \"${__name}\";"
+        fi
+    done <<< "${__deps}" | sort | uniq >> "${__graph}"
+
+fi
+
+}
+
 for __range in $(__get_range "${__catalogue}" ITEM); do
 
     __read_range "${__catalogue}" "${__range}" > "${__graph_tmp_dir}/readrangetmp"
 
     __name="$(__get_value "${__graph_tmp_dir}/readrangetmp" NAME)"
-
-    __tmp_func () {
-
-    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG | __stdconf; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
-
-    if ! [ -z "${__deps}" ]; then
-
-        while read -r __dep; do
-            if ! [ "${__dep}" = "${__name}" ]; then
-                echo "    \"${__dep}\" -> \"${__name}\";"
-            fi
-        done <<< "${__deps}" | sort | uniq >> "${__graph}"
-
-    fi
-
-    }
 
     if [ "${__use_files}" = '1' ]; then
 
