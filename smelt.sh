@@ -84,7 +84,7 @@ Options:
                             Output is 'graph.<FORMAT>'
   --graph-format <FORMAT>   Specifies the format to graph to.
                             When --graph is used instead,
-                            defaults to SVG.\
+                            defaults to png.\
 "
 }
 
@@ -374,7 +374,7 @@ if [ "${__graph_deps}" = '1' ]; then
     fi
 
     if [ -z "${__graph_format}" ]; then
-        __graph_format='svg'
+        __graph_format='png'
     fi
 
     "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}"
