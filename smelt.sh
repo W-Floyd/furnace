@@ -81,10 +81,11 @@ Options:
                             the comma and/or new-line separated
                             list of ITEMs to be the subject of
                             the graph. For a full graph, use ''.
-                            Output is 'graph.<FORMAT>'
+                            Default output is 'graph.<FORMAT>'
   --graph-format <FORMAT>   Specifies the format to graph to.
                             When --graph is used instead,
-                            defaults to png.\
+                            defaults to png
+  --graph-output <FILE>     Name to use when outputting a graph\
 "
 }
 
@@ -201,6 +202,10 @@ while ! [ "${#}" = '0' ]; do
             __graph_deps='1'
             ;;
 
+        "--graph-output")
+            __graph_deps='1'
+            ;;
+
         "--changed")
             __list_changed='1'
             ;;
@@ -303,6 +308,10 @@ ${1}"
             __graph_format="${1}"
             ;;
 
+        "--graph-output")
+            __graph_output="${1}"
+            ;;
+
         *)
 
             if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
@@ -377,7 +386,11 @@ if [ "${__graph_deps}" = '1' ]; then
         __graph_format='png'
     fi
 
-    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}"
+    if [ -z "${__graph_output}" ]; then
+        __graph_output='graph'
+    fi
+
+    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}"
     exit 0
 fi
 

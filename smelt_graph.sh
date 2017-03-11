@@ -7,7 +7,7 @@ fi
 __graph_tmp_dir="/tmp/smelt/graph${__pid}"
 mkdir -p "${__graph_tmp_dir}"
 
-__output="graph.${1}"
+__output="${4}.${1}"
 
 __catalogue="${2}"
 
