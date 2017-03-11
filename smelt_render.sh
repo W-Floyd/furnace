@@ -470,6 +470,9 @@ __time "Split XML" start
 
 __tsort_file='tsort'
 
+__list_name='list'
+__list_file="${__tmp_dir}/${__list_name}"
+
 __dep_list_tsort="${__tmp_dir}/${__tsort_file}"
 
 __dep_list_name='tmp_deps'
@@ -515,7 +518,7 @@ __popd
 __new_catalogue_hash="$(md5sum "${__catalogue}")"
 
 # if the new catalogue is the same as the old catalogue, then
-if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ] && [ -e "./src/xml/${__optimize_file}" ]; then
+if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ] && [ -e "./src/xml/${__optimize_file}" ] && [ -e "./src/xml/${__list_name}" ]; then
 
 # say so
     __announce "No changes to XML catalogue."
@@ -531,6 +534,8 @@ if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/
     mv "./src/xml/${__cleanup_file}" "${__cleanup_all}"
 
     mv "./src/xml/${__optimize_file}" "${__optimize_list}"
+
+    mv "./src/xml/${__list_name}" "${__list_file}"
 
 # end if statement whether the catalogues are the same
 fi
@@ -611,7 +616,6 @@ fi
 # Get into the xml directory
 __pushd ./src/xml/
 
-__list_file="${__tmp_dir}/listing_complete"
 touch "${__list_file}"
 
 find . -type f > "${__list_file}"
@@ -1692,6 +1696,8 @@ cp -r "${__dep_list_folder}" "./src/xml/"
 cp "${__cleanup_all}" "./src/xml/${__cleanup_file}"
 
 cp "${__optimize_list}" "./src/xml/${__optimize_file}"
+
+cp "${__list_file}" "./src/xml/${__list_name}"
 
 if [ "${__xml_only}" = '0' ]; then
 

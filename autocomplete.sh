@@ -2,9 +2,11 @@ _smelt () {
     local cur prev sizes rundir helper
     _init_completion || return
 
-    rundir="$(dirname "$(readlink -f "$(which ${1})")")"
-    helper="${rundir}/smelt_helper.sh"
-    sizes=$(seq 5 10 | sed 's/^/2^/' | bc)
+    local rundir="$(dirname "$(readlink -f "$(which ${1})")")"
+    local helper="${rundir}/smelt_helper.sh"
+    local sizes=$(seq 5 10 | sed 's/^/2^/' | bc)
+    local graph_formats='dot xdot ps pdf svg svgz fig png gif gtk jpg jpeg json imap xmapx'
+
 
     case ${prev} in
         -'?'|-h|--help)
@@ -23,6 +25,22 @@ _smelt () {
 
         '--name')
             COMPREPLY=($(compgen -W "$(basename "$(pwd)" | rev | sed -e 's/.*-//' -e 's/.*_//' -e 's/.*\.//' | rev)" -- "${cur}"))
+            return 0
+            ;;
+
+        "--graph-format")
+            COMPREPLY=($(compgen -W "${graph_formats}" -- "${cur}"))
+            return 0
+            ;;
+
+        "--graph")
+            if [ -e './src/xml/list' ]; then
+                local items="$(cat './src/xml/list')"
+            else
+                local items='error'
+            fi
+
+            COMPREPLY=($(compgen -W "${items}" -- "${cur}"))
             return 0
             ;;
 
