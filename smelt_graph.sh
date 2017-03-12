@@ -29,8 +29,7 @@ echo \
 'digraph pack {
     overlap=scalexy;
     splines=true;
-    sep="0.3";
-    node [style=filled, shape=record];' > "${__graph}"
+    sep="0.3";' > "${__graph}"
 
 __list="$(cat './src/xml/list')"
 
@@ -38,26 +37,37 @@ __pushd './src/xml/tmp_deps/'
 
 if [ "${__use_files}" = '1' ]; then
 
-while read -r __item; do
-    if ! grep -xq "${__item}" <<< "${__list}"; then
-        __force_warn "Item \"${__item}\" does not exist"
-    else
-        __matches="$(grep -x "${__item}" <<< "${__list}")"
-        while read -r __match; do
-            __dep_list="$(cat "${__match}")
+    while read -r __item; do
+        if ! grep -xq "${__item}" <<< "${__list}"; then
+            __force_warn "Item \"${__item}\" does not exist"
+        else
+            __matches="$(grep -x "${__item}" <<< "${__list}")"
+            while read -r __match; do
+                __dep_list="$(cat "${__match}")
 ${__dep_list}"
-        done <<< "${__matches}"
-    fi
-done <<< "${__files}"
+            done <<< "${__matches}"
+        fi
+    done <<< "${__files}"
 
+fi
+
+echo '    node [style=filled, shape=record, color="black" fillcolor="lightgray" ];' >> "${__graph}"
+
+if [ "${__use_files}" = '1' ]; then
+    echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' >> "${__graph}"
+fi
+
+__dep_list="$(grep -x "${__files}" <<< "${__list}")
+${__dep_list}"
+
+if [ "${__use_files}" = '1' ]; then
+    echo '    node [style=filled, shape=record, color="blue" fillcolor="lightblue"];
+    ' >> "${__graph}"
 fi
 
 __popd
 
 if ! [ -z "${__dep_list}" ]; then
-
-    __dep_list="$(grep -x "${__files}" <<< "${__list}")
-${__dep_list}"
 
     __dep_list="$(echo "${__dep_list}" | grep -v '^$' | sort | uniq)"
 
@@ -111,6 +121,6 @@ else
 
 fi
 
-rm -r "${__graph_tmp_dir}"
+# rm -r "${__graph_tmp_dir}"
 
 exit
