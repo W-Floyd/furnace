@@ -78,11 +78,16 @@ Options:
                             dependency tree. Optional input is
                             the comma and/or new-line separated
                             list of ITEMs to be the subject of
-                            the graph. For a full graph, use ''.
-                            Default output is 'graph.<FORMAT>'
+                            the graph. For a full graph, use '',
+                            '.*', or nothing when there are no
+                            other options after. Default output
+                            is 'graph'.
   --graph-format <FORMAT>   Specifies the format to graph to.
-                            When --graph is used instead,
-                            defaults to png
+                            Defaults to png.
+  --graph-seed <SEED>       Seed to use when graphing. Defaults
+                            to '1337'.
+  --grapher <GRAPHER>       Graphviz tool to use when graphing.
+                            Defaults to neato.
   --graph-output <FILE>     Name to use when outputting a graph\
 "
 }
@@ -204,10 +209,17 @@ while ! [ "${#}" = '0' ]; do
             __graph_deps='1'
             ;;
 
+        "--grapher")
+            __graph_deps='1'
+            ;;
+
+        "--graph-seed")
+            __graph_deps='1'
+            ;;
+
         "--changed")
             __list_changed='1'
             ;;
-
 
         "--no-optimize")
             __no_optimize='1'
@@ -310,6 +322,14 @@ ${1}"
             __graph_output="${1}"
             ;;
 
+        "--grapher")
+            __grapher="${1}"
+            ;;
+
+        "--graph-seed")
+            __graph_seed="${1}"
+            ;;
+
         *)
 
             if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
@@ -388,7 +408,15 @@ if [ "${__graph_deps}" = '1' ]; then
         __graph_output='graph'
     fi
 
-    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}"
+    if [ -z "${__grapher}" ]; then
+        __grapher='neato'
+    fi
+
+    if [ -z "${__graph_seed}" ]; then
+        __graph_seed='1337'
+    fi
+
+    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}"
     exit 0
 fi
 

@@ -1,17 +1,15 @@
 #!/bin/bash
 
-if ! which neato &> /dev/null; then
-    __error "\"neato\" could not be found, please install the graphviz package"
+if ! which "${5}" &> /dev/null; then
+    __error "\"${5}\" could not be found, please install the graphviz package"
 fi
 
 __graph_tmp_dir="/tmp/smelt/graph${$}"
 mkdir -p "${__graph_tmp_dir}"
 
-__output="${4}.${1}"
-
 __catalogue="${2}"
 
-__graph="${__graph_tmp_dir}/graph"
+__graph="${__graph_tmp_dir}/${4}"
 
 if ! [ -z "${3}" ]; then
     __files="${3}"
@@ -25,11 +23,15 @@ fi
 
 __dep_list=''
 
-echo \
-'digraph pack {
-    overlap=scalexy;
+__options=\
+'    overlap=scalexy;
+    center=true
     splines=true;
-    sep="0.3";' > "${__graph}"
+    sep="0.3";'
+
+echo \
+"digraph pack {
+${__options}" > "${__graph}"
 
 __list="$(cat './src/xml/list')"
 
@@ -49,20 +51,25 @@ ${__dep_list}"
         fi
     done <<< "${__files}"
 
+else
+    __dep_list="${__list}"
 fi
 
-echo '    node [style=filled, shape=record, color="black" fillcolor="lightgray" ];' >> "${__graph}"
+echo "    node [style=filled, shape=record, color=\"black\" fillcolor=\"lightgray\" ];
+" >> "${__graph}"
 
 if [ "${__use_files}" = '1' ]; then
-    echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' >> "${__graph}"
+    echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' | sort | uniq >> "${__graph}"
 fi
 
 __dep_list="$(grep -x "${__files}" <<< "${__list}")
 ${__dep_list}"
 
+__dep_list="$(echo "${__dep_list}" | grep -v '^$')"
+
 if [ "${__use_files}" = '1' ]; then
-    echo '    node [style=filled, shape=record, color="blue" fillcolor="lightblue"];
-    ' >> "${__graph}"
+    echo "    node [style=filled, shape=record, color=\"blue\" fillcolor=\"lightblue\"];
+" >> "${__graph}"
 fi
 
 __popd
@@ -113,7 +120,11 @@ if ! [ -z "${__dep_list}" ]; then
 
     echo '}' >> "${__graph}"
 
-    neato "-T${1}" -o "${__output}" < "${__graph}"
+    cp "${__graph}" "./$(basename "${__graph}")"
+
+    "${5}" -Ln5 "-Gstart=${6}" "-T${1}" "./$(basename "${__graph}")" -O
+
+    rm "./$(basename "${__graph}")"
 
 else
 
@@ -121,6 +132,6 @@ else
 
 fi
 
-# rm -r "${__graph_tmp_dir}"
+rm -r "${__graph_tmp_dir}"
 
 exit
