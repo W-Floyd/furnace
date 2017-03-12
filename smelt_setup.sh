@@ -5,6 +5,7 @@ export __smelt_completed_bin="${__run_dir}/smelt_completed.sh"
 export __smelt_graph_bin="${__run_dir}/smelt_graph.sh"
 export __standard_conf_dir="${__run_dir}/conf"
 export __catalogue='catalogue.xml'
+export PS4='Line ${LINENO}: '
 
 # get functions from file
 source "${__smelt_functions_bin}" &> /dev/null || { echo "Failed to load functions \"${__smelt_functions_bin}\""; exit 1; }

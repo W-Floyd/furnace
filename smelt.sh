@@ -1,7 +1,5 @@
 #!/bin/bash
 
-PS4='Line ${LINENO}: '
-
 __sizes=''
 __verbose='0'
 __very_verbose_pack='0'

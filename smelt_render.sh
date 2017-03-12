@@ -23,7 +23,6 @@ __should_optimize='0'
 __re_optimize='0'
 __show_progress='0'
 __render_optional='0'
-PS4='Line ${LINENO}: '
 
 ###############################################################
 # Setting up functions

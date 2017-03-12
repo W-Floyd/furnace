@@ -57,7 +57,7 @@ __popd
 if ! [ -z "${__dep_list}" ]; then
 
     __dep_list="$(grep -x "${__files}" <<< "${__list}")
-    ${__dep_list}"
+${__dep_list}"
 
     __dep_list="$(echo "${__dep_list}" | grep -v '^$' | sort | uniq)"
 
