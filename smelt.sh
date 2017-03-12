@@ -79,7 +79,7 @@ Options:
                             the comma and/or new-line separated
                             list of ITEMs to be the subject of
                             the graph. For a full graph, use '',
-                            '.*', or nothing when there are no
+                            '.*', or nothing, when there are no
                             other options after. Default output
                             is 'graph'.
   --graph-format <FORMAT>   Specifies the format to graph to.
