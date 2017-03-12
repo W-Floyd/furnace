@@ -344,11 +344,6 @@ fi
 # Check software deps
 ###############################################################
 
-# check tsort
-if ! which tsort &> /dev/null; then
-    __error "Please install 'tsort' to continue. It is required for dependency resolution"
-fi
-
 # check inkscape
 if which inkscape &> /dev/null; then
     __has_inkscape='1'
@@ -366,23 +361,18 @@ else
     __has_rsvg_convert='0'
 fi
 
-# if both inkscape and rsvg-convert don't exist, say so and exit
-if [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '0' ]; then
-    __error "Missing both inkscape and rsvg-convert. Please install either/both to continue.
-Please install 'librsvg-devel' to obtain rsvg-convert, and 'inkscape' for Inkscape"
-
 # if inkscape exists, but rsvg-convert doesn't exist, and we're
 # wanting to use rsvg-convert, say so and force inkscape
-elif [ "${__has_inkscape}" = '1' ] && [ "${__has_rsvg_convert}" = '0' ] && [ "${__quick}" = '1' ]; then
+if [ "${__has_inkscape}" = '1' ] && [ "${__has_rsvg_convert}" = '0' ] && [ "${__quick}" = '1' ]; then
     __force_warn "Missing rsvg-convert. Cannot continue in quick mode.
-Please install 'librsvg-devel', defaulting to inkscape"
+Please install 'librsvg-devel', changing to inkscape"
     export __quick='0'
 
 # if rsvg-convert exists, but inkscape doesn't exist, and we're
 # wanting to use inkscape, say so and force rsvg-convert
 elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${__quick}" = '0' ]; then
     __force_warn "Missing Inkscape. Must continue in quick mode.
-Please install 'inkscape'. Defaulting to rsvg-convert."
+Please install 'inkscape', changing to rsvg-convert"
     export __quick='1'
 fi
 

@@ -12,9 +12,10 @@ sudo ln -s "$(pwd)/smelt.sh" "/usr/bin/smelt"
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
 ```
 
-Requires:
-* Inkscape and/or rsvg-convert
-* tsort
+Recommended:
+* Imagemagick (**most HIGHLY** recommended)
+* Inkscape and/or rsvg-convert (**HIGHLY** recommended)
+* GIMP (recommended)
 
 Then you can run `smelt` in the appropriate folder, and it should render.
 Run `smelt -h` for help. 
