@@ -49,10 +49,16 @@ if [ -z "${__quick}" ]; then
     __force_warn "__quick has not been set correctly. Defaulting to rsvg-convert"
 fi
 
+if ! [ "${__vector_render_check}" = '1' ]; then
+
 if ! which inkscape &> /dev/null && [ "${__quick}" = '0' ]; then
     __error "Inkscape is not installed"
 elif ! which rsvg-convert &> /dev/null && [ "${__quick}" = '1' ]; then
     __error "rsvg-convert is not installed"
+fi
+
+__vector_render_check='1'
+
 fi
 
 if ! [ "$(__oext "${2}")" = 'svg' ]; then
@@ -100,8 +106,14 @@ if ! [ "$(__oext "${1}")" = 'xcf' ]; then
     __error "File \"${1}\" is not a xcf file"
 fi
 
+if ! [ "${__gimp_export_check}" = '1' ]; then
+
 if ! which gimp &> /dev/null; then
     __error "GIMP is not installed"
+fi
+
+__gimp_export_check='1'
+
 fi
 
 __gimp_sub () {
