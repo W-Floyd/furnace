@@ -499,8 +499,6 @@ new maximum with --max-optimize <SIZE>"
     fi
 fi
 
-echo "${__sizes}"
-
 if [ -z "${__max_optional}" ]; then
     __default_max_optional='2048'
     __max_optional="${__default_max_optional}"
