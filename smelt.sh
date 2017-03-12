@@ -26,8 +26,10 @@ __last_size='0'
 __should_optimize='0'
 __no_optimize='0'
 __ignore_max_optimize='0'
+__ignore_max_optional='0'
 __re_optimize='0'
 __show_progress='1'
+__use_optional_size='0'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
@@ -53,7 +55,6 @@ Options:
   -d  --debug               Use debugging mode
   -l  --lengthy             Very verbose debugging mode
   -f  --force-render        Discard pre-rendered data
-      --optional            Render optional items
       --no-optional         Do not render optional items
   -q  --quiet               No output unless specified
       --silent              No output at all
@@ -70,6 +71,10 @@ Options:
   --re-optimize             Re-process and re-optimize files
                             appropriately
   --optimizer <OPTIMIZER>   Optimize with specified optimizer
+  --optional <SIZE>         Render optional items, optionally at
+                            specified size only.
+  --max-optional <SIZE>     Maximum size to render optional size
+  --no-optional             Do not render any optional images.
   --name <NAME>             Name to use when processing a pack
   --completed               List completed textures, according
                             to the COMMON field in the catalogue
@@ -100,221 +105,265 @@ __force_time "Processed XML" start
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
 
+################################################################
+
+__check_input () {
+
+case "${1}" in
+
+    "h" | "--help" | "?")
+        __usage
+        exit 77
+        ;;
+
+    "--no-progress")
+        __show_progress='0'
+        ;;
+
+    "v" | "--verbose")
+        __verbose='1'
+        __quiet='0'
+        ;;
+
+    "l" | "--lengthy")
+        __verbose='1'
+        __very_verbose_pack='1'
+        ;;
+
+    "i" | "--install")
+        __install='1'
+        ;;
+
+    "m" | "--mobile")
+        __mobile='1'
+        ;;
+
+    "s" | "--slow")
+        __quick='0'
+        ;;
+
+    "t" | "--time")
+        __time='1'
+        ;;
+
+    "d" | "--debug")
+        __debug='1'
+        ;;
+
+    "f" | "--force-render")
+        __force='1'
+        ;;
+
+    "--optional")
+        __render_optional='1'
+        ;;
+
+    "--no-optional")
+        __render_optional='0'
+        ;;
+
+    "--max-optional")
+        ;;
+
+    "--force-optional")
+        __render_optional='1'
+        __ignore_max_optional='1'
+        ;;
+
+    "q" | "--quiet")
+        __quiet='1'
+        __verbose='0'
+        ;;
+
+    "--silent")
+        __silent='1'
+        __quiet='1'
+        ;;
+
+    "w" | "--warn")
+        __should_warn='1'
+        ;;
+
+    "c" | "--compress")
+        __compress='1'
+        ;;
+
+    "x" | "--force-xml")
+        __force_warn "Cleaning split xml files"
+        __clean_xml='1'
+        ;;
+
+    "--xml-only")
+        __xml_only='1'
+        ;;
+
+    "o" | "--optimize")
+        __should_optimize='1'
+        ;;
+
+    "--dry")
+        __dry='1'
+        ;;
+
+    "--completed")
+        __list_completed='1'
+        ;;
+
+    "--graph")
+        __graph_deps='1'
+        ;;
+
+    "--graph-format")
+        __graph_deps='1'
+        ;;
+
+    "--graph-output")
+        __graph_deps='1'
+        ;;
+
+    "--grapher")
+        __graph_deps='1'
+        ;;
+
+    "--graph-seed")
+        __graph_deps='1'
+        ;;
+
+    "--changed")
+        __list_changed='1'
+        ;;
+
+    "--no-optimize")
+        __no_optimize='1'
+        ;;
+
+    "--max-optimize")
+        ;;
+
+    "--force-max-optimize")
+        __ignore_max_optimize='0'
+        ;;
+
+    "--force-optimize")
+        __should_optimize='1'
+        __ignore_max_optimize='1'
+        ;;
+
+    "--re-optimize")
+        __re_optimize='1'
+        ;;
+
+    "--optimizer")
+        ;;
+
+    "--name")
+        ;;
+
+    [0-9]*)
+        if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
+            __use_custom_size='1'
+            __sizes="${__sizes}
+${1}"
+        else
+            __warn "Overriding render sizes"
+            __use_custom_size='1'
+            __sizes="${1}"
+        fi
+        ;;
+
+    *)
+        __custom_error "Unknown option \"${1}\""
+        __usage
+        exit 77
+        ;;
+
+esac
+
+}
+
+################################################################
+
+__process_option () {
+
+if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
+
+    __check_input "${1}"
+
+elif echo "${1}" | grep '^--.*' &> /dev/null; then
+
+    __check_input "${1}"
+
+elif echo "${1}" | grep '^-.*' &> /dev/null; then
+
+    __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
+
+    for __letter in ${__letters}; do
+
+        __check_input "${__letter}"
+
+    done
+
+else
+    __check_input "${1}"
+fi
+
+if [ "${?}" = '77' ]; then
+    exit
+fi
+
+}
+
+################################################################
+
+__check_option () {
+if grep -q '^-.*' <<< "${1}"; then
+    return 0
+else
+    return 1
+fi
+}
+
+################################################################
+
 # then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
 
-    __check_input () {
 
-    case "${1}" in
-
-        "h" | "--help" | "?")
-            __usage
-            exit 77
-            ;;
-
-        "--no-progress")
-            __show_progress='0'
-            ;;
-
-        "v" | "--verbose")
-            __verbose='1'
-            __quiet='0'
-            ;;
-
-        "l" | "--lengthy")
-            __verbose='1'
-            __very_verbose_pack='1'
-            ;;
-
-        "i" | "--install")
-            __install='1'
-            ;;
-
-        "m" | "--mobile")
-            __mobile='1'
-            ;;
-
-        "s" | "--slow")
-            __quick='0'
-            ;;
-
-        "t" | "--time")
-            __time='1'
-            ;;
-
-        "d" | "--debug")
-            __debug='1'
-            ;;
-
-        "f" | "--force-render")
-            __force='1'
-            ;;
-
-        "--optional")
-            __render_optional='1'
-            ;;
-
-        "--no-optional")
-            __render_optional='0'
-            ;;
-
-        "q" | "--quiet")
-            __quiet='1'
-            __verbose='0'
-            ;;
-
-        "--silent")
-            __silent='1'
-            __quiet='1'
-            ;;
-
-        "w" | "--warn")
-            __should_warn='1'
-            ;;
-
-        "c" | "--compress")
-            __compress='1'
-            ;;
-
-        "x" | "--force-xml")
-            __force_warn "Cleaning split xml files"
-            __clean_xml='1'
-            ;;
-
-        "--xml-only")
-            __xml_only='1'
-            ;;
-
-        "o" | "--optimize")
-            __should_optimize='1'
-            ;;
-
-        "--dry")
-            __dry='1'
-            ;;
-
-        "--completed")
-            __list_completed='1'
-            ;;
-
-        "--graph")
-            __graph_deps='1'
-            ;;
-
-        "--graph-format")
-            __graph_deps='1'
-            ;;
-
-        "--graph-output")
-            __graph_deps='1'
-            ;;
-
-        "--grapher")
-            __graph_deps='1'
-            ;;
-
-        "--graph-seed")
-            __graph_deps='1'
-            ;;
-
-        "--changed")
-            __list_changed='1'
-            ;;
-
-        "--no-optimize")
-            __no_optimize='1'
-            ;;
-
-        "--max-optimize")
-            ;;
-
-        "--force-max-optimize")
-            __ignore_max_optimize='0'
-            ;;
-
-        "--force-optimize")
-            __should_optimize='1'
-            __ignore_max_optimize='1'
-            ;;
-
-        "--re-optimize")
-            __re_optimize='1'
-            ;;
-
-        "--optimizer")
-            ;;
-
-        "--name")
-            ;;
-
-        [0-9]*)
-            if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
-                __use_custom_size='1'
-                __sizes="${__sizes}
-${1}"
-            else
-                __warn "Overriding render sizes"
-                __use_custom_size='1'
-                __sizes="${1}"
-            fi
-            ;;
-
-        *)
-            __custom_error "Unknown option \"${1}\""
-            __usage
-            exit 77
-            ;;
-
-    esac
-
-    }
 
     case "${__last_option}" in
 
         "--max-optimize")
-
             if [ "${1}" -eq "${1}" ] 2>/dev/null; then
-
                 __max_optimize="${1}"
-
             else
-
                 __error "Given input is not a size"
-
             fi
-
             ;;
 
         "--optimizer")
-
             if __check_optimizer "${1}"; then
-
                 __optimizer="${1}"
-
             else
-
                 __error "Given input is not a valid optimizer"
-
             fi
-
             ;;
 
         "--name")
-
+            if __check_option "${1}"; then
+                __force_warn "Given name may actually be an option."
+            fi
             __name="${1}"
             ;;
 
         "--graph")
-
             if echo "${1}" | grep '^-.*' &> /dev/null; then
-                __error "File option must come after graph option"
+                __process_option "${1}"
+            else
+                __graph_files="$(echo "${1}" | tr ',' '\n')"
             fi
-
-            __graph_files="$(echo "${1}" | tr ',' '\n')"
             ;;
 
         "--graph-format")
-
             __graph_format="${1}"
             ;;
 
@@ -330,34 +379,27 @@ ${1}"
             __graph_seed="${1}"
             ;;
 
-        *)
-
-            if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
-
-                __check_input "${1}"
-
-            elif echo "${1}" | grep '^--.*' &> /dev/null; then
-
-                __check_input "${1}"
-
-            elif echo "${1}" | grep '^-.*' &> /dev/null; then
-
-                __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
-
-                for __letter in ${__letters}; do
-
-                    __check_input "${__letter}"
-
-                done
-
+        "--optional")
+            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
+                __use_optional_size='1'
+                __optional_size="${1}"
+            elif __check_option "${1}"; then
+                __process_option "${1}"
             else
-                __check_input "${1}"
+                __error "Given input is not a size"
             fi
+            ;;
 
-            if [ "${?}" = '77' ]; then
-                exit
+        "--max-optional")
+            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
+                __max_optional="${1}"
+            else
+                __error "Given input is not a size"
             fi
+            ;;
 
+        *)
+            __process_option "${1}"
             ;;
 
     esac
@@ -436,7 +478,7 @@ fi
 
 __final_size="$(tr ' ' '\n' <<< "${__sizes}" | tail -n1)"
 
-__sizes="$(echo "${__sizes}" | sort -n | uniq)"
+__sizes="$(echo "${__sizes}" | tr ' ' '\n' | sort -n | uniq)"
 
 if [ -z "${__max_optimize}" ]; then
     __default_max_optimize='512'
@@ -452,7 +494,28 @@ if [ -z "${__max_optimize}" ]; then
         if [ "${__should_warn_size}" = '1' ]; then
             __force_warn "Default maximum optimization size is \"${__default_max_optimize}\", some sizes will not
 be optimized. Use --force-optimize to override this, or set a
-new maximum with --max-optimize=SIZE"
+new maximum with --max-optimize <SIZE>"
+        fi
+    fi
+fi
+
+echo "${__sizes}"
+
+if [ -z "${__max_optional}" ]; then
+    __default_max_optional='2048'
+    __max_optional="${__default_max_optional}"
+    if [ "${__render_optional}" = '1' ] ; then
+        __should_warn_size='0'
+        while read -r __test_size; do
+            if ! [ "${__test_size}" -lt "${__default_max_optional}" ]; then
+                __should_warn_size='1'
+                break
+            fi
+        done <<< "${__sizes}"
+        if [ "${__should_warn_size}" = '1' ]; then
+            __force_warn "Default maximum optional size is \"${__default_max_optional}\", some sizes will not have optional
+images rendered. Use --force-optional to override this, or set a
+new maximum with --max-optional <SIZE>"
         fi
     fi
 fi
@@ -522,7 +585,21 @@ if [ "${__do_not_render}" = '1' ]; then
 fi
 
 if [ "${__render_optional}" = '1' ]; then
-    __options="${__options} --optional"
+
+    if [ "${__use_optional_size}" = '1' ]; then
+
+        if [ "${__optional_size}" = "${1}" ]; then
+
+            __options="${__options} --optional"
+
+        fi
+
+    elif ! [ "${1}" -gt "${__max_optional}" ] || [ "${__ignore_max_optional}" = '1' ]; then
+
+        __options="${__options} --optional"
+
+    fi
+
 fi
 
 if [ "${__very_verbose_pack}" = '1' ]; then
