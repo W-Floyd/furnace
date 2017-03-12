@@ -1,5 +1,5 @@
 _smelt () {
-    local cur prev sizes rundir helper sizes graph_formats items graphers
+    local cur prev sizes rundir helper sizes graph_formats matches items graphers
     _init_completion || return
 
     rundir="$(dirname "$(readlink -f "$(which "${1}")")")"
@@ -8,9 +8,10 @@ _smelt () {
     graph_formats='bmp canon dot gv xdot xdot1.2 xdot1.4 cgimage cmap eps exr fig gd gd2 gif gtk ico imap cmapx imap_np cmapx_np ismap jp2 jpg jpeg jpe json json0 dot_json xdot_json pct pict pdf pic plain plain-ext png pov ps ps2 psd sgi svg svgz tga tif tiff tk vml vmlz vrml wbmp webp xlib x11'
     graphers='dot neato twopi circo fdp sfdp patchwork osage'
     if [ -e './src/xml/list' ]; then
-        items="$(cat './src/xml/list')"
+        matches="$(cat './src/xml/list' | grep "^${cur}" | sed "s#^\(${cur}[^/]*/\)\(.*\)#\1#")"
+        items="$(sort <<< "${matches}" | uniq | sed 's/$/ /')"
     else
-        items='error'
+        items=''
     fi
 
 
@@ -41,6 +42,9 @@ _smelt () {
 
         "--graph")
             COMPREPLY=($(compgen -W "${items}" -- "${cur}"))
+            if [ "$(echo "${matches}" | wc -l )" -gt 1 ]; then
+                compopt -o nospace
+            fi
             return 0
             ;;
 
