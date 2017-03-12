@@ -32,16 +32,21 @@ echo \
     sep="0.3";
     node [style=filled, shape=record];' > "${__graph}"
 
+__list="$(cat './src/xml/list')"
+
 __pushd './src/xml/tmp_deps/'
 
 if [ "${__use_files}" = '1' ]; then
 
 while read -r __item; do
-    if ! [ -e "${__item}" ]; then
+    if ! grep -xq "${__item}" <<< "${__list}"; then
         __force_warn "Item \"${__item}\" does not exist"
     else
-        __dep_list="$(cat "${__item}")
+        __matches="$(grep -x "${__item}" <<< "${__list}")"
+        while read -r __match; do
+            __dep_list="$(cat "${__match}")
 ${__dep_list}"
+        done <<< "${__matches}"
     fi
 done <<< "${__files}"
 
@@ -51,10 +56,10 @@ __popd
 
 if ! [ -z "${__dep_list}" ]; then
 
-    __dep_list="${__files}
+    __dep_list="$(grep -x "${__files}" <<< "${__list}")
     ${__dep_list}"
 
-    __dep_list="$(echo "${__dep_list}" | grep -v '^$')"
+    __dep_list="$(echo "${__dep_list}" | grep -v '^$' | sort | uniq)"
 
     echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
 
