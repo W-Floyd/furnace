@@ -28,10 +28,6 @@ compgen -A variable > /tmp/tmpvars
 # Defaults to quick mode if missing
 #__quick='1'
 
-# Whether or not to render optional images (usually demo images)
-# Defaults to off if missing
-#__render_optional='0'
-
 # Whether or not the final images should be optimized
 # Defaults to no optimization if missing
 #__should_optimize='1'
@@ -50,6 +46,18 @@ compgen -A variable > /tmp/tmpvars
 # list and by availability. If available, optipng is first on
 # the list, due to compatability
 #__optimizer='zopflipng'
+
+# Whether or not to render optional images (usually demo images)
+# Defaults to off if missing
+#__render_optional='0'
+
+# Largest size to render optional images for
+# Defaults to 2048 if missing
+#__max_optional='2048'
+
+# Whether or not to ignore the max optional size
+# Defaults to off if missing
+#__ignore_max_optional='1'
 
 ################################################################
 # Stop customizing from here
