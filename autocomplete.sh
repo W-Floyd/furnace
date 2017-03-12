@@ -15,7 +15,7 @@ _smelt () {
 
 
     case ${prev} in
-        '-?' | '-h' | '--help')
+        '-?' | '-h' | '--help' | "--graph-seed" | "--completed")
             return 0
             ;;
 
@@ -46,10 +46,6 @@ _smelt () {
 
         "--grapher")
             COMPREPLY=($(compgen -W "${graphers}" -- "${cur}"))
-            return 0
-            ;;
-
-        "--graph-seed")
             return 0
             ;;
 
