@@ -356,7 +356,7 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         "--graph")
-            if echo "${1}" | grep '^-.*' &> /dev/null; then
+            if __check_option "${1}"; then
                 __process_option "${1}"
             else
                 if [ -z "${__graph_files}" ]; then
