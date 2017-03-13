@@ -21,6 +21,7 @@ __xml_only='0'
 __do_not_render='0'
 __list_completed='0'
 __graph_deps='0'
+__no_highlight='0'
 __list_changed='0'
 __last_size='0'
 __should_optimize='0'
@@ -93,7 +94,9 @@ Options:
   --grapher <GRAPHER>       Graphviz tool to use when graphing.
                             Defaults to neato.
   --graph-output <FILE>     Name to use when outputting a graph.
-                            Default output is 'graph'\
+                            Default output is 'graph'
+  --no-highlight            Do not highlight specified files
+                            when graphing.\
 "
 }
 
@@ -227,6 +230,10 @@ case "${1}" in
 
     "--graph-seed")
         __graph_deps='1'
+        ;;
+
+    "--no-highlight")
+        __no_highlight='1'
         ;;
 
     "--changed")
@@ -463,7 +470,7 @@ if [ "${__graph_deps}" = '1' ]; then
         __graph_seed="${RANDOM}"
     fi
 
-    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}"
+    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}" "${__no_highlight}"
     exit 0
 fi
 

@@ -67,7 +67,7 @@ ${__dep_list}"
 
 __dep_list="$(echo "${__dep_list}" | grep -v '^$')"
 
-if [ "${__use_files}" = '1' ]; then
+if [ "${__use_files}" = '1' ] && [ "${7}" = '0' ]; then
     echo "    node [style=filled, shape=record, color=\"blue\" fillcolor=\"lightblue\"];
 " >> "${__graph}"
 fi
