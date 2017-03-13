@@ -28,9 +28,6 @@ __render_optional='0'
 # Setting up functions
 ###############################################################
 
-# get set up
-source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
-
 if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
 fi
