@@ -31,6 +31,7 @@ __ignore_max_optional='0'
 __re_optimize='0'
 __show_progress='1'
 __use_optional_size='0'
+__max_install_size='1024'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
@@ -722,7 +723,7 @@ fi
 
 __dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
 
-if [ "${__install}" = '1' ]; then
+if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; then
 
     if [ -e "${__dest}" ] ; then
         rm "${__dest}"
