@@ -84,16 +84,16 @@ Options:
                             the comma and/or new-line separated
                             list of ITEMs to be the subject of
                             the graph. For a full graph, use '',
-                            '.*', or nothing, when there are no
-                            other options after. Default output
-                            is 'graph'.
+                            '.*', or nothing. May be specified
+                            multiple times.
   --graph-format <FORMAT>   Specifies the format to graph to.
                             Defaults to png.
   --graph-seed <SEED>       Seed to use when graphing. Defaults
                             to a random seed when unspecified.
   --grapher <GRAPHER>       Graphviz tool to use when graphing.
                             Defaults to neato.
-  --graph-output <FILE>     Name to use when outputting a graph\
+  --graph-output <FILE>     Name to use when outputting a graph.
+                            Default output is 'graph'\
 "
 }
 
@@ -359,7 +359,12 @@ while ! [ "${#}" = '0' ]; do
             if echo "${1}" | grep '^-.*' &> /dev/null; then
                 __process_option "${1}"
             else
-                __graph_files="$(echo "${1}" | tr ',' '\n')"
+                if [ -z "${__graph_files}" ]; then
+                    __graph_files="$(echo "${1}" | tr ',' '\n')"
+                else
+                    __graph_files="${__graph_files}
+$(echo "${1}" | tr ',' '\n')"
+                fi
             fi
             ;;
 
