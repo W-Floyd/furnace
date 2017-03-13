@@ -1371,7 +1371,11 @@ __break_loop='0'
 
 __time "Rendered ${__size}px" start
 
-__process_count="$(wc -l < "${__render_list}")"
+__pushd './src/xml/'
+
+__process_count="$(while read -r __item; do if ! [ -z "$(__get_value "${__item}" CONFIG)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
+
+__popd
 
 if [ "${__process_count}" = '0' ] && [ "${__quiet}" = '1' ]; then
     __bypass_announce "No changes to \"${__size}\""
@@ -1430,10 +1434,10 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 # get the name of the config script, and replace any macro locations
         __config_script="$(__get_value "${__config}" CONFIG | __stdconf)"
 
-        __render_num=$((__render_num+1))
-
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
+
+            __render_num=$((__render_num+1))
 
             __failed='0'
 
