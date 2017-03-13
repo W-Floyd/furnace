@@ -90,7 +90,7 @@ Options:
   --graph-format <FORMAT>   Specifies the format to graph to.
                             Defaults to png.
   --graph-seed <SEED>       Seed to use when graphing. Defaults
-                            to '1337'.
+                            to a random seed when unspecified.
   --grapher <GRAPHER>       Graphviz tool to use when graphing.
                             Defaults to neato.
   --graph-output <FILE>     Name to use when outputting a graph\
@@ -455,7 +455,7 @@ if [ "${__graph_deps}" = '1' ]; then
     fi
 
     if [ -z "${__graph_seed}" ]; then
-        __graph_seed='1337'
+        __graph_seed="${RANDOM}"
     fi
 
     "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}"
