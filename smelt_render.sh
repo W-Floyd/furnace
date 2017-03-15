@@ -1485,7 +1485,7 @@ Won't create \".${__config//.\/xml/}\""
                 {
                 eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ')
 
-                if [ "$(__get_value "${__config}" IMAGE)" = 'YES' ] && [ "${__will_optimize}" = '1' ]; then
+                if [ "${__will_optimize}" = '1' ]; then
 
                     __optimize "./${__orig_config_name}"
 
@@ -1504,6 +1504,18 @@ Won't create \".${__config//.\/xml/}\""
             fi
 
 # end loop for when a config script is present
+        else
+
+            if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
+                __will_optimize='1'
+            fi
+
+            if [ "${__will_optimize}" = '1' ]; then
+
+                __optimize "./${__orig_config_name}"
+
+            fi
+
         fi
 
 # often enough breaking the loop also breaks an image this will
