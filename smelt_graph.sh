@@ -5,6 +5,13 @@ if ! which "${5}" &> /dev/null; then
 fi
 
 __graph_tmp_dir="/tmp/smelt/graph${6}"
+
+if [ -d "${__graph_tmp_dir}" ]; then
+
+    rm -r "${__graph_tmp_dir}"
+
+fi
+
 mkdir -p "${__graph_tmp_dir}"
 
 __catalogue="${2}"
