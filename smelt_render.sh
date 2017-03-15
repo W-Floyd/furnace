@@ -711,11 +711,15 @@ done < "${__dep_list_tsort}"
 
 __time "Read and inherited dep files" end
 
+__time "Setting deps from file" start
+
 while read -r __xml; do
 
-    __set_value "${__xml}" DEPENDS "$(cat "${__dep_list_folder}/${__xml}")"
+    __set_value "${__xml}" DEPENDS < "${__dep_list_folder}/${__xml}"
 
 done < "${__list_file}"
+
+__time "Setting deps from file" end
 
 while read -r __xml; do
 
