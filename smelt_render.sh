@@ -541,7 +541,7 @@ __xml_current="${__tmp_dir}/xml_current"
 __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
 # Actually read the range into file. This now contains an ITEM.
-    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
+    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}" | sed -e '1d' -e '$d' )"
 
 # TODO
 # Optimize xml functions more
@@ -643,8 +643,6 @@ while read -r __xml; do
 # Finish loop
 done < "${__list_file}"
 
-cp "${__dep_list_tsort}" "${__dep_list_tsort}_original"
-
 __time "Read base dependencies" end
 
 __time "tsort-ed" start
@@ -652,6 +650,8 @@ __time "tsort-ed" start
 tsort "${__dep_list_tsort}" | tac > "${__dep_list_tsort}_"
 
 mv "${__dep_list_tsort}_" "${__dep_list_tsort}"
+
+cp "${__dep_list_tsort}" "${__dep_list_tsort}_original"
 
 __time "tsort-ed" end
 
@@ -722,8 +722,6 @@ __time "Setting deps from file" end
 __time "Getting cleanup files" start
 
 while read -r __xml; do
-
-    sed -i -e '1d' -e '$d' "${__xml}"
 
 # get the cleanup files, and list it to a file
     __get_value "${__xml}" CLEANUP >> "${__cleanup_all}"
