@@ -640,7 +640,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    { __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG; } | sort | uniq | grep -v '^$' | while read -r __line; do
+    { __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG | __stdconf; } | sort | uniq | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
@@ -689,7 +689,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        { __get_value_piped CONFIG <<< "${__xml}" | __stdconf; __get_value_piped CLEANUP <<< "${__xml}"; __get_value_piped DEPENDS <<< "${__xml}"; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
+        { __get_value "${__xml}" CONFIG; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "./${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
@@ -1450,7 +1450,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
         fi
 
 # get the name of the config script, and replace any macro locations
-        __config_script="$(__get_value "${__config}" CONFIG | __stdconf)"
+        __config_script="$(__get_value "${__config}" CONFIG)"
 
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
