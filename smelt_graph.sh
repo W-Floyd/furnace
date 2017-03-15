@@ -4,7 +4,7 @@ if ! which "${5}" &> /dev/null; then
     __error "\"${5}\" could not be found, please install the graphviz package"
 fi
 
-__graph_tmp_dir="/tmp/smelt/graph${$}"
+__graph_tmp_dir="/tmp/smelt/graph${6}"
 mkdir -p "${__graph_tmp_dir}"
 
 __catalogue="${2}"
@@ -55,7 +55,8 @@ else
     __dep_list="${__list}"
 fi
 
-echo "    node [style=filled, shape=record, color=\"black\" fillcolor=\"lightgray\" ];
+echo "
+    node [style=filled, shape=record, color=\"black\" fillcolor=\"lightgray\" ];
 " >> "${__graph}"
 
 if [ "${__use_files}" = '1' ]; then
@@ -68,7 +69,8 @@ ${__dep_list}"
 __dep_list="$(echo "${__dep_list}" | grep -v '^$')"
 
 if [ "${__use_files}" = '1' ] && [ "${7}" = '0' ]; then
-    echo "    node [style=filled, shape=record, color=\"blue\" fillcolor=\"lightblue\"];
+    echo "
+    node [style=filled, shape=record, color=\"blue\" fillcolor=\"lightblue\"];
 " >> "${__graph}"
 fi
 
