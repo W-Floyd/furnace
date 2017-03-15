@@ -32,10 +32,16 @@ if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
 fi
 
-# temporary timer for quick timing
+# temporary timer for quick timing automatically toggles
 __time_var='temporary timer'
 __tmp_time () {
-__time "${__time_var}" "${1}"
+if [ -z "${__tmp_time_var}" ] || [ "${__tmp_time_var}" = 'end' ]; then
+    __tmp_time_var='start'
+elif [ "${__tmp_time_var}" = 'start' ]; then
+    __tmp_time_var='end'
+fi
+
+__time "${__time_var}" "${__tmp_time_var}"
 }
 
 # print help
@@ -1292,6 +1298,8 @@ done
 
 wait
 
+__time "Copied existing files" start
+
 while read -r __xml_name; do
 
     dirname "${__working_dir}/${__pack_new}/${__xml_name}"
@@ -1311,6 +1319,8 @@ while read -r __xml_name; do
 done < "${__copy_list}"
 
 wait
+
+__time "Copied existing files" end
 
 sort "${__render_list}" | uniq > "${__render_list}_"
 
