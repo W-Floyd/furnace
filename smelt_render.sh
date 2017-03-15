@@ -563,6 +563,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # more useful, according to the item's name
 
     echo "${__tmp_read}" > "${__xml_current}/${__item_name}"
+
 # Finish loop, but don't block the loop until it finishes
 done
 
@@ -640,7 +641,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    { __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG | __stdconf; } | sort | uniq | grep -v '^$' | while read -r __line; do
+    { __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG; } | sort | uniq | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
