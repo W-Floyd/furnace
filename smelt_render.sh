@@ -629,6 +629,8 @@ mkdir -p "${__dep_list_folder}"
 # Get into the xml directory
 __pushd ./src/xml/
 
+__time "Read base dependencies" start
+
 # For every xml file,
 while read -r __xml; do
 
@@ -645,9 +647,17 @@ done < "${__list_file}"
 
 cp "${__dep_list_tsort}" "${__dep_list_tsort}_original"
 
+__time "Read base dependencies" end
+
+__time "tsort-ed" start
+
 tsort "${__dep_list_tsort}" | tac > "${__dep_list_tsort}_"
 
 mv "${__dep_list_tsort}_" "${__dep_list_tsort}"
+
+__time "tsort-ed" end
+
+__time "Made directories" start
 
 while read -r __xml; do
 
@@ -666,6 +676,10 @@ done < "${__dep_list_tsort}" | sort | uniq | while read -r __dir; do
 
 done
 
+__time "Made directories" end
+
+__time "Read and inherited dep files" start
+
 while read -r __xml; do
 
     if [ -e "${__xml}" ]; then
@@ -675,11 +689,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        __tmp_var="$({ __get_value "${__xml}" CONFIG | __stdconf; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | grep -v "^$")"
-
-        echo "${__tmp_var}" >> "${__dep_list}"
-
-        echo "${__tmp_var}" | while read -r __suspect_dep; do
+        { __get_value "${__xml}" CONFIG | __stdconf; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "./${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
@@ -689,15 +699,17 @@ while read -r __xml; do
 
         done
 
-        touch "${__dep_list}_"
+        sort "${__dep_list}" | uniq | sed '/^$/d' > "${__dep_list}_"
 
-        sort "${__dep_list}" | uniq | grep -v '^$' > "${__dep_list}_"
+        touch "${__dep_list}_"
 
         mv "${__dep_list}_" "${__dep_list}"
 
     fi
 
 done < "${__dep_list_tsort}"
+
+__time "Read and inherited dep files" end
 
 while read -r __xml; do
 
