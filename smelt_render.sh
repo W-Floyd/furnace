@@ -651,8 +651,6 @@ tsort "${__dep_list_tsort}" | tac > "${__dep_list_tsort}_"
 
 mv "${__dep_list_tsort}_" "${__dep_list_tsort}"
 
-cp "${__dep_list_tsort}" "${__dep_list_tsort}_original"
-
 __time "tsort-ed" end
 
 __time "Made directories" start
@@ -1631,6 +1629,7 @@ wait
 rm -r ./xml
 rm -r ./conf
 
+# remove all empty directories
 find . -type d | while read -r __dir; do
     if ! [ "$(ls -A "${__dir}/")" ]; then
         rmdir "${__dir}"
