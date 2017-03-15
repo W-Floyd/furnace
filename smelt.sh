@@ -472,6 +472,8 @@ if [ "${__graph_deps}" = '1' ]; then
         __force_announce "Using seed \"${__graph_seed}\"."
     fi
 
+    export __debug
+
     "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}" "${__no_highlight}"
     exit 0
 fi

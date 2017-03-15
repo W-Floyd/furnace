@@ -132,6 +132,10 @@ else
 
 fi
 
-rm -r "${__graph_tmp_dir}"
+if [ "${__debug}" = '0' ]; then
+
+    rm -r "${__graph_tmp_dir}"
+
+fi
 
 exit
