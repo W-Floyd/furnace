@@ -545,11 +545,11 @@ __xml_current="${__tmp_dir}/xml_current"
 # For every ITEM in catalogue,
 __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
-# Actually read the range into file. This now contains an ITEM.
-    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
-
 # TODO
 # Optimize xml functions more
+
+# Actually read the range into a variable. This now contains an ITEM.
+    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
 
 # Get the NAME of this ITEM
     __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
@@ -557,13 +557,12 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # Make the correct directory for dumping the xml into an
 # appropriately named file
 
-    mkdir -p "$(dirname "${__xml_current}/${__item_name}")"
+    mkdir -p "$(dirname "${__xml_current}/${__item_name//.\//}")"
 
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
 
     echo "${__tmp_read}" > "${__xml_current}/${__item_name}"
-
 # Finish loop, but don't block the loop until it finishes
 done
 
