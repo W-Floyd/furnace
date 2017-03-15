@@ -473,6 +473,9 @@ __optimize_file='optimize_list'
 __optimize_list="${__tmp_dir}/${__optimize_file}"
 touch "${__optimize_list}"
 
+__cleaned_catalogue="${__tmp_dir}/${__catalogue}"
+__clean_pack < "${__catalogue}" > "${__cleaned_catalogue}"
+
 # if the xml folder does not exist,
 if ! [ -d ./src/xml/ ]; then
 
@@ -489,7 +492,7 @@ __pushd ./src/xml
 if [ -e "${__catalogue}" ]; then
 
 # get the md5sum hash of the catalogue
-    __old_catalogue_hash="$(md5sum "${__catalogue}")"
+    __old_catalogue_hash="$(md5sum "${__catalogue}" | sed 's/ .*//')"
 
 # remove the catalogue
     rm "${__catalogue}"
@@ -501,7 +504,7 @@ fi
 __popd
 
 # md5sum hash the current catalogue
-__new_catalogue_hash="$(md5sum "${__catalogue}")"
+__new_catalogue_hash="$(md5sum "${__cleaned_catalogue}" | sed 's/ .*//')"
 
 # if the new catalogue is the same as the old catalogue, then
 if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ] && [ -e "./src/xml/${__optimize_file}" ] && [ -e "./src/xml/${__list_name}" ]; then
@@ -535,13 +538,13 @@ __announce "Splitting XML files."
 __xml_current="${__tmp_dir}/xml_current"
 
 # For every ITEM in catalogue,
-for __range in $(__get_range "${__catalogue}" ITEM); do
+for __range in $(__get_range "${__cleaned_catalogue}" ITEM); do
 
 # File to use for reading ranges
     __read_range_file="${__tmp_dir}/${__range}"
 
 # Actually read the range into file. This now contains an ITEM.
-    __read_range "${__catalogue}" "${__range}" > "${__read_range_file}"
+    __read_range "${__cleaned_catalogue}" "${__range}" > "${__read_range_file}"
 
 # TODO
 # Optimize xml functions more
@@ -1689,7 +1692,7 @@ fi
 fi
 
 # copy the catalogue into the src xml folder
-cp "${__catalogue}" "./src/xml/${__catalogue}"
+cp "${__cleaned_catalogue}" "./src/xml/${__catalogue}"
 
 cp "${__dep_list_tsort}" "./src/xml/${__tsort_file}"
 
