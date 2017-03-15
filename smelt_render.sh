@@ -474,7 +474,12 @@ __optimize_list="${__tmp_dir}/${__optimize_file}"
 touch "${__optimize_list}"
 
 __cleaned_catalogue="${__tmp_dir}/${__catalogue}"
+
+__time "Cleaned pack" start
+
 __clean_pack < "${__catalogue}" > "${__cleaned_catalogue}"
+
+__time "Cleaned pack" end
 
 # if the xml folder does not exist,
 if ! [ -d ./src/xml/ ]; then
