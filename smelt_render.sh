@@ -685,7 +685,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        { __get_value "${__xml}" CONFIG | __stdconf; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
+        { __get_value_piped CONFIG <<< "${__xml}" | __stdconf; __get_value_piped CLEANUP <<< "${__xml}"; __get_value_piped DEPENDS <<< "${__xml}"; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "./${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
