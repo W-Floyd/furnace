@@ -518,6 +518,19 @@ __log2 () {
 
 ###############################################################
 #
+# ... | __strip_zero
+#
+# Strip Zero
+# From pipe, strips trailing zeros and dangling decimal place
+#
+###############################################################
+
+__strip_zero () {
+    cat | sed -e 's/\([^0]*\)0*$/\1/' -e 's/\.$//'
+}
+
+###############################################################
+#
 # __check_optimizer <OPTIMIZER>
 #
 # Check Optimizer

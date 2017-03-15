@@ -467,8 +467,17 @@ composite -define png:color-type=6 -compose xor "${2}" "${1}" "${3}"
 ###############################################################
 
 __fade () {
-local __tmptrans=$(echo '1/'"${3}" | bc)
-convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -define png:color-type=6 "${2}"
+if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
+
+    local __tmptrans=$(echo '1/'"${3}" | bc)
+    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -define png:color-type=6 "${2}"
+
+else
+
+    cp "${1}" "${2}"
+
+fi
+
 }
 
 ###############################################################
