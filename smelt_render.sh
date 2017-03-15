@@ -541,7 +541,7 @@ __xml_current="${__tmp_dir}/xml_current"
 __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
 # Actually read the range into file. This now contains an ITEM.
-    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}" | sed -e '1d' -e '$d' )"
+    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}" | head -n -1 | tail -n +2 )"
 
 # TODO
 # Optimize xml functions more
