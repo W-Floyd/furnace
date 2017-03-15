@@ -124,7 +124,7 @@ cat | pcregrep -M "<${1}>(\n|.)*</${1}>" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"$
 # Set Value
 # Sets the <VALUE> of the specified <FIELD_NAME>
 #
-# When piped version is used, DATASET should be omitted
+# When piped version is used, VALUE should be omitted
 #
 ###############################################################
 
@@ -133,7 +133,7 @@ perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
 }
 
 __set_value_piped () {
-cat | perl -pe "BEGIN{undef $/;} s#<${1}>.*</${1}>#<${1}>${2}</${1}>#sm"
+perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>$(cat)</${2}>#sm" "${1}"
 }
 
 ###############################################################
