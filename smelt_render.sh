@@ -538,19 +538,16 @@ __announce "Splitting XML files."
 __xml_current="${__tmp_dir}/xml_current"
 
 # For every ITEM in catalogue,
-for __range in $(__get_range "${__cleaned_catalogue}" ITEM); do
-
-# File to use for reading ranges
-    __read_range_file="${__tmp_dir}/${__range}"
+__get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
 # Actually read the range into file. This now contains an ITEM.
-    __read_range "${__cleaned_catalogue}" "${__range}" > "${__read_range_file}"
+    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
 
 # TODO
 # Optimize xml functions more
 
 # Get the NAME of this ITEM
-    __item_name="$(__get_value "${__read_range_file}" NAME)"
+    __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
 
 # Make the correct directory for dumping the xml into an
 # appropriately named file
@@ -560,7 +557,7 @@ for __range in $(__get_range "${__cleaned_catalogue}" ITEM); do
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
 
-    mv "${__read_range_file}" "${__xml_current}/${__item_name}"
+    echo "${__tmp_read}" > "${__xml_current}/${__item_name}"
 
 # Finish loop, but don't block the loop until it finishes
 done
