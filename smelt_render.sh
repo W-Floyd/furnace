@@ -721,6 +721,8 @@ done < "${__list_file}"
 
 __time "Setting deps from file" end
 
+__time "Getting cleanup files" start
+
 while read -r __xml; do
 
     sed -i -e '1d' -e '$d' "${__xml}"
@@ -742,6 +744,8 @@ done < "${__list_file}"
 sort "${__cleanup_all}" | uniq > "${__cleanup_all}_"
 
 mv "${__cleanup_all}_" "${__cleanup_all}"
+
+__time "Getting cleanup files" end
 
 # Go back to the regular directory
 __popd
