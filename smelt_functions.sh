@@ -99,13 +99,16 @@ cat | sed -e "${1}"'!d' | sed -e 's/^[\t| ]*//'
 
 ###############################################################
 #
-# __get_value <DATASET> <FIELD_NAME>
+# __get_value/s <DATASET> <FIELD_NAME1> <FIELD_NAME2> ...
 #
 # Get Value
 # Gets the value/s of <FIELD_NAME> from <DATASET>
 # Meant to be used on separated data-sets.
 #
 # When piped version is used, DATASET should be omitted
+#
+# When __get_values* is used, multiple field names may be
+# specified
 #
 ###############################################################
 
@@ -115,6 +118,23 @@ pcregrep -M "<${2}>(\n|.)*</${2}>" "${1}" | sed -e 's/^<'"${2}"'>//' -e 's/<\/'"
 
 __get_value_piped () {
 cat | pcregrep -M "<${1}>(\n|.)*</${1}>" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+}
+
+__get_values () {
+local __file="${1}"
+shift
+for __input in "$@"; do
+pcregrep -M "<${1}>(\n|.)*</${1}>" "${__file}" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+shift
+done
+}
+
+__get_values_piped () {
+local __pipe="$(cat)"
+for __input in "$@"; do
+pcregrep -M "<${1}>(\n|.)*</${1}>" <<< "${__pipe}" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+shift
+done
 }
 
 ###############################################################
