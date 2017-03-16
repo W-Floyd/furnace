@@ -1302,15 +1302,10 @@ wait
 
 __time "Copied existing files" start
 
-while read -r __xml_name; do
-
-    dirname "${__working_dir}/${__pack_new}/${__xml_name}"
-
-done < "${__copy_list}" | sort | uniq | while read -r __dir; do
-
-    mkdir -p "${__dir}"
-
-done
+if [ -s "${__copy_list}" ]; then
+    mapfile -t __dir_array <<< "$(sed "s#^#${__working_dir}/${__pack_new}/#" < "${__copy_list}")"
+    mkdir -p "${__dir_array[@]%/*}"
+fi
 
 while read -r __xml_name; do
 
@@ -1320,22 +1315,20 @@ while read -r __xml_name; do
 
 done < "${__copy_list}"
 
-wait
-
-__time "Copied existing files" end
-
-__time "Made directories" start
-
 sort "${__render_list}" | uniq > "${__render_list}_"
 
 mv "${__render_list}_" "${__render_list}"
 
-mapfile -t __dir_array < "${__render_list}"
-mkdir -p "${__dir_array[@]%/*}"
-
-__time "Made directories" end
-
 cp "${__render_list}" "${__render_list}_backup"
+
+if [ -s "${__render_list}" ]; then
+    mapfile -t __dir_array <<< "$(sed "s#^#${__working_dir}/${__pack_new}/#" < "${__render_list}")"
+    mkdir -p "${__dir_array[@]%/*}"
+fi
+
+wait
+
+__time "Copied existing files" end
 
 __time "Checked for items to re/process" end
 
