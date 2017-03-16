@@ -1,0 +1,99 @@
+# TODO list
+
+***
+## Easy to do
+#### Render script
+Rename CONFIG field to SCRIPT field.
+Add \_\_check\_field function to ensure a field exists. Act accordingly (\_\_error out when required)
+
+***
+
+## Planned features
+#### Allow pack variants. 
+Will require a field named VARIANT, which describes what variants it belongs to.  
+This feature will be tricky to implement gracefully, and will certainly require major restructuring of xml splitting (though, hopefully, minimal changes to XML). XML will be split per-variant, into their own folders. Non XML files (that is, listings, tsort, optimization, etc.) should go into their own folder/s - the XML folder should just be XML.  
+
+Variants should stack, and calling order will dictate variant combination. Definition order, however, does not matter.
+
+Examples where allowing variants will be useful:  
+* **most** importantly, size specific variants. For example in Angl, wool sizes 32 and below are a blurred blob, due to the way the stripes run (half pixel). Allowing a size variant would afford me the opportunity to do differently spaced striped for 32, and few stripes for lower textures.
+* animated/non-animated pack (non-animated would be default)
+* themed/non-themed pack (Halloween, Candy Land, whatever sets your pants on fire)
+
+To define variants, the field VARIANT will be used.
+
+The planned calling syntax for this would be like so:
+
+smelt 32 --variant all,animated,32,halloween
+
+Would render size 32, using base textures, some of which might be overridden by animated texture variants, some of which might be overridden by size 32 specific variants, some of which might be overridden by halloween variants.
+
+To include an ITEM in a variant, or combination of variants, plus symbols ('+') should be used to split and prefix the variant combination to which it applies. Like so:  
+```<VARIANT>+animated+32+halloween</VARIANT>```
+
+This means the texture **only** applies to a combination of animated, 32, and halloween (e.g. a 32 scale animated jack'o'lantern). This takes priority over a combination of 32, animated and halloween mixed together. It will not be included in, say, animated,32,halloween,high\_contrast, animated,32, animated,32,high_contrast, or any others, unless it states so separately (we'll get to that)
+
+This allows us to limit to a single level variant, like so:  
+```<VARIANT>+animated</VARIANT>```
+
+Commas (',') will separate variants it applies to. e.g.  
+```<VARIANT>+animated,+32,+halloween,+animated+32</VARIANT>```
+
+This means it can be used for: animated, 32, halloween, and animated 32.  
+It will not be included in child variants (we'll get to that later)
+If VARIANT is empty, or missing, it applies to the default 'all' variant. Alternatively, 'all' may be declared. First defined ITEM is the one used. smelt should warn when multiple images of the same definition are declared in the same scope, and it should also warn when an image is not available in the current set of variants (but is in others).
+
+To exclude an item from a variant, specific or inherited (we'll get to that), an exclamation mark should be used ('!') to prefix that exclusion, in the same way an inclusion was defined. e.g.  
+```<VARIANT>all,animated,!animated!32!halloween</VARIANT>```
+Note that an inclusion must be specified in this case.
+Excludes that item from being considered in animated,32,halloween (when called, not defined), though it will be in animated and all, or any combination thereof (it is still included in the base group). Remember, this is specific, so order does not matter.
+
+```<VARIANT>+all,!animated,+animated+32+halloween,+halloween</VARIANT>```
+Would mean it will be in 'all, but should not be in 'animated' (so, if 'all' is called, it's included. If 'all,animated', 'animated,all', or 'animated' is called, it's not included.)
+'+animated+32+halloween' then includes it specifically with 'animated', '32' and 'halloween' together. Halloween on its own is stated, meaning that it is included in halloween. Remember, none of these files are inherited by other variants unless called as such.
+
+To make things complete, variants may use a form of regex, like so:  
+```<VARIANT>+\*.\*,!animated!.\*,+animated+32,!.*_wood+dark\_.\*</VARIANT>```
+This means the following:
+It starts by being included in all variants, specific and non-specific, of any kind (+\*.\* - that is, match any number of inclusions of any name)  
+Next, it is excluded from any 2 part specific variant in which one variant is 'animated'  
+Then, it is re-included in specific variant animated 32, which it would have otherwise been excluded from.  
+Now, it is excluded from any variant that ends in '_wood'  
+Finally, it is re-included in any variant stating with 'dark\_' (there may be some from the '\_wood' exclusion that get re-included here.)  
+
+Therefore, order of consideration is on a per-group basis (separated by commas)
+Specific variants will be chossen in order of specificity.
+
+This is entirely more complicated than I will ever need in full, so here are some examples that I might actually use:  
+
+```<VARIANT>+.\*,!no_animation!\*</VARIANT>```
+Use: Animated grass
+Variants: All variants, except any with 'no_animation'
+Explanation: Include it in all base level variants (hence, all possible combinations), minus all possible combinations that have, in part or in full, 'no_animation'.
+
+```<VARIANT>+halloween</VARIANT>```
+Use: Halloween themed pumpkin
+Variants: All variants that include 'halloween'
+Explanation: By including it is halloween as a base variant, and no more, it means it can be overridden by more specific variants.
+
+Back to the smelt calling syntax, it is to be used in a similar way to the definitions. By default, comma separated declarations with no leader are deemed to be inclusions. Otherwise + and ! are again used. That is + include any ITEMS that are included in this variant, and any subsequent options will need to be checked for specific variants. Specific variants may be called through smelt directly also. That leaves !, which excludes ITEMS that are included in this variant, or specific variant.
+
+***
+
+## Greater goals
+* generic mobile render script should allow for any partial stage of completion
+* all pack folders should be put into a 'build' directory, as should split xml (keep source clean)
+* all current 'conf' files should be moved out of src once again, possibly into a folder of the same name. This is required in order to most pedantically avoid collisions and keep good form
+* build-time xml splitting (re-used within render batch only). This will require *fast*, *efficient* and *comprehensive* xml work, specifically dependency resolution and error reporting before render time
+
+The following features are deemed high priority additions:
+* gracefully exiting a render - finishing the current item before performing any cleanup needed, if any (it would be preferred it not exist)
+* resumable renders (where good build-time xml work and graceful exiting is essential)
+* parallel rendering (isolating render environment would be one option, or a reworking of the script system to allow graceful coexistence, later would be preferable)
+
+In the long run, this will require at least one thing:
+#### Language change
+A more powerful and succinct programming language will be required for the render system (though individual file render scripts should remain). I am currently considering C++ . This would provide a much more robust system with which to work. That, combined with a clearer goal of my render system, should provide the desired speed and functions.
+
+#### Blockers
+Time, first and foremost. Though I am putting a great deal of work into this tool, I am in my final year of high school, and struggle to justify the effort and time involved in learning C++ or any other language. 
