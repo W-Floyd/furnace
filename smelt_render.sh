@@ -563,7 +563,9 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # Make the correct directory for dumping the xml into an
 # appropriately named file
 
-    mkdir -p "$(dirname "${__xml_current}/${__item_name//.\//}")"
+    __goal_dir="${__xml_current}/${__item_name//.\//}"
+
+    mkdir -p "${__goal_dir%/*}"
 
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
@@ -1322,19 +1324,16 @@ wait
 
 __time "Copied existing files" end
 
+__time "Made directories" start
+
 sort "${__render_list}" | uniq > "${__render_list}_"
 
 mv "${__render_list}_" "${__render_list}"
 
-while read -r __xml_name; do
+mapfile -t __dir_array < "${__render_list}"
+mkdir -p "${__dir_array[@]%/*}"
 
-    dirname "${__working_dir}/${__pack_new}/${__xml_name}"
-
-done < "${__render_list}" | sort | uniq | while read -r __dir; do
-
-    mkdir -p "${__dir}"
-
-done
+__time "Made directories" end
 
 cp "${__render_list}" "${__render_list}_backup"
 
