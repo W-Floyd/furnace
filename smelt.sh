@@ -40,7 +40,7 @@ export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
 source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
 
 # Print help
-__usage () {
+__usage_short () {
 echo "$(basename "${0}") <OPTIONS> <SIZE>
 
 Makes the resource pack at the specified size(s) (or using
@@ -48,46 +48,80 @@ default list of sizes). Order of options and size(s) are not
 important, other than options which take secondary inputs.
 
 Options:
-  -h  --help  -?            This help message
+  -h  -?                    Short help(this message)
+      --help                Long help
   -v  --verbose             Be verbose
   -i  --install             Install to ~/.minecraft folder
   -m  --mobile              Make mobile resource pack as well
-  -s  --slow                Use Inkscape instead of rsvg-convert
-  -t  --time                Time functions (for debugging)
-  -d  --debug               Use debugging mode
-  -l  --lengthy             Very verbose debugging mode
   -f  --force-render        Discard pre-rendered data
-      --no-optional         Do not render optional items
-  -q  --quiet               No output unless specified
+  -q  --quiet               Just show progress report
       --silent              No output at all
-      --no-progress         Do not show a progress report
   -w  --warn                Show warnings
   -c  --compress            Actually compress zip files
-  -x  --force-xml           Force re-splitting of xml files
-      --xml-only            Only split xml files
   -o  --optimize            Optimize final PNG files
-  --no-optimize             Do not optimize final PNG files
+      --no-optimize         Do not optimize final PNG files
+  --optional <SIZE>         Render optional items, optionally at
+                            specified size only.
+  --graph <ITEM>            Render a graph of the dependency
+                            tree. Optional input is list of
+                            ITEMs to be the subject of the graph
+                            May be specified multiple times."
+}
+
+__usage () {
+echo "$(basename "${0}") <OPTIONS> <SIZE>
+
+Makes the resource pack at the specified size(s) (or using
+default list of sizes). Order of options and size(s) are not
+important, other than options which take secondary inputs.
+
+General Options:
+  -h  -?                    Short help
+      --help                Long help (this message)
+
+  -v  --verbose             Be verbose
+  -q  --quiet               Just progress report
+      --silent              No output at all
+      --no-progress         Do not show a progress report
+
+  -i  --install             Install to ~/.minecraft folder
+  -t  --time                Time functions
+  -d  --debug               Use debugging mode
+  -l  --lengthy             Very verbose debugging mode
+  -w  --warn                Show warnings
+  -c  --compress            Actually compress zip files
+
+Render Options:
+  -f  --force-render        Discard pre-rendered data
+  -m  --mobile              Make mobile resource pack as well
+  -s  --slow                Use Inkscape instead of rsvg-convert
+
+  -o  --optimize            Optimize final PNG files
+      --no-optimize         Do not optimize final PNG files
+      --re-optimize         Re-process and re-optimize files
+                            appropriately
+
   --max-optimize <SIZE>     Max size to optimize
   --force-optimize          Optimize any size of final PNG files
   --force-max-optimize      Ensure max-optimize is obeyed
-  --re-optimize             Re-process and re-optimize files
-                            appropriately
+
   --optimizer <OPTIMIZER>   Optimize with specified optimizer
+
   --optional <SIZE>         Render optional items, optionally at
                             specified size only.
   --max-optional <SIZE>     Maximum size to render optional size
-  --no-optional             Do not render any optional images.
+  --no-optional             Do not render any optional items.
+
   --name <NAME>             Name to use when processing a pack
-  --completed               List completed textures, according
-                            to the COMMON field in the catalogue
-  --changed                 List ITEMS changed since last render
-  --graph <ITEM>            Render an svg graph of the
-                            dependency tree. Optional input is
-                            the comma and/or new-line separated
-                            list of ITEMs to be the subject of
-                            the graph. For a full graph, use '',
-                            '.*', or nothing. May be specified
-                            multiple times.
+
+Graphing Options:
+  --graph <ITEM>            Render a graph of the dependency
+                            tree. Optional input is a comma
+                            and/or new-line separated list of
+                            ITEMs to be the subject of the graph
+                            For a full graph, use '', '.*', or
+                            nothing. May be specified multiple
+                            times. Supports regex.
   --graph-format <FORMAT>   Specifies the format to graph to.
                             Defaults to png.
   --graph-seed <SEED>       Seed to use when graphing. Defaults
@@ -97,8 +131,16 @@ Options:
   --graph-output <FILE>     Name to use when outputting a graph.
                             Default output is 'graph'
   --no-highlight            Do not highlight specified files
-                            when graphing.\
-"
+                            when graphing.
+
+Other Options:
+  --completed               List completed textures, according
+                            to the COMMON field in the catalogue
+
+  --changed                 List ITEMS changed since last render
+
+  -x  --force-xml           Force re-splitting of xml files
+      --xml-only            Only split xml files"
 }
 
 ################################################################
@@ -115,7 +157,12 @@ __check_input () {
 
 case "${1}" in
 
-    "h" | "--help" | "?")
+    "h" |"?")
+        __usage_short
+        exit 77
+        ;;
+
+    "--help")
         __usage
         exit 77
         ;;
