@@ -113,18 +113,18 @@ cat | sed -e "${1}"'!d' | sed -e 's/^[\t| ]*//'
 ###############################################################
 
 __get_value () {
-pcregrep -M "<${2}>(\n|.)*</${2}>" "${1}" | sed -e 's/^<'"${2}"'>//' -e 's/<\/'"${2}"'>$//'
+pcregrep -M -o1 "<${2}>((\n|.)*)</${2}>" "${1}"
 }
 
 __get_value_piped () {
-cat | pcregrep -M "<${1}>(\n|.)*</${1}>" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+cat | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
 }
 
 __get_values () {
 local __file="${1}"
 shift
 for __input in "$@"; do
-pcregrep -M "<${1}>(\n|.)*</${1}>" "${__file}" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
 shift
 done
 }
@@ -132,7 +132,7 @@ done
 __get_values_piped () {
 local __pipe="$(cat)"
 for __input in "$@"; do
-pcregrep -M "<${1}>(\n|.)*</${1}>" <<< "${__pipe}" | sed -e 's/^<'"${1}"'>//' -e 's/<\/'"${1}"'>$//'
+pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
 shift
 done
 }
