@@ -706,7 +706,7 @@ while read -r __xml; do
 
             fi
 
-        done | sort | uniq | sed '/^$/d' > "${__dep_list}"
+        done | sort | uniq | sed '/^$/d' >> "${__dep_list}"
 
     fi
 
@@ -994,9 +994,8 @@ __pushd "./${__pack}"
 # Hash source files into designated file, excluding xml files
 __hash_folder "${__source_hash_old}" xml
 
-while read -r __file; do
-    md5sum "${__file}" >> "${__shared_source_list_hash}"
-done < "${__shared_source_list}"
+
+md5sum $(tr '\n' ' ' < "${__shared_source_list}") >> "${__shared_source_list_hash}"
 
 # Get back to main directory
 __popd
@@ -1303,11 +1302,11 @@ while read -r __xml_name; do
 
 done < "${__copy_list}"
 
-sort "${__render_list}" | uniq > "${__render_list}_"
+sort "${__render_list}" | uniq > "${__render_list}_backup"
 
-mv "${__render_list}_" "${__render_list}"
+rm "${__render_list}"
 
-cp "${__render_list}" "${__render_list}_backup"
+cp "${__render_list}_backup" "${__render_list}"
 
 if [ -s "${__render_list}" ]; then
     mapfile -t __dir_array <<< "$(sed "s#^#${__working_dir}/${__pack_new}/#" < "${__render_list}")"
@@ -1575,6 +1574,14 @@ __pack_cleaned="${__pack}_cleaned"
 if [ -d "${__pack_cleaned}" ]; then
     rm -r "${__pack_cleaned}"
 fi
+
+__pushd "${__pack}"
+
+set -x
+__final_list="$(find . -type f)"
+set +x
+
+__popd
 
 # copy the pack to a new folder to be cleaned
 cp -r "${__pack}" "${__pack_cleaned}"
