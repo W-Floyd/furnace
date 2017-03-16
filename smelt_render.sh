@@ -1575,14 +1575,6 @@ if [ -d "${__pack_cleaned}" ]; then
     rm -r "${__pack_cleaned}"
 fi
 
-__pushd "${__pack}"
-
-set -x
-__final_list="$(find . -type f)"
-set +x
-
-__popd
-
 # copy the pack to a new folder to be cleaned
 cp -r "${__pack}" "${__pack_cleaned}"
 
