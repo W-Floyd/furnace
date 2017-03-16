@@ -649,7 +649,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    { __get_value "${__xml}" DEPENDS; __get_value "${__xml}" CONFIG; } | sort | uniq | grep -v '^$' | while read -r __line; do
+    __get_values "${__xml}" DEPENDS CONFIG | sort | uniq | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
@@ -698,21 +698,15 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        { __get_value "${__xml}" CONFIG; __get_value "${__xml}" CLEANUP; __get_value "${__xml}" DEPENDS; } | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
+        __get_values "${__xml}" CONFIG CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee "${__dep_list}" | while read -r __suspect_dep; do
 
-            if [ -e "./${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
+            if [ -e "${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
-                cat "${__dep_list_folder}/${__suspect_dep}" >> "${__dep_list}"
+                cat "${__dep_list_folder}/${__suspect_dep}"
 
             fi
 
-        done
-
-        sort "${__dep_list}" | uniq | sed '/^$/d' > "${__dep_list}_"
-
-        touch "${__dep_list}_"
-
-        mv "${__dep_list}_" "${__dep_list}"
+        done | sort | uniq | sed '/^$/d' > "${__dep_list}"
 
     fi
 
@@ -1281,24 +1275,18 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 # if a rendered file for it exists
     if [ -e "${__working_dir}/${__pack}/${__xml_name}" ]; then
 
-        wait
-
-        echo "${__xml_name}" >> "${__copy_list}" &
+        echo "${__xml_name}" >> "${__copy_list}"
 
 # if the file does not exist, re-render
     else
 
-        wait
-
-        echo "./${__xml_name}" >> "${__render_list}" &
+        echo "./${__xml_name}" >> "${__render_list}"
 
 # Done with if statement
     fi
 
 # Finish loop
 done
-
-wait
 
 __time "Copied existing files" start
 
