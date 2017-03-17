@@ -581,7 +581,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
     echo "${__tmp_read}" > "${__tmp_out}"
 
     __list_optional_fields | while read -r __field; do
-        if ! __test_field "${__tmp_out}" "${__field}"; then
+        if ! __test_field_piped "${__field}" <<< "${__tmp_read}"; then
             __add_value "${__tmp_out}" "${__field}" "$(__field_default "${__tmp_out}" "${__field}")"
         fi
     done
