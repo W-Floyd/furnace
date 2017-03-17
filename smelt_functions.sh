@@ -151,13 +151,13 @@ esac
 
 __get_value () {
 local __pipe="$(cat "${1}")"
-__get_value_piped "${1}" <<< "${__pipe}"
+__get_value_piped "${2}" <<< "${__pipe}"
 }
 
 __get_value_test () {
 local __pipe="$(cat "${1}")"
 if __test_field "${1}" "${2}"; then
-    __get_value_piped "${1}" <<< "${__pipe}"
+    __get_value_piped "${2}" <<< "${__pipe}"
 else
     __field_default "${1}" "${2}"
 fi
@@ -179,20 +179,20 @@ fi
 }
 
 __get_values () {
-local __file="${1}"
+local __pipe="$(cat "${1}")"
 shift
 for __input in "$@"; do
-    __get_value "${__file}" "${1}"
+    __get_value_piped "${1}" <<< "${__pipe}"
     shift
 done
 }
 
 __get_values_test () {
-local __file="${1}"
+local __pipe="$(cat "${1}")"
 shift
 for __input in "$@"; do
     if __test_field "${__file}" "${1}"; then
-        __get_value "${__file}" "${1}"
+        __get_value_piped "${1}" <<< "${__pipe}"
     else
         __field_default "${__file}" "${1}"
     fi
