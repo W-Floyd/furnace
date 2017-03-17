@@ -555,7 +555,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # Optimize xml functions more
 
 # Actually read the range into a variable. This now contains an ITEM.
-    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
+    __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}" | sed -e '1d' -e '$d')"
 
 # Get the NAME of this ITEM
     __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
@@ -576,8 +576,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
     __list_optional_fields | while read -r __field; do
         if ! __test_field "${__tmp_out}" "${__field}"; then
-            __set_value "${__tmp_out}" "${__field}" ""
-            __set_value "${__tmp_out}" "${__field}" "$(__field_default "${__tmp_out}" "${__field}")"
+            __add_value "${__tmp_out}" "${__field}" "$(__field_default "${__tmp_out}" "${__field}")"
         fi
     done
 

@@ -227,7 +227,19 @@ done
 #
 # When test variants are used, fields are created when needed
 #
+# Add value assumes the value is missing, unless check is used
+#
 ###############################################################
+
+__add_value () {
+echo "<${2}>${3}</${2}>" >> "${1}"
+}
+
+__add_value_test () {
+if ! __test_field "${1}" "${2}"; then
+    __add_value "${1}" "${2}" "${3}"
+fi
+}
 
 __set_value () {
 perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
