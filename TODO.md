@@ -24,9 +24,11 @@ To define variants, the field VARIANT will be used.
 
 The planned calling syntax for this would be like so:
 
-smelt 32 --variant all,animated,32,halloween
+smelt 32.all,animated,32,halloween
 
-Would render size 32, using base textures, some of which might be overridden by animated texture variants, some of which might be overridden by size 32 specific variants, some of which might be overridden by halloween variants.
+The first part is the size used, which is separated by a period. This means different sizes may be called with different variants in the same pass, and defaults may be declared in a config (and by smelt itself if all else fails)
+
+Would render size 32, using base 'all' textures, some of which might be overridden by animated texture variants, some of which might be overridden by size 32 specific variants, some of which might be overridden by halloween variants. Any animated 32 specific variants will override the previous mix of animated and 32, then any 32 halloween variants will override any previous mix of 32 halloween, then any animated 32 halloween variants will override any previous variants from all others.
 
 To include an ITEM in a variant, or combination of variants, plus symbols ('+') should be used to split and prefix the variant combination to which it applies. Like so:  
 ```<VARIANT>+animated+32+halloween</VARIANT>```
