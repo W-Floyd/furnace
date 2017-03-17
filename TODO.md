@@ -3,8 +3,18 @@
 ***
 ## Easy to do
 #### Render script
-Rename CONFIG field to SCRIPT field.
-Add \_\_check\_field function to ensure a field exists. Act accordingly (\_\_error out when required)
+Rename CONFIG field to SCRIPT field.  
+
+Add \_\_check\_field function to ensure a field exists. Act accordingly (\_\_error out when required)  
+
+For starters, allow not having CONFIG (to be renamed to SCRIPT), SIZE, OPTIONS, DEPENDS, CLEANUP, and COMMON.
+Also to be considered are default values for KEEP, IMAGE and OPTIONAL.
+KEEP should default to NO, IMAGE to YES (better yet, check the files name for extension when field is missing), OPTIONAL to NO.
+Only required field should be NAME.  
+
+Expose the hardwired 128 base size as a variable, but default to 128 (in function) if not set.  
+
+Allow specifying the svg DPI, since some poor soul out there must be using the older version of Inkscape.  
 
 ***
 
