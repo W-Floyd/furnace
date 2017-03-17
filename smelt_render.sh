@@ -802,14 +802,18 @@ find . -type f > "${__new_xml_list}"
 # Get back to main directory
 __popd
 
-# Get to old xml directory again
-__pushd "./${__pack}/xml"
+if [ -d "./${__pack}/xml" ]; then
 
-# List all files into old list
-find . -type f > "${__old_xml_list}"
+    # Get to old xml directory again
+    __pushd "./${__pack}/xml"
 
-# Get back to main directory
-__popd
+    # List all files into old list
+    find . -type f > "${__old_xml_list}"
+
+    # Get back to main directory
+    __popd
+
+fi
 
 # Grep stuff to get uniq entries from different lists
 grep -Fxvf "${__old_xml_list}" "${__new_xml_list}" > "${__new_split_xml_list}"
@@ -850,14 +854,18 @@ __hash_folder "${__new_hashes}"
 # Get back to main directory
 __popd
 
-# Get to old xml directory again
-__pushd "./${__pack}/xml"
+if [ -d "./${__pack}/xml" ]; then
 
-# Hash the folder, and output to the old hashes file
-__hash_folder "${__old_hashes}"
+    # Get to old xml directory again
+    __pushd "./${__pack}/xml"
 
-# Get back to main directory
-__popd
+    # Hash the folder, and output to the old hashes file
+    __hash_folder "${__old_hashes}"
+
+    # Get back to main directory
+    __popd
+
+fi
 
 __time "Checked hash changes" start
 
