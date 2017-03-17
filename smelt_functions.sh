@@ -310,6 +310,17 @@ OPTIONAL
 COMMON"
 }
 
+__list_required_fields () {
+echo "NAME"
+}
+
+__list_all_fields () {
+{
+__list_optional_fields
+__list_required_fields
+} | sort
+}
+
 ###############################################################
 # Other stuff
 ###############################################################
