@@ -567,10 +567,19 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
     mkdir -p "${__goal_dir%/*}"
 
+    __tmp_out="${__xml_current}/${__item_name}"
+
 # Move that temporary read range file from before to somewhere
 # more useful, according to the item's name
 
-    echo "${__tmp_read}" > "${__xml_current}/${__item_name}"
+    echo "${__tmp_read}" > "${__tmp_out}"
+
+    __list_optional_fields | while read -r __field; do
+        if ! __test_field "${__tmp_out}" "${__field}"; then
+            __set_value "${__tmp_out}" "${__field}" ""
+            __set_value "${__tmp_out}" "${__field}" "$(__field_default "${__tmp_out}" "${__field}")"
+        fi
+    done
 
 # Finish loop, but don't block the loop until it finishes
 done
@@ -597,7 +606,7 @@ __time "Found files to optimize" start
 __pushd ./src/xml/
 
 find . -type f | while read -r __xml; do
-    if [ "$(__get_value_test "${__xml}" IMAGE)" = 'YES' ] && [ "$(__get_value_test "${__xml}" KEEP)" = 'YES' ]; then
+    if [ "$(__get_value "${__xml}" IMAGE)" = 'YES' ] && [ "$(__get_value "${__xml}" KEEP)" = 'YES' ]; then
         echo "./${__xml}"
     fi
 done | sort | uniq > "${__optimize_list}"
@@ -651,7 +660,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    __get_values_test "${__xml}" DEPENDS CONFIG | sort | uniq | grep -v '^$' | while read -r __line; do
+    __get_values "${__xml}" DEPENDS CONFIG | sort | uniq | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
@@ -700,7 +709,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        __get_values_test "${__xml}" CONFIG CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee -a "${__dep_list}" | while read -r __suspect_dep; do
+        __get_values "${__xml}" CONFIG CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee -a "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
@@ -720,7 +729,7 @@ __time "Setting deps from file" start
 
 while read -r __xml; do
 
-    __set_value_test "${__xml}" DEPENDS < "${__dep_list_folder}/${__xml}"
+    __set_value "${__xml}" DEPENDS < "${__dep_list_folder}/${__xml}"
 
 done < "${__list_file}"
 
@@ -731,10 +740,10 @@ __time "Getting cleanup files" start
 while read -r __xml; do
 
 # get the cleanup files, and list it to a file
-    __get_value_test "${__xml}" CLEANUP >> "${__cleanup_all}"
+    __get_value "${__xml}" CLEANUP >> "${__cleanup_all}"
 
 # if the file is not to be kept,
-    if [ "$(__get_value_test "${__xml}" KEEP)" = "NO" ]; then
+    if [ "$(__get_value "${__xml}" KEEP)" = "NO" ]; then
 
 # add it to the cleanup file list
         echo "${__xml}" >> "${__cleanup_all}"
@@ -1335,11 +1344,7 @@ touch "${__render_list}_"
 if [ "${__render_optional}" = '0' ]; then
     while read -r __item; do
         __config="./xml/${__item//.\//}"
-        if __test_field "${__config}" OPTIONAL; then
-            if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
-                echo "${__item}" >> "${__render_list}_"
-            fi
-        else
+        if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
             echo "${__item}" >> "${__render_list}_"
         fi
     done < "${__render_list}"
@@ -1396,7 +1401,7 @@ __time "Rendered ${__size}px" start
 
 __pushd './src/xml/'
 
-__process_count="$(while read -r __item; do if ! [ -z "$(__get_value_test "${__item}" CONFIG)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
+__process_count="$(while read -r __item; do if ! [ -z "$(__get_value "${__item}" CONFIG)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
 
 __popd
 
@@ -1437,7 +1442,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
     if ! grep -qFxf "${__dep_list_folder}/${__orig_config_name}" "${__render_list}"; then
 
 # get the size of the texture
-        __tmp_val="$(__get_value_test "${__config}" SIZE)"
+        __tmp_val="$(__get_value "${__config}" SIZE)"
 
 # if the size was set,
         if ! [ -z "${__tmp_val}" ]; then
@@ -1455,7 +1460,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
         fi
 
 # get the name of the config script, and replace any macro locations
-        __config_script="$(__get_value_test "${__config}" CONFIG)"
+        __config_script="$(__get_value "${__config}" CONFIG)"
 
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
@@ -1476,7 +1481,7 @@ Won't create \".${__config//.\/xml/}\""
 
             if [ "${__failed}" = '0' ]; then
 
-                if [ "${__should_optimize}" = '1' ] && [ "$(__get_value_test "${__config}" KEEP)" = "YES" ] && [ "$(__get_value_test "${__config}" IMAGE)" = 'YES' ]; then
+                if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
                     __will_optimize='1'
                 fi
 
@@ -1506,7 +1511,7 @@ Won't create \".${__config//.\/xml/}\""
 # execute the script, given the determined size and options set
 # in the config
                 {
-                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value_test "${__config}" OPTIONS | tr '\n' ' ')
+                eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ')
 
                 if [ "${__will_optimize}" = '1' ]; then
 
@@ -1529,7 +1534,7 @@ Won't create \".${__config//.\/xml/}\""
 # end loop for when a config script is present
         else
 
-            if [ "${__should_optimize}" = '1' ] && [ "$(__get_value_test "${__config}" KEEP)" = "YES" ] && [ "$(__get_value_test "${__config}" IMAGE)" = 'YES' ]; then
+            if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
                 __will_optimize='1'
             fi
 
@@ -1615,10 +1620,8 @@ while read -r __file; do
 
         if [ -e "./xml/${__file//.\//}" ]; then
 
-            if __test_field "./xml/${__file//.\//}" OPTIONAL; then
-                if [ "$(__get_value_test "./xml/${__file//.\//}" OPTIONAL)" = 'YES' ] && [ "${__render_optional}" = '1' ]; then
-                    __warn_missing_cleanup "${__file}"
-                fi
+            if [ "$(__get_value "./xml/${__file//.\//}" OPTIONAL)" = 'YES' ] && [ "${__render_optional}" = '1' ]; then
+                __warn_missing_cleanup "${__file}"
             fi
 
         else

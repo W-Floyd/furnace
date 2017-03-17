@@ -278,6 +278,27 @@ fi
 }
 
 ###############################################################
+#
+# __list_optional_fields
+#
+# List Optional Fields
+# Lists all optional fields
+#
+###############################################################
+
+__list_optional_fields () {
+echo "CONFIG
+SIZE
+OPTIONS
+KEEP
+IMAGE
+DEPENDS
+CLEANUP
+OPTIONAL
+COMMON"
+}
+
+###############################################################
 # Other stuff
 ###############################################################
 #
