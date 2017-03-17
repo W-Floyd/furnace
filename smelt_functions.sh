@@ -150,25 +150,29 @@ esac
 ###############################################################
 
 __get_value () {
-pcregrep -M -o1 "<${2}>((\n|.)*)</${2}>" "${1}"
+local __pipe="$(cat "${1}")"
+__get_value_piped "${1}" <<< "${__pipe}"
 }
 
 __get_value_test () {
+local __pipe="$(cat "${1}")"
 if __test_field "${1}" "${2}"; then
-    pcregrep -M -o1 "<${2}>((\n|.)*)</${2}>" "${1}"
+    __get_value_piped "${1}" <<< "${__pipe}"
 else
     __field_default "${1}" "${2}"
 fi
 }
 
 __get_value_piped () {
-cat | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
+local __pipe="$(cat)"
+local __after="${__pipe/*<${1}>}"
+echo "${__after/<\/${1}>*}"
 }
 
 __get_value_piped_test () {
 local __pipe="$(cat)"
 if __test_field_piped "${1}" <<< "${__pipe}"; then
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
+    __get_value_piped "${1}" <<< "${__pipe}"
 else
     __field_default_piped "${1}" <<< "${__pipe}"
 fi
@@ -178,7 +182,7 @@ __get_values () {
 local __file="${1}"
 shift
 for __input in "$@"; do
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
+    __get_value "${__file}" "${1}"
     shift
 done
 }
@@ -188,7 +192,7 @@ local __file="${1}"
 shift
 for __input in "$@"; do
     if __test_field "${__file}" "${1}"; then
-        pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
+        __get_value "${__file}" "${1}"
     else
         __field_default "${__file}" "${1}"
     fi
@@ -199,7 +203,7 @@ done
 __get_values_piped () {
 local __pipe="$(cat)"
 for __input in "$@"; do
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
+    __get_value_piped "${1}" <<< "${__pipe}"
     shift
 done
 }
@@ -208,7 +212,7 @@ __get_values_piped_test () {
 local __pipe="$(cat)"
 for __input in "$@"; do
     if __test_field_piped "${1}" <<< "${__pipe}"; then
-        pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
+        __get_value_piped "${1}" <<< "${__pipe}"
     else
         __field_default_piped "${1}" <<< "${__pipe}"
     fi
