@@ -994,8 +994,9 @@ __pushd "./${__pack}"
 # Hash source files into designated file, excluding xml files
 __hash_folder "${__source_hash_old}" xml
 
-
-md5sum $(tr '\n' ' ' < "${__shared_source_list}") >> "${__shared_source_list_hash}"
+if [ -s "${__shared_source_list}" ]; then
+    md5sum $(tr '\n' ' ' < "${__shared_source_list}") >> "${__shared_source_list_hash}"
+fi
 
 # Get back to main directory
 __popd
