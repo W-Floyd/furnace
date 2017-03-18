@@ -557,12 +557,6 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # Actually read the range into a variable. This now contains an ITEM.
     __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}" | sed -e '1d' -e '$d')"
 
-    __list_required_fields | while read -r __field; do
-        if ! __test_field_piped "${__field}" <<< "${__tmp_read}"; then
-            __error "Field \"${__field}\" is missing from range ${__range}"
-        fi
-    done
-
 # Get the NAME of this ITEM
     __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
 
