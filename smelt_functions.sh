@@ -288,7 +288,7 @@ fi
 __test_field_piped () {
 local __pipe="$(cat)"
 if [[ "${__pipe}" == *"<${1}>"* ]]; then
-    if [[ "${__pipe}" == *"</${1}>"* ]]; then
+    if [[ "${__pipe}" =~ "</${1}>" ]]; then
         return 0
     else
         return 1
