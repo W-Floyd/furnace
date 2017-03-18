@@ -110,109 +110,30 @@ cat | sed -e "${1}"'!d' -e 's/^[\t| ]*//'
 # When __get_values* is used, multiple field names may be
 # specified
 #
-# When test variants are used, only fields that exist are
-# pulled, non-existant ones fail silently
-#
-###############################################################
-
-###############################################################
-#
-# __field_default <DATASET> <FIELD_NAME>
-#
-# Returns the default value for a field, given the context of a
-# provided DATASET.
-#
-# piped should pipe in DATASET
-#
-###############################################################
-
-__field_default () {
-cat "${1}" | __field_default_piped "${2}"
-}
-
-__field_default_piped () {
-local __pipe="$(cat)"
-case "${1}" in
-
-    "IMAGE")
-        if [ "$(__oext "$(__get_value_piped NAME <<< "${__pipe}")")" = 'png' ]; then
-            echo YES
-        else
-            echo NO
-        fi
-        ;;
-    "KEEP" | "OPTIONAL")
-        echo "NO"
-        ;;
-esac
-}
-
 ###############################################################
 
 __get_value () {
 pcregrep -M -o1 "<${2}>((\n|.)*)</${2}>" "${1}"
 }
 
-__get_value_test () {
-if __test_field "${1}" "${2}"; then
-    pcregrep -M -o1 "<${2}>((\n|.)*)</${2}>" "${1}"
-else
-    __field_default "${1}" "${2}"
-fi
-}
-
 __get_value_piped () {
 cat | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
-}
-
-__get_value_piped_test () {
-local __pipe="$(cat)"
-if __test_field_piped "${1}" <<< "${__pipe}"; then
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
-else
-    __field_default_piped "${1}" <<< "${__pipe}"
-fi
 }
 
 __get_values () {
 local __file="${1}"
 shift
 for __input in "$@"; do
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
-    shift
-done
-}
-
-__get_values_test () {
-local __file="${1}"
+pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
 shift
-for __input in "$@"; do
-    if __test_field "${__file}" "${1}"; then
-        pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
-    else
-        __field_default "${__file}" "${1}"
-    fi
-    shift
 done
 }
 
 __get_values_piped () {
 local __pipe="$(cat)"
 for __input in "$@"; do
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
-    shift
-done
-}
-
-__get_values_piped_test () {
-local __pipe="$(cat)"
-for __input in "$@"; do
-    if __test_field_piped "${1}" <<< "${__pipe}"; then
-        pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
-    else
-        __field_default_piped "${1}" <<< "${__pipe}"
-    fi
-    shift
+pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
+shift
 done
 }
 
@@ -225,8 +146,6 @@ done
 #
 # When piped version is used, VALUE should be omitted
 #
-# When test variants are used, fields are created when needed
-#
 ###############################################################
 
 __set_value () {
@@ -234,20 +153,6 @@ perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
 }
 
 __set_value_piped () {
-perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>$(cat)</${2}>#sm" "${1}"
-}
-
-__set_value_test () {
-if ! __test_field "${1}" "${2}"; then
-    echo "<${2}></${2}>" >> "${1}"
-fi
-perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
-}
-
-__set_value_piped_test () {
-if ! __test_field "${1}" "${2}"; then
-    echo "<${2}></${2}>" >> "${1}"
-fi
 perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>$(cat)</${2}>#sm" "${1}"
 }
 
@@ -262,15 +167,7 @@ perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>$(cat)</${2}>#sm" "${1}"
 ###############################################################
 
 __test_field () {
-if grep -q "^<${2}>" "${1}"; then
-    return 0
-else
-    return 1
-fi
-}
-
-__test_field_piped () {
-if grep -q "^<${1}>" <<< "$(cat)"; then
+if grep -q "^<${2}>"; then
     return 0
 else
     return 1

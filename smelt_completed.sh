@@ -9,9 +9,9 @@ __read_range "${__catalogue}" "${__range}" > "/tmp/readrangetmp"
 
 touch "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
 
-if [ "$(__get_value_test "/tmp/readrangetmp" KEEP)" = 'YES' ]; then
+if [ "$(__get_value "/tmp/readrangetmp" KEEP)" = 'YES' ]; then
 
-	__common="$(__get_value_test "/tmp/readrangetmp" COMMON)"
+	__common="$(__get_value "/tmp/readrangetmp" COMMON)"
 
 	if ! [ -z "${__common}" ]; then
 	    echo "${__common}" >> "/tmp/commontmp"
