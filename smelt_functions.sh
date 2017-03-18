@@ -245,18 +245,6 @@ if ! __test_field "${1}" "${2}"; then
 fi
 }
 
-__add_value_piped () {
-echo "$(cat)
-<${2}>${3}</${2}>"
-}
-
-__add_value_piped_test () {
-local __pipe="$(cat)"
-if ! __test_field_piped "${1}" <<< "${__pipe}"; then
-    __add_value_piped "${1}" "${2}" <<< "${__pipe}"
-fi
-}
-
 __set_value () {
 perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>${3}</${2}>#sm" "${1}"
 }
