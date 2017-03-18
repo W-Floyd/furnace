@@ -568,6 +568,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
 # Make the correct directory for dumping the xml into an
 # appropriately named file
+
     __tmp_out="${__xml_current}/${__item_name#.\/#}"
 
     mkdir -p "${__tmp_out%/*}"
