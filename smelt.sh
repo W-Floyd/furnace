@@ -496,7 +496,7 @@ if [ "${__list_completed}" = '1' ]; then
 fi
 
 if [ "${__graph_deps}" = '1' ]; then
-    "${__smelt_render_bin}" --xml-only 1> /dev/null || __error "XML processing encountered an error"
+    "${__smelt_render_bin}" --xml-only 1> /dev/null
 
     if [ -z "${__graph_files}" ]; then
         __graph_files=''

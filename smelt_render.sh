@@ -559,9 +559,9 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
     __list_required_fields | while read -r __field; do
         if ! __test_field_piped "${__field}" <<< "${__tmp_read}"; then
-            __error "Field \"${__field}\" is missing from range ${__range} in catalogue"
+            __error "Field \"${__field}\" is missing from range ${__range}"
         fi
-    done || exit 1
+    done
 
 # Get the NAME of this ITEM
     __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
@@ -587,7 +587,7 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
     done
 
 # Finish loop, but don't block the loop until it finishes
-done || exit 1
+done
 
 # If xml files currently exist, and we're not told to re-use
 # them, delete them and move new xml in
