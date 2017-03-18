@@ -136,9 +136,9 @@ case "${1}" in
 
     "IMAGE")
         if [ "$(__oext "$(__get_value_piped NAME <<< "${__pipe}")")" = 'png' ]; then
-            echo "YES"
+            echo YES
         else
-            echo "NO"
+            echo NO
         fi
         ;;
     "KEEP" | "OPTIONAL")
@@ -274,25 +274,16 @@ perl -i -pe "BEGIN{undef $/;} s#<${2}>.*</${2}>#<${2}>$(cat)</${2}>#sm" "${1}"
 ###############################################################
 
 __test_field () {
-if [[ "$(cat "${1}")" == *"<${2}>"* ]]; then
-    if [[ "$(cat "${1}")" == *"</${2}>"* ]]; then
-        return 0
-    else
-        return 1
-    fi
+if grep -q "^<${2}>" "${1}"; then
+    return 0
 else
     return 1
 fi
 }
 
 __test_field_piped () {
-local __pipe="$(cat)"
-if [[ "${__pipe}" == *"<${1}>"* ]]; then
-    if [[ "${__pipe}" =~ "</${1}>" ]]; then
-        return 0
-    else
-        return 1
-    fi
+if grep -q "^<${1}>" <<< "$(cat)"; then
+    return 0
 else
     return 1
 fi
