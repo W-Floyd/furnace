@@ -34,7 +34,7 @@ This tool is pretty much neutered without Imagemagick, so though it's not requir
 
 Where it really comes into its own is doing the boring jobs, like overlaying a wool pattern on all 16 colours, so when the overlay or colour changes, so do the dependant wool pieces. Same with planks, logs, glass, etc.
 
-###Known issues
+### Known issues
 
 At one point I had to compile a newer version of Imagemagick from source to make some compositing work. If you get odd results, that may be the issue. This *seems* to have been solved by setting some options on all image operations.
 
