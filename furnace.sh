@@ -37,7 +37,7 @@ export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
 
 # get set up
-source "${__furnace_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }
+source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }
 
 # Print help
 __usage_short () {
