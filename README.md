@@ -1,26 +1,26 @@
-# Smelt
+# Furnace
 ## A Minecraft resource pack builder
 ## Undergoing major changes (in another branch). Here be dragons.
 
-![Logo](https://github.com/W-Floyd/smelt/raw/master/logo.png)
+![Logo](https://github.com/W-Floyd/furnace/raw/master/logo.png)
 
 cd into an appropriate folder, then run:
 
 ```
-git clone https://github.com/W-Floyd/smelt.git
-cd smelt
-sudo ln -s "$(pwd)/smelt.sh" "/usr/bin/smelt"  
-sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/smelt"  
+git clone https://github.com/W-Floyd/furnace.git
+cd furnace
+sudo ln -s "$(pwd)/furnace.sh" "/usr/bin/furnace"  
+sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/furnace"  
 ```
 
-Then you can run `smelt` in the appropriate folder, and it should render.
-Run `smelt -h` for help. 
+Then you can run `furnace` in the appropriate folder, and it should render.
+Run `furnace -h` for help. 
 
-If things don't render properly after modifying some stuff, run `smelt --force`, or delete the appropriate folders and re-render. This shouldn't happen, so if it does, please add an issue and describe which files were changed so I can fix it.
+If things don't render properly after modifying some stuff, run `furnace --force`, or delete the appropriate folders and re-render. This shouldn't happen, so if it does, please add an issue and describe which files were changed so I can fix it.
 
 If, however, it was because you forget some dependencies and it tried to use a file that wasn't there, you need to fix your stuff, then see if it still has an issue.
 
-It is wise to render fresh packs upon significant script changes. Though smelt should handle the changes gracefully, I cannot be sure.
+It is wise to render fresh packs upon significant script changes. Though furnace should handle the changes gracefully, I cannot be sure.
 
 ***
 

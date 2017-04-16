@@ -284,7 +284,7 @@ __time "Set variables" start
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
-    __tmp_dir="/tmp/smelt/texpack${__pid}"
+    __tmp_dir="/tmp/furnace/texpack${__pid}"
 else
     __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
@@ -1650,7 +1650,7 @@ __time "Made cleaned folder" end
 
 # if a mobile pack is supposed to be made, and the mobile script
 # doesn't exist
-if [ "${__mobile}" = '1' ] && ! [ -e "${__smelt_make_mobile_bin}" ]; then
+if [ "${__mobile}" = '1' ] && ! [ -e "${__furnace_make_mobile_bin}" ]; then
 
 # complain
     __force_warn "Missing mobile script system, will not make mobile pack"
@@ -1680,16 +1680,16 @@ if [ "${__mobile}" = '1' ]; then
     cp -r "${__pack_cleaned}" "${__pack_end}"
 
 # copy the script to the end pack folder
-    cp "${__smelt_make_mobile_bin}" "${__pack_end}/$(basename "${__smelt_make_mobile_bin}")"
+    cp "${__furnace_make_mobile_bin}" "${__pack_end}/$(basename "${__furnace_make_mobile_bin}")"
 
 # get into the end pack folder
     __pushd "${__pack_end}"
 
 # execute the mobile script folder
-    "./${__smelt_make_mobile_bin}" || __error "Make mobile script failed"
+    "./${__furnace_make_mobile_bin}" || __error "Make mobile script failed"
 
 # remove the mobile script folder
-    rm "${__smelt_make_mobile_bin}"
+    rm "${__furnace_make_mobile_bin}"
 
 # get back into the main directory
     __popd

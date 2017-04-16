@@ -34,10 +34,10 @@ __use_optional_size='0'
 __max_install_size='1024'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
-export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
+export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
 
 # get set up
-source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
+source "${__furnace_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }
 
 # Print help
 __usage_short () {
@@ -491,12 +491,12 @@ if [ -z "${__name}" ]; then
 fi
 
 if [ "${__list_completed}" = '1' ]; then
-    "${__smelt_completed_bin}" "${__catalogue}"
+    "${__furnace_completed_bin}" "${__catalogue}"
     exit
 fi
 
 if [ "${__graph_deps}" = '1' ]; then
-    "${__smelt_render_bin}" --xml-only 1> /dev/null
+    "${__furnace_render_bin}" --xml-only 1> /dev/null
 
     if [ -z "${__graph_files}" ]; then
         __graph_files=''
@@ -521,7 +521,7 @@ if [ "${__graph_deps}" = '1' ]; then
 
     export __debug
 
-    "${__smelt_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}" "${__no_highlight}"
+    "${__furnace_graph_bin}" "${__graph_format}" "${__catalogue}" "${__graph_files}" "${__graph_output}" "${__grapher}" "${__graph_seed}" "${__no_highlight}"
     exit 0
 fi
 
@@ -664,11 +664,11 @@ if [ "${__render_optional}" = '1' ]; then
 fi
 
 if [ "${__very_verbose_pack}" = '1' ]; then
-    "${__smelt_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
+    "${__furnace_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
 elif [ "${__verbose}" = '1' ]; then
-    "${__smelt_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
+    "${__furnace_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 else
-    "${__smelt_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
+    "${__furnace_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 fi
 
 }
@@ -738,7 +738,7 @@ __sub_loop () {
 
 __size="${1}"
 
-__packfile="$("${__smelt_render_bin}" --name-only "${__size}")"
+__packfile="$("${__furnace_render_bin}" --name-only "${__size}")"
 
 if ! [ "${?}" = 0 ]; then
     echo "${__packfile}"

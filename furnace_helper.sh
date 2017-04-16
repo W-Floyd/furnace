@@ -1,10 +1,10 @@
 #!/bin/bash
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
-export __smelt_setup_bin="${__run_dir}/smelt_setup.sh"
+export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
 
 # get set up
-source "${__smelt_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__smelt_setup_bin}\""; exit 1; }
+source "${__furnace_setup_bin}" &> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }
 
 # If there are any options,
 if ! [ "${#}" = 0 ]; then

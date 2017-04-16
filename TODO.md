@@ -34,9 +34,9 @@ To define variants, the field VARIANT will be used.
 
 The planned calling syntax for this would be like so:
 
-smelt 32.base,animated,32,halloween
+furnace 32.base,animated,32,halloween
 
-The first part is the size used, which is separated by a period. This means different sizes may be called with different variants in the same pass, and defaults may be declared in a config (and by smelt itself if all else fails)
+The first part is the size used, which is separated by a period. This means different sizes may be called with different variants in the same pass, and defaults may be declared in a config (and by furnace itself if all else fails)
 
 Would render size 32, using 'base' items, some of which might be overridden by 'animated' item variants, some of which might be overridden by '32' specific variants, some of which might be overridden by 'halloween' variants. Any 'animated' '32' specific variants will override the previous mix of 'animated' and '32', then any '32' 'halloween' variants will override any previous mix of '32' and 'halloween', then any 'animated' '32' 'halloween' variants will override any previous variants from all others.
 
@@ -53,7 +53,7 @@ Commas (',') will separate variants it applies to. e.g.
 
 This means it can be used for: 'animated', '32', 'halloween', and 'animated 32'.  
 It will not be included in child variants (we'll get to that later)
-If variant is missing, it applies to the default 'base' variant. Alternatively, 'base' may be declared. First defined item is the one used. smelt should warn when multiple images of the same definition are declared in the same level of scope, and it should also warn when an image is not available in the current set of variants (but is in others).
+If variant is missing, it applies to the default 'base' variant. Alternatively, 'base' may be declared. First defined item is the one used. furnace should warn when multiple images of the same definition are declared in the same level of scope, and it should also warn when an image is not available in the current set of variants (but is in others).
 
 To exclude an item from a variant, specific or inherited (we'll get to that), an exclamation mark should be used ('!') to prefix that exclusion, in the same way an inclusion was defined. e.g.  
 ```<VARIANT>+base,+animated,!animated!32!halloween</VARIANT>```
@@ -90,7 +90,7 @@ Explanation: By including 'halloween' as a base variant, and no more, it means i
 
 This is also of note then: an inclusive calling ('+foo,+bar,+fizz,+bang') will be extrapolated to include specific variants ('+foo+bar,+fizz+bang'), but a specific calling ('+foo+bar+fizz+bang') will not be carried forward in any way.
 
-Back to the smelt calling syntax, it is to be used in the same way as the definitions. That is, + includes any items that are included in this variant, and any subsequent options will need to be checked for specific variants. Specific variants may be called through smelt directly also. That leaves !, which excludes ITEMS that are included in this variant, or specific variant.
+Back to the furnace calling syntax, it is to be used in the same way as the definitions. That is, + includes any items that are included in this variant, and any subsequent options will need to be checked for specific variants. Specific variants may be called through furnace directly also. That leaves !, which excludes ITEMS that are included in this variant, or specific variant.
 
 FURTHER NOTES:
 Actually, I am not going to allow regex in the definition field, as somehow trying to implement intersecting regexes would be a clusterfuck. Only calling may use regex, definition must be specific. I'm too lazy to go back and make sure that is clear...

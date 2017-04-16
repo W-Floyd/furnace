@@ -1,4 +1,4 @@
-#smeltconfig#
+#furnaceconfig#
 echo 'something to use a pipe' | rev > /dev/null
 compgen -A variable > /tmp/tmpvars
 ################################################################
@@ -17,7 +17,7 @@ compgen -A variable > /tmp/tmpvars
 
 # Script to use for mobile conversion. No default currently,
 # will disable mobile conversion if missing
-#__smelt_make_mobile_bin='./convert_to_mobile.sh'
+#__furnace_make_mobile_bin='./convert_to_mobile.sh'
 
 # Custom functions to use. Please follow the same format as the
 # standard functions.sh file. May include both image functions

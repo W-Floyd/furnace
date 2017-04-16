@@ -4,7 +4,7 @@ if ! which "${5}" &> /dev/null; then
     __error "\"${5}\" could not be found, please install the graphviz package"
 fi
 
-__graph_tmp_dir="/tmp/smelt/graph${6}"
+__graph_tmp_dir="/tmp/furnace/graph${6}"
 
 if [ -d "${__graph_tmp_dir}" ]; then
 

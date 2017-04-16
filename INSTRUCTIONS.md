@@ -7,7 +7,7 @@ The following variables may be set:
 __name  
 __sizes  
 __tmp_dir  
-__smelt\_make\_mobile_bin  
+__furnace\_make\_mobile_bin  
 __custom\_function\_bin  
 __quick  
 __render_optional  
