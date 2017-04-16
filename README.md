@@ -1,6 +1,6 @@
 # Smelt
 ## A Minecraft resource pack builder
-## Undergoing major changes, do not use for now.
+## Undergoing major changes (in another branch). Here be dragons.
 
 ![Logo](https://github.com/W-Floyd/smelt/raw/master/logo.png)
 
