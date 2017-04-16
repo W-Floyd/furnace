@@ -91,7 +91,7 @@ if ! [ -z "${__dep_list}" ]; then
 
     __tmp_func () {
 
-    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG | __stdconf; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
+    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG ; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
 
     if ! [ -z "${__deps}" ]; then
 

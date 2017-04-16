@@ -27,7 +27,7 @@ At the most basic level, a catalogue must contain entries like so:
 ```
 	<ITEM>
 		<NAME>./assets/minecraft/textures/blocks/dirt.png</NAME>
-		<CONFIG>%stdconf%/vector_basic_block.sh</CONFIG>
+		<CONFIG>./conf/vector_basic_block.sh</CONFIG>
 		<SIZE></SIZE>
 		<OPTIONS>dirt</OPTIONS>
 		<KEEP>YES</KEEP>
@@ -45,7 +45,7 @@ The fields are as follow:
 
 **NAME** describes the output file name achieved. Formatted relative to the top folder of the resource pack.
 
-**CONFIG** describes what file is used to process the file. More on this later. Also formatted relative to the top folder of the resource pack. The use of the macro %stdconf% indicates the common folder for scripts which are included with smelt. Custom scripts usually go in './conf/'.
+**CONFIG** describes what file is used to process the file. More on this later. Also formatted relative to the top folder of the resource pack. Custom scripts usually go in './conf/'.
 
 **SIZE** describes what size to process the file with. Rarely used. If blank, uses pack size. Mainly included for pack logo. Any positive integer will work.
 
