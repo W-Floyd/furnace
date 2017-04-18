@@ -24,6 +24,9 @@ It is wise to render fresh packs upon significant script changes. Though furnace
 
 ***
 
+Required:
+* pcregrep
+
 Recommended:
 * Imagemagick (**most HIGHLY** recommended)
 * Inkscape and/or rsvg-convert (recommended)

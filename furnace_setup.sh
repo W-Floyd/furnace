@@ -34,3 +34,9 @@ if ! [ -z "${__custom_function_bin}" ]; then
         __error "Custom functions file \"${__custom_function_bin}\" is missing"
     fi
 fi
+
+while read -r __dep; do
+	if ! which "${__dep}" &> /dev/null; then
+		__error "Please install \"${__dep}\""
+	fi
+done <<< "pcregrep"
