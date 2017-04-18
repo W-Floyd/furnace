@@ -35,7 +35,7 @@ done'
 )" 
         echo "${__tmpvar}" > '/tmp/config.sh'
         source '/tmp/config.sh' || __error "Config file has an error"
-#        rm '/tmp/config.sh'
+        rm '/tmp/config.sh'
     else
         __error "Config does not have correct header \"#furnaceconfig#\""
     fi
