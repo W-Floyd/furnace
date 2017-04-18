@@ -321,14 +321,18 @@ case "${1}" in
         ;;
 
     [0-9]*)
-        if [ -z "${__sizes}" ] || [ "${__use_custom_size}" = '1' ]; then
+        if [ "${__use_custom_size}" = '0' ]; then
+            __warn "Overriding render sizes"
             __use_custom_size='1'
+            __sizes=''
+        fi
+
+        if [ "${1}" -gt '0' ]; then
             __sizes="${__sizes}
 ${1}"
         else
-            __warn "Overriding render sizes"
+            __force_warn "Specified size \"${1}\" is less than 1, cannot render"
             __use_custom_size='1'
-            __sizes="${1}"
         fi
         ;;
 
@@ -545,13 +549,17 @@ fi
 
 ################################################################
 
-if [ -z "${__sizes}" ]; then
+if [ "${__use_custom_size}" = '0' ] && [ -z "${__sizes}" ]; then
 __sizes="32
 64
 128
 256
 512
 1024"
+fi
+
+if [ -z "${__sizes}" ]; then
+    __error "No valid sizes to render"
 fi
 
 __final_size="$(tr ' ' '\n' <<< "${__sizes}" | tail -n1)"
