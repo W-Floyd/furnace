@@ -226,10 +226,13 @@ fi
 ###############################################################
 
 __choose_optimizer () {
+__optimizer=''
+
 local __possible_optimizers='optipng
 pngcrush
 zopflipng'
 
+__sub_check () {
 while read -r __possible_optimizer; do
 
     if __check_optimizer "${__possible_optimizer}"; then
@@ -237,10 +240,17 @@ while read -r __possible_optimizer; do
         break
     fi
 
-done <<< "${__possible_optimizers}"
+done <<< "${1}"
+}
+
+__sub_check "${__possible_optimizers}"
 
 if [ -z "${__optimizer}" ]; then
-    __error "No valid optimizer is available"
+    __sub_check "${__list_optimizers}"
+    if [ -z "${__optimizer}" ]; then
+        __warn "No valid optimizer is available, disabling optimization"
+        export __no_optimize='1'
+    fi
 fi
 }
 

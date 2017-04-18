@@ -529,6 +529,14 @@ if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then
     rm -r './src/xml/'
 fi
 
+if [ "${__should_optimize}" = '1' ] && [ -z "${__optimizer}" ]; then
+    __choose_optimizer
+elif [ "${__should_optimize}" = '1' ]; then
+    if ! __check_optimizer "${__optimizer}"; then
+        __choose_optimizer
+    fi
+fi
+
 ################################################################
 
 if [ -z "${__sizes}" ]; then
