@@ -19,7 +19,23 @@ if ! [ -e 'config.sh' ]; then
     __force_warn "No config file was found, using default values"
 else
     if [ "$(head -n 1 'config.sh')" = '#furnaceconfig#' ]; then
-        source 'config.sh' || __error "Config file has an error"
+        cp 'config.sh' '/tmp/config.sh'
+        __tmpvar="$(
+        echo \
+'echo "something to use a pipe" | rev > /dev/null
+compgen -A variable > /tmp/tmpvars'
+
+        cat '/tmp/config.sh'
+        
+        echo \
+'compgen -A variable > /tmp/tmpvars2
+for __variable in $(grep -Fxvf /tmp/tmpvars /tmp/tmpvars2); do
+    export "${__variable}"
+done'
+)" 
+        echo "${__tmpvar}" > '/tmp/config.sh'
+        source '/tmp/config.sh' || __error "Config file has an error"
+#        rm '/tmp/config.sh'
     else
         __error "Config does not have correct header \"#furnaceconfig#\""
     fi

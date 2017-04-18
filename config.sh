@@ -1,9 +1,4 @@
 #furnaceconfig#
-echo 'something to use a pipe' | rev > /dev/null
-compgen -A variable > /tmp/tmpvars
-################################################################
-# Start customizing from here
-################################################################
 
 # Name of the pack, defaults to folder name if missing
 #__name='Pack'
@@ -58,11 +53,3 @@ compgen -A variable > /tmp/tmpvars
 # Whether or not to ignore the max optional size
 # Defaults to off if missing
 #__ignore_max_optional='1'
-
-################################################################
-# Stop customizing from here
-################################################################
-compgen -A variable > /tmp/tmpvars2
-for __variable in $(grep -Fxvf /tmp/tmpvars /tmp/tmpvars2); do
-    export "${__variable}"
-done
