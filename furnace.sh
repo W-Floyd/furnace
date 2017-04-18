@@ -32,6 +32,7 @@ __re_optimize='0'
 __show_progress='1'
 __use_optional_size='0'
 __max_install_size='1024'
+__short_output='0'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
@@ -83,6 +84,7 @@ General Options:
   -q  --quiet               Just progress report
       --silent              No output at all
       --no-progress         Do not show a progress report
+      --short               Use short output format
 
   -i  --install             Install to ~/.minecraft folder
   -t  --time                Time functions
@@ -169,6 +171,10 @@ case "${1}" in
 
     "--no-progress")
         __show_progress='0'
+        ;;
+
+    "--short")
+        __short_output='1'
         ;;
 
     "v" | "--verbose")
@@ -651,6 +657,10 @@ fi
 
 if [ "${__do_not_render}" = '1' ]; then
     __options="${__options} --do-not-render"
+fi
+
+if [ "${__short_output}" = '1' ]; then
+    __options="${__options} --short"
 fi
 
 if [ "${__render_optional}" = '1' ]; then

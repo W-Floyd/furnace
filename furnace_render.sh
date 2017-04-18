@@ -23,6 +23,7 @@ __should_optimize='0'
 __re_optimize='0'
 __show_progress='0'
 __render_optional='0'
+__short_output='0'
 
 ###############################################################
 # Setting up functions
@@ -56,6 +57,7 @@ Options:
       --progress        Show a progress report
   -f  --force           Discard pre-rendered data
   -v  --verbose         Verbose
+      --short           Short output
   -p  --process-id      Using PID as given after
   -d  --debug           Debugging mode
   -l  --lengthy         Very verbose debugging mode
@@ -142,6 +144,10 @@ while ! [ "${#}" = '0' ]; do
 
                 "--quiet")
                     __quiet='1'
+                    ;;
+
+                "--short")
+                    __short_output='1'
                     ;;
 
 # let the script and user know it should and will force rendering,
@@ -1474,10 +1480,18 @@ Won't create \".${__config//.\/xml/}\""
                     __will_optimize='1'
                 fi
 
-                if [ "${__will_optimize}" = '1' ]; then
-                    __leader="Processing and optimizing"
+                if [ "${__short_output}" = '0' ]; then
+
+                    if [ "${__will_optimize}" = '1' ]; then
+                        __leader="Processing and optimizing "
+                    else
+                        __leader="Processing "
+                    fi
+
                 else
-                    __leader="Processing"
+
+                    __leader=''
+
                 fi
 
                 if [ "${__render_num}" = '1' ] && [ "${__show_progress}" = '1' ]; then
@@ -1491,7 +1505,13 @@ Won't create \".${__config//.\/xml/}\""
 
 # announce that we are processing the given config
                 if [ "${__quiet}" = '0' ]; then
-                    __format_text "\e[36m${__size}\e[39m" "${__leader} \".${__config//.\/xml/}\"" ""
+                    if [ "${__short_output}" = '0' ]; then
+                        __file_part="\".${__config//.\/xml/}\""
+                    else
+                        __file_part="$(basename ".${__config//.\/xml/}")"
+                    fi
+
+                    __format_text "\e[36m${__size}\e[39m" "${__leader}${__file_part}" ""
                 fi
 
 # copy the config script out so we can use it
