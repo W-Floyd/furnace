@@ -364,7 +364,15 @@ elif echo "${1}" | grep '^-.*' &> /dev/null; then
 
     for __letter in ${__letters}; do
 
-        __check_input "${__letter}"
+        if [[ "${__letter}" == [0-9] ]]; then
+
+            __force_warn "Sizes are not to be specified in this way"
+
+        else
+
+            __check_input "${__letter}"
+
+        fi
 
     done
 
@@ -392,8 +400,6 @@ fi
 
 # then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
-
-
 
     case "${__last_option}" in
 
