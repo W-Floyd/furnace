@@ -53,10 +53,10 @@ Options:
       --help                Long help
   -v  --verbose             Be verbose
   -i  --install             Install to ~/.minecraft folder
-  -m  --mobile              Make mobile resource pack as well
   -f  --force-render        Discard pre-rendered data
   -q  --quiet               Just show progress report
       --silent              No output at all
+      --short               Use short output format
   -w  --warn                Show warnings
   -c  --compress            Actually compress zip files
   -o  --optimize            Optimize final PNG files
