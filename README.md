@@ -41,9 +41,9 @@ Where it really comes into its own is doing the boring jobs, like overlaying a w
 
 At one point I had to compile a newer version of Imagemagick from source to make some compositing work. If you get odd results, that may be the issue. This *seems* to have been solved by setting some options on all image operations.
 
-Sizes above 1024px **will not** not to be loaded in Minecraft at all, and even 1024px has not always loaded for me (needs optifine for sure), so 512px is the largest default size. 4096px is the largest size I have successfully processed, as 8192px is killed when I run out of memory (16gb RAM + 4gb swap). Even 4096px runs out of memory when processing some demo images. Really though, why anyone needs anything larger than 4096px is beyond me - a single texture is larger than a 4K screen. Certainly large enough for print usage.
+Sizes above 1024px **will not** not to be loaded in Minecraft at all, and even 1024px has not always loaded for me (needs optifine for sure), so 1024px is the largest default size. 4096px is the largest size I have successfully processed, as 8192px is killed when I run out of memory (16gb RAM + 4gb swap). Even 4096px runs out of memory when processing some demo images. Size 1024, however, may comfortably be rendered within less than 2gb free RAM. Really though, why anyone needs anything larger than 4096px is beyond me - a single texture is larger than a 4K screen. Certainly large enough for print usage.
 
-If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or get errors about missing dependencies, forcefully re-render to fix it. Using a cancelled render is never recommended, nor supported!
+If a render run is cancelled, it may leave incomplete images. If you find you have odd results, or continue to get errors about missing dependencies, forcefully re-render to fix it. Using a cancelled render is never recommended, nor supported!
 
 Documentation could be better - I may eventually clean things up.
 
