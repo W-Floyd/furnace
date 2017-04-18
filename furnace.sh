@@ -793,11 +793,21 @@ __dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
 
 if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; then
 
-    if [ -e "${__dest}" ] ; then
-        rm "${__dest}"
-    fi
+    if [ -d "$(dirname "${__dest}")" ]; then
 
-    cp "${__packfile}.zip" "${__dest}"
+        if [ -e "${__dest}" ] ; then
+            rm "${__dest}"
+        fi
+
+        cp "${__packfile}.zip" "${__dest}"
+
+    else
+
+        __force_warn "Minecraft does not seem to be installed, I won't try to install"
+
+        __install='0'
+
+    fi
 
 fi
 
