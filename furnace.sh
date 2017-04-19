@@ -7,6 +7,7 @@ __install='0'
 __mobile='0'
 __quick='1'
 __time='0'
+__benchmark='0'
 __force='0'
 __render_optional='0'
 __debug='0'
@@ -88,6 +89,8 @@ General Options:
 
   -i  --install             Install to ~/.minecraft folder
   -t  --time                Time functions
+  -b  --benchmark           Log times for each texture, for
+                            each size rendered
   -d  --debug               Use debugging mode
   -l  --lengthy             Very verbose debugging mode
   -w  --warn                Show warnings
@@ -201,6 +204,10 @@ case "${1}" in
 
     "t" | "--time")
         __time='1'
+        ;;
+
+    "b" | "--benchmark")
+        __benchmark='1'
         ;;
 
     "d" | "--debug")
@@ -624,6 +631,10 @@ fi
 
 if [ "${__time}" = '1' ]; then
     __options="${__options} -t"
+fi
+
+if [ "${__benchmark}" = '1' ]; then
+    __options="${__options} -b"
 fi
 
 if [ "${__debug}" = '1' ]; then

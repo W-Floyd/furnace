@@ -16,6 +16,7 @@ __xml_only='0'
 __name_only='0'
 __mobile='0'
 __time='0'
+__benchmark='0'
 __should_warn='0'
 __dry='0'
 __list_changed='0'
@@ -67,6 +68,7 @@ Options:
   -s  --slow            Use slower render engine (Inkscape)
   -q  --quick           Use quicker render engine (rsvg-convert)
   -t  --time            Time operations (for debugging)
+  -b  --benchmark       Benchmark (for... benchmarking)
   -w  --warn            Show warnings
   -o  --optimize        Optimize final PNG files
       --no-optimize     Do not optimize final PNG files
@@ -214,6 +216,15 @@ while ! [ "${#}" = '0' ]; do
 # whether to time functions
                 "-t" | "--time")
                     __time='1'
+                    ;;
+
+                "-b" | "--benchmark")
+                    __force_announce "Benchmarking mode enabled"
+                    __benchmark='1'
+                    __benchmark_file="${__working_dir}/benchmark_${__size}.csv"
+                    if [ -e "${__benchmark_file}" ]; then
+                        rm "${__benchmark_file}"
+                    fi
                     ;;
 
 # whether to warn
@@ -1413,8 +1424,23 @@ __set_break_loop () {
 __break_loop='1'
 }
 
-# trap ctrl c in case the user is stupid
-# doesn't always work, please use 'q' instead
+__benchmark_bit='1'
+
+__benchmark_time () {
+
+if [ "${__benchmark}" = '1' ]; then
+
+if [ "${1}" = 'start' ]; then
+    export __benchmark_start_time="$(date +%s.%N)"
+elif [ "${1}" = 'end' ]; then
+    echo "\"${2}\", $(echo "$(date +%s.%N)-${__benchmark_start_time}" | bc)" >> "${__benchmark_file}"
+fi
+
+fi
+
+}
+
+# trap ctrl c in case the user (me) is stupid
 trap __set_break_loop SIGINT
 
 # while the render list has lines to process,
@@ -1435,6 +1461,8 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
 # if the dependencies are not yet to be rendered, then
     if ! grep -qFxf "${__dep_list_folder}/${__orig_config_name}" "${__render_list}"; then
+
+        __benchmark_time start
 
 # get the size of the texture
         __tmp_val="$(__get_value "${__config}" SIZE)"
@@ -1561,6 +1589,9 @@ Won't create \".${__config//.\/xml/}\""
             rm "./${__orig_config_name}"
         fi
 
+
+        __benchmark_time end "${__orig_config}"
+
 # if the config still has dependencies that need to be rendered
     else
 
@@ -1572,6 +1603,17 @@ Won't create \".${__config//.\/xml/}\""
 
 # finish render loop
 done
+
+if [ "${__benchmark}" = '1' ]; then
+
+    echo 'file, time' > "${__benchmark_file}_"
+
+    sort -r -k 2 "${__benchmark_file}" >> "${__benchmark_file}_"
+
+    mv "${__benchmark_file}_" "${__benchmark_file}"
+
+fi
+
 
 # untrap ctrl c, so we don't get ourselves into trouble some day
 trap - SIGINT
