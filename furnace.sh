@@ -49,7 +49,7 @@ default list of sizes). Order of options and size(s) are not
 important, other than options which take secondary inputs.
 
 Options:
-  -h  -?                    Short help(this message)
+  -h  -?                    Short help (this message)
       --help                Long help
   -v  --verbose             Be verbose
   -i  --install             Install to ~/.minecraft folder
@@ -338,7 +338,7 @@ ${1}"
 
     *)
         __custom_error "Unknown option \"${1}\""
-        __usage
+        __usage_short
         exit 77
         ;;
 
