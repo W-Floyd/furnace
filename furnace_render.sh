@@ -1613,7 +1613,7 @@ if [ "${__benchmark}" = '1' ] && [ "${__clean_benchmark}" = '1' ]; then
 
     echo 'file, time' > "${__benchmark_file}_"
 
-    sort -r -k 2 "${__benchmark_file}" >> "${__benchmark_file}_"
+    sort -r -n -k 2 "${__benchmark_file}" >> "${__benchmark_file}_"
 
     mv "${__benchmark_file}_" "${__benchmark_file}"
 
