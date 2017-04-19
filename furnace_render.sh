@@ -219,12 +219,8 @@ while ! [ "${#}" = '0' ]; do
                     ;;
 
                 "-b" | "--benchmark")
-                    __force_announce "Benchmarking mode enabled"
                     __benchmark='1'
                     __benchmark_file="${__working_dir}/benchmark_${__size}.csv"
-                    if [ -e "${__benchmark_file}" ]; then
-                        rm "${__benchmark_file}"
-                    fi
                     ;;
 
 # whether to warn
@@ -1443,6 +1439,15 @@ fi
 # trap ctrl c in case the user (me) is stupid
 trap __set_break_loop SIGINT
 
+if [ -s "${__render_list}" ]; then
+    __clean_benchmark='1'
+    if [ -e "${__benchmark_file}" ]; then
+        rm "${__benchmark_file}"
+    fi
+else
+    __clean_benchmark='0'
+fi
+
 # while the render list has lines to process,
 while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 
@@ -1604,7 +1609,7 @@ Won't create \".${__config//.\/xml/}\""
 # finish render loop
 done
 
-if [ "${__benchmark}" = '1' ]; then
+if [ "${__benchmark}" = '1' ] && [ "${__clean_benchmark}" = '1' ]; then
 
     echo 'file, time' > "${__benchmark_file}_"
 

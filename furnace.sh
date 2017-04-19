@@ -207,6 +207,7 @@ case "${1}" in
         ;;
 
     "b" | "--benchmark")
+        __announce "Benchmarking mode enabled"
         __benchmark='1'
         ;;
 
