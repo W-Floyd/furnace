@@ -10,11 +10,13 @@ __tmp_dir
 __furnace\_make\_mobile_bin  
 __custom\_function\_bin  
 __quick  
-__render_optional  
 __should_optimize  
 __max_optimize  
 __ignore\_max\_optimize  
 __optimizer  
+__render_optional  
+__max_optional  
+__ignore\_max\_optional  
 
 The following variables may be used:
 __pid
