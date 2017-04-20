@@ -626,6 +626,25 @@ case "${2}" in
 esac
 
 mogrify -rotate "${__angle}" "${1}"
+
+}
+
+###############################################################
+#
+# __rotate_exact <INPUT.png> <OUTPUT.png> <AMOUNT>
+#
+# Rotate Exact
+# Rotates the image by the given amount, from 0 to 1.
+#
+# 0.0 = 0 degrees
+# 0.5 = 180 degrees
+# 1.0 = 360 degrees
+###############################################################
+
+__rotate_exact () {
+
+convert -background none -define png:color-type=6 -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
+
 }
 
 ###############################################################
