@@ -3,9 +3,11 @@
 __un_named='0'
 __catalogue="${1}"
 
-for __range in $(__get_range "${__catalogue}" ITEM); do
+__clean_pack < "${__catalogue}" > "/tmp/texpackcatalogue"
 
-__read_range "${__catalogue}" "${__range}" > "/tmp/readrangetmp"
+for __range in $(__get_range "/tmp/texpackcatalogue" ITEM); do
+
+__read_range "/tmp/texpackcatalogue" "${__range}" > "/tmp/readrangetmp"
 
 touch "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
 
@@ -31,6 +33,6 @@ as well as ${__un_named} un-named items, with raw values:
 
 $(sort "/tmp/nametmp")"
 
-rm "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp"
+rm "/tmp/readrangetmp" "/tmp/commontmp" "/tmp/nametmp" "/tmp/texpackcatalogue"
 
 exit
