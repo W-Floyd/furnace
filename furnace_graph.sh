@@ -14,7 +14,9 @@ fi
 
 mkdir -p "${__graph_tmp_dir}"
 
-__catalogue="${2}"
+__clean_pack < "${2}" > "/tmp/texpackcatalogue"
+
+__catalogue="/tmp/texpackcatalogue"
 
 __graph="${__graph_tmp_dir}/${4}"
 
