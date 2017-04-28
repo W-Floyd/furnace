@@ -8,7 +8,8 @@
 #
 # Finds the chunks in a PNG file - currently being used to test
 # for changed colour profiles with zopflipng, since Minecraft is
-# borked, and doesn't like anything other than color_type 6
+# borked, and doesn't seem to like anything other than
+# color_type 6
 #
 ###############################################################
 
@@ -51,13 +52,13 @@ fi
 
 if ! [ "${__vector_render_check}" = '1' ]; then
 
-if ! which inkscape &> /dev/null && [ "${__quick}" = '0' ]; then
-    __error "Inkscape is not installed"
-elif ! which rsvg-convert &> /dev/null && [ "${__quick}" = '1' ]; then
-    __error "rsvg-convert is not installed"
-fi
+    if ! which inkscape &> /dev/null && [ "${__quick}" = '0' ]; then
+        __error "Inkscape is not installed"
+    elif ! which rsvg-convert &> /dev/null && [ "${__quick}" = '1' ]; then
+        __error "rsvg-convert is not installed"
+    fi
 
-__vector_render_check='1'
+    __vector_render_check='1'
 
 fi
 
@@ -66,25 +67,26 @@ if ! [ "$(__oext "${2}")" = 'svg' ]; then
 fi
 
 __dpi="$(echo "(96*${1})/128" | bc -l | sed 's/0*$//')"
+
 if [ "${__quick}" = '1' ]; then
 # GOD awful hack to catch svg size, since rsvg-convert seems
 # buggy
 # TODO
 # FIX THIS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-rsvg-convert \
---width="$(echo "($(grep "^   width=\"*\"" < "${2}" | sed -e 's/.*="//' -e 's/"$//')*${1})/128" | bc)" \
--a \
-"${2}" \
--o "$(__mext "${2}").png" 1> /dev/null
-convert "$(__mext "${2}")"".png" -define png:color-type=6 "$(__mext "$2")"'_'".png"
-mv "$(__mext "${2}")"'_'".png" "$(__mext "${2}")"".png"
+    rsvg-convert \
+    --width="$(echo "($(grep "^   width=\"*\"" < "${2}" | sed -e 's/.*="//' -e 's/"$//')*${1})/128" | bc)" \
+    -a \
+    "${2}" \
+    -o "$(__mext "${2}").png" 1> /dev/null
+    convert "$(__mext "${2}").png" -define png:color-type=6 "$(__mext "$2")_.png"
+    mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
 
 elif [ "${__quick}" = '0' ]; then
-inkscape \
---export-dpi="${__dpi}" \
---export-png "$(__mext "${2}").png" "${2}" 1> /dev/null
-convert "$(__mext "${2}")"".png" -define png:color-type=6 "$(__mext "${2}")"'_'".png"
-mv "$(__mext "${2}")"'_'".png" "$(__mext "${2}")"".png"
+    inkscape \
+    --export-dpi="${__dpi}" \
+    --export-png "$(__mext "${2}").png" "${2}" 1> /dev/null
+    convert "$(__mext "${2}").png" -define png:color-type=6 "$(__mext "${2}")_.png"
+    mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
 fi
 }
 
@@ -95,24 +97,25 @@ fi
 # GIMP Export
 # Exports a given GIMP file to a PNG file of the same name
 #
-# Shamelessly stolen from:
+# Shamelessly stolen from
 # http://stackoverflow.com/a/5846727/7578643
+# and wrapped up as a function.
 #
 ###############################################################
 
 __gimp_export () {
 
 if ! [ "$(__oext "${1}")" = 'xcf' ]; then
-    __error "File \"${1}\" is not a xcf file"
+    __error "File \"${1}\" is not a GIMP file"
 fi
 
 if ! [ "${__gimp_export_check}" = '1' ]; then
 
-if ! which gimp &> /dev/null; then
-    __error "GIMP is not installed"
-fi
+    if ! which gimp &> /dev/null; then
+        __error "GIMP is not installed"
+    fi
 
-__gimp_export_check='1'
+    __gimp_export_check='1'
 
 fi
 
@@ -135,7 +138,39 @@ EOF
 }
 
 # My instance of GIMP throws some errors no matter what, so
+# it's made silent. Bad idea, I know...
 __gimp_sub "${1}" &> /dev/null
+
+}
+
+###############################################################
+#
+# __krita_export <FILE.kra>
+#
+# Krita Export
+# Exports a given Krita file to a PNG file of the same name
+#
+###############################################################
+
+__krita_export () {
+
+if ! [ "$(__oext "${1}")" = 'kra' ]; then
+    __error "File \"${1}\" is not a Krita file"
+fi
+
+if ! [ "${__krita_export_check}" = '1' ]; then
+
+    if ! which krita &> /dev/null; then
+        __error "Krita is not installed"
+    fi
+
+    __krita_export_check='1'
+
+fi
+
+# My instance of Krita throws some errors no matter what, so
+# it's made silent. Bad idea, I know...
+krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 
 }
 
