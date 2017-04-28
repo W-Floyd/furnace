@@ -63,7 +63,8 @@ Options:
   -o  --optimize            Optimize final PNG files
       --no-optimize         Do not optimize final PNG files
   --optional <SIZE>         Render optional items, optionally at
-                            specified size only.
+                            specified size only. Use - to ignore
+                            the specification.
   --graph <ITEM>            Render a graph of the dependency
                             tree. Optional input is list of
                             ITEMs to be the subject of the graph
@@ -113,7 +114,8 @@ Render Options:
   --optimizer <OPTIMIZER>   Optimize with specified optimizer
 
   --optional <SIZE>         Render optional items, optionally at
-                            specified size only.
+                            specified size only. Use - to ignore
+                            the specification.
   --max-optional <SIZE>     Maximum size to render optional size
   --no-optional             Do not render any optional items.
 
@@ -437,6 +439,8 @@ while ! [ "${#}" = '0' ]; do
         "--graph")
             if __check_option "${1}"; then
                 __process_option "${1}"
+            elif [[  "${1}" == [0-9]* ]]; then
+                __force_warn "Size is not important when graphing, and will be ignored"
             else
                 if [ -z "${__graph_files}" ]; then
                     __graph_files="$(echo "${1}" | tr ',' '\n')"
@@ -464,13 +468,15 @@ $(echo "${1}" | tr ',' '\n')"
             ;;
 
         "--optional")
-            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
-                __use_optional_size='1'
-                __optional_size="${1}"
-            elif __check_option "${1}"; then
-                __process_option "${1}"
-            else
-                __error "Given input is not a size"
+            if ! [ "${1}" = '-' ]; then
+                if [ "${1}" -eq "${1}" ] 2>/dev/null; then
+                    __use_optional_size='1'
+                    __optional_size="${1}"
+                elif __check_option "${1}"; then
+                    __process_option "${1}"
+                else
+                    __error "Given input is not a size"
+                fi
             fi
             ;;
 
