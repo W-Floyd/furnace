@@ -15,7 +15,7 @@ _furnace () {
     fi
 
 
-    case ${prev} in
+    case "${prev}" in
         '-?' | '-h' | '--help' | "--graph-seed" | "--completed")
             return 0
             ;;
@@ -41,11 +41,13 @@ _furnace () {
             ;;
 
         "--graph")
-            COMPREPLY=($(compgen -W "${items}" -- "${cur}"))
-            if [ "$(echo "${matches}" | wc -l )" -gt 1 ]; then
-                compopt -o nospace
+            if ! [[ "${cur}" == "-"* ]]; then
+                COMPREPLY=($(compgen -W "${items}" -- "${cur}"))
+                if [ "$(echo "${matches}" | wc -l )" -gt 1 ]; then
+                    compopt -o nospace
+                fi
+                return 0
             fi
-            return 0
             ;;
 
         "--grapher")
