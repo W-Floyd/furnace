@@ -61,16 +61,22 @@ ${__dep_list}"
     done <<< "${__files}"
 
 else
-    __dep_list="${__list}"
+    __files="${__list}"
+    while read -r __item; do
+
+        __dep_list="$(cat "${__item}")
+${__dep_list}"
+
+    done <<< "${__list}"
 fi
+
+__popd
 
 echo "
     node [style=filled, shape=record, color=\"black\" fillcolor=\"lightgray\" ];
 " >> "${__graph}"
 
-if [ "${__use_files}" = '1' ]; then
-    echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' | sort | uniq >> "${__graph}"
-fi
+echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' | sort | uniq >> "${__graph}"
 
 __dep_list="$(grep -x "${__files}" <<< "${__list}")
 ${__dep_list}"
@@ -83,8 +89,6 @@ if [ "${__use_files}" = '1' ] && [ "${7}" = '0' ]; then
 " >> "${__graph}"
 fi
 
-__popd
-
 if ! [ -z "${__dep_list}" ]; then
 
     __dep_list="$(echo "${__dep_list}" | grep -v '^$' | sort | uniq)"
@@ -93,7 +97,7 @@ if ! [ -z "${__dep_list}" ]; then
 
     __tmp_func () {
 
-    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG ; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
+    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" CONFIG; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
 
     if ! [ -z "${__deps}" ]; then
 
@@ -121,9 +125,7 @@ if ! [ -z "${__dep_list}" ]; then
 
         else
 
-            if [ "$(__get_value "${__graph_tmp_dir}/readrangetmp" KEEP)" = 'YES' ]; then
-                __tmp_func
-            fi
+            __tmp_func
 
         fi
 
@@ -146,6 +148,8 @@ fi
 if [ "${__debug}" = '0' ]; then
 
     rm -r "${__graph_tmp_dir}"
+
+    rm "${__catalogue}"
 
 fi
 
