@@ -2,7 +2,7 @@
 # Functions
 ###############################################################
 #
-# __mext <string>
+# <LIST_OF_FILES> | __mext <FILE_1> <FILE_2> <FILE_3> ...
 #
 # Minus Extension
 # Strips last file extension from string
@@ -10,12 +10,27 @@
 ###############################################################
 
 __mext () {
-sed 's|\(.*\)\(\.\).*|\1|' <<< "${1}"
+
+__tmp_mext_sub () {
+    echo "${1%.*}"
+}
+
+while ! [ "${#}" = '0' ]; do
+    __tmp_mext_sub "${1}"
+    shift
+done
+
+if read -t 0; then
+    cat | while read -r __value; do
+        __tmp_mext_sub "${__value}"
+    done
+fi
+
 }
 
 ###############################################################
 #
-# __oext <string>
+# <LIST_OF_FILES> | __oext <FILE_1> <FILE_2> <FILE_3> ...
 #
 # Only Extension
 # Returns the final extension of a filename
@@ -24,7 +39,22 @@ sed 's|\(.*\)\(\.\).*|\1|' <<< "${1}"
 ###############################################################
 
 __oext () {
-sed 's|\(.*\)\(\.\)\(.*\)|\3|' <<< "${1}"
+
+__tmp_oext_sub () {
+    echo "${1/*.}"
+}
+
+while ! [ "${#}" = '0' ]; do
+    __tmp_oext_sub "${1}"
+    shift
+done
+
+if read -t 0; then
+    cat | while read -r __value; do
+        __tmp_oext_sub "${__value}"
+    done
+fi
+
 }
 
 ###############################################################
