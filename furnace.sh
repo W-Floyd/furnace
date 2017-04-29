@@ -45,30 +45,28 @@ source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"$
 __usage_short () {
 echo "$(basename "${0}") <OPTIONS> <SIZE>
 
-Makes the resource pack at the specified size(s) (or using
-default list of sizes). Order of options and size(s) are not
-important, other than options which take secondary inputs.
+Makes the resource pack at the specified size(s) (or using default list of
+sizes). Order of options and size(s) are not important, other than options which
+take secondary inputs.
 
 Options:
-  -h  -?                    Short help (this message)
-      --help                Long help
-  -v  --verbose             Be verbose
-  -i  --install             Install to ~/.minecraft folder
-  -f  --force-render        Discard pre-rendered data
-  -q  --quiet               Just show progress report
-      --silent              No output at all
-      --short               Use short output format
-  -w  --warn                Show warnings
-  -c  --compress            Actually compress zip files
-  -o  --optimize            Optimize final PNG files
-      --no-optimize         Do not optimize final PNG files
-  --optional <SIZE>         Render optional items, optionally at
-                            specified size only. Use - to ignore
-                            the specification.
-  --graph <ITEM>            Render a graph of the dependency
-                            tree. Optional input is list of
-                            ITEMs to be the subject of the graph
-                            May be specified multiple times."
+  -h  -?                    Short help (this message).
+      --help                Long help.
+  -v  --verbose             Be verbose.
+  -i  --install             Install to ~/.minecraft folder.
+  -f  --force-render        Discard pre-rendered data.
+  -q  --quiet               Just show progress report.
+      --silent              No output at all.
+      --short               Use short output format.
+  -w  --warn                Show warnings.
+  -c  --compress            Actually compress zip files.
+  -o  --optimize            Optimize final PNG files.
+      --no-optimize         Do not optimize final PNG files.
+  --optional <SIZE>         Render optional items, optionally at specified size
+                            only. Use - to ignore the specification.
+  --graph <ITEM>            Render a graph of the dependency tree. Optional
+                            input is list of ITEMs to be the subject of the
+                            graph. May be specified multiple times."
 }
 
 __usage () {
@@ -79,70 +77,63 @@ default list of sizes). Order of options and size(s) are not
 important, other than options which take secondary inputs.
 
 General Options:
-  -h  -?                    Short help
-      --help                Long help (this message)
+  -h  -?                    Short help.
+      --help                Long help (this message).
 
-  -v  --verbose             Be verbose
-  -q  --quiet               Just progress report
-      --silent              No output at all
-      --no-progress         Do not show a progress report
-      --short               Use short output format
+  -v  --verbose             Be verbose.
+  -q  --quiet               Just progress report.
+      --silent              No output at all.
+      --no-progress         Do not show a progress report.
+      --short               Use short output format.
 
-  -i  --install             Install to ~/.minecraft folder
-  -t  --time                Time functions
-  -b  --benchmark           Log times for each texture, for
-                            each size rendered
-  -d  --debug               Use debugging mode
-  -l  --lengthy             Very verbose debugging mode
-  -w  --warn                Show warnings
-  -c  --compress            Actually compress zip files
+  -i  --install             Install to ~/.minecraft folder.
+  -t  --time                Time functions.
+  -b  --benchmark           Log times for each texture, for each size rendered.
+  -d  --debug               Use debugging mode.
+  -l  --lengthy             Very verbose debugging mode.
+  -w  --warn                Show warnings.
+  -c  --compress            Actually compress zip files.
 
 Render Options:
-  -f  --force-render        Discard pre-rendered data
-  -m  --mobile              Make mobile resource pack as well
-  -s  --slow                Use Inkscape instead of rsvg-convert
+  -f  --force-render        Discard pre-rendered data.
+  -m  --mobile              Make mobile resource pack as well.
+  -s  --slow                Use Inkscape instead of rsvg-convert.
 
-  -o  --optimize            Optimize final PNG files
-      --no-optimize         Do not optimize final PNG files
-      --re-optimize         Re-process and re-optimize files
-                            appropriately
+  -o  --optimize            Optimize final PNG files.
+      --no-optimize         Do not optimize final PNG files.
+      --re-optimize         Re-process and re-optimize files appropriately.
 
-  --max-optimize <SIZE>     Max size to optimize
-  --force-optimize          Optimize any size of final PNG files
-  --force-max-optimize      Ensure max-optimize is obeyed
+  --max-optimize <SIZE>     Max size to optimize.
+  --force-optimize          Optimize any size of final PNG files.
+  --force-max-optimize      Ensure max-optimize is obeyed.
 
-  --optimizer <OPTIMIZER>   Optimize with specified optimizer
+  --optimizer <OPTIMIZER>   Optimize with specified optimizer.
 
-  --optional <SIZE>         Render optional items, optionally at
-                            specified size only. Use - to ignore
-                            the specification.
-  --max-optional <SIZE>     Maximum size to render optional size
+  --optional <SIZE>         Render optional items, optionally at specified size
+                            only. Use - to ignore the specification.
+  --max-optional <SIZE>     Maximum size to render optional size.
   --no-optional             Do not render any optional items.
 
-  --name <NAME>             Name to use when processing a pack
+  --name <NAME>             Name to use when processing a pack.
 
 Graphing Options:
-  --graph <ITEM>            Render a graph of the dependency
-                            tree. Optional input is a comma
-                            and/or new-line separated list of
-                            ITEMs to be the subject of the graph
-                            For a full graph, use '', '.*', or
-                            nothing. May be specified multiple
-                            times. Supports regex.
-  --graph-format <FORMAT>   Specifies the format to graph to.
-                            Defaults to png.
-  --graph-seed <SEED>       Seed to use when graphing. Defaults
-                            to a random seed when unspecified.
-  --grapher <GRAPHER>       Graphviz tool to use when graphing.
-                            Defaults to neato.
-  --graph-output <FILE>     Name to use when outputting a graph.
-                            Default output is 'graph'
-  --no-highlight            Do not highlight specified files
-                            when graphing.
+  --graph <ITEM>            Render a graph of the dependency tree. Optional
+                            input is a comma and/or new-line separated list of
+                            ITEMs to be the subject of the graph For a full
+                            graph, use '', '.*', or nothing. May be specified
+                            multiple times. Supports regex.
+  --graph-format <FORMAT>   Specifies the format to graph to. Defaults to png.
+  --graph-seed <SEED>       Seed to use when graphing. Defaults to a random seed
+                            when unspecified.
+  --grapher <GRAPHER>       Graphviz tool to use when graphing. Defaults to
+                            neato.
+  --graph-output <NAME>     Name to use when outputting a graph. Default output
+                            is 'graph'
+  --no-highlight            Do not highlight specified files when graphing.
 
 Other Options:
-  --completed               List completed textures, according
-                            to the COMMON field in the catalogue
+  --completed               List completed textures, according to the COMMON
+                            field in the catalogue
 
   --changed                 List ITEMS changed since last render
 
@@ -150,7 +141,7 @@ Other Options:
       --xml-only            Only split xml files"
 }
 
-################################################################
+################################################################################
 
 __force_time "Rendered all" start
 __force_time "Processed XML" start
@@ -158,7 +149,7 @@ __force_time "Processed XML" start
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
 
-################################################################
+################################################################################
 
 __check_input () {
 
@@ -356,7 +347,7 @@ esac
 
 }
 
-################################################################
+################################################################################
 
 __process_option () {
 
@@ -396,7 +387,7 @@ fi
 
 }
 
-################################################################
+################################################################################
 
 __check_option () {
 if grep -q '^-.*' <<< "${1}"; then
@@ -406,7 +397,7 @@ else
 fi
 }
 
-################################################################
+################################################################################
 
 # then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
@@ -504,7 +495,7 @@ fi
 
 __last_option=''
 
-################################################################
+################################################################################
 
 if ! [ -d './src' ] && ! [ -e "${__catalogue}" ]; then
     __error "Not a resource pack project folder"
@@ -567,7 +558,7 @@ elif [ "${__should_optimize}" = '1' ]; then
     fi
 fi
 
-################################################################
+################################################################################
 
 if [ "${__use_custom_size}" = '0' ] && [ -z "${__sizes}" ]; then
 __sizes="32
@@ -883,6 +874,14 @@ else
             __sub_loop "${__size}"
 
         fi
+
+        __loop_status="$(cat "./src/xml/loopstatus")"
+        rm "./src/xml/loopstatus"
+
+        if [ "${__loop_status}" = '1' ]; then
+            exit
+        fi
+
     done
 fi
 

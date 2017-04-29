@@ -1,8 +1,8 @@
 #!/bin/bash
 
-###############################
+################################################################################
 # Defaults
-###############################
+################################################################################
 
 __size='128'
 __quiet='0'
@@ -26,9 +26,9 @@ __show_progress='0'
 __render_optional='0'
 __short_output='0'
 
-###############################################################
+################################################################################
 # Setting up functions
-###############################################################
+################################################################################
 
 if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
@@ -50,33 +50,31 @@ __time "${__time_var}" "${__tmp_time_var}"
 __usage () {
 echo "$(basename "${0}") <OPTIONS> <SIZE>
 
-Renders the texture pack at the specified size (or default 128)
-Order of options and size are not important.
+Renders the texture pack at the specified size (or default 128). Order of
+options and size are not important.
 
 Options:
-  -h  --help  -?        This help message
-      --progress        Show a progress report
-  -f  --force           Discard pre-rendered data
-  -v  --verbose         Verbose
-      --short           Short output
-  -p  --process-id      Using PID as given after
-  -d  --debug           Debugging mode
-  -l  --lengthy         Very verbose debugging mode
-  -x  --xml-only        Only process XML files
-  -n  --name-only       Print output folder name
-  -m  --mobile          Make mobile resource pack
-  -s  --slow            Use slower render engine (Inkscape)
-  -q  --quick           Use quicker render engine (rsvg-convert)
-  -t  --time            Time operations (for debugging)
-  -b  --benchmark       Benchmark (for... benchmarking)
-  -w  --warn            Show warnings
-  -o  --optimize        Optimize final PNG files
-      --no-optimize     Do not optimize final PNG files
-      --quiet           No output unless specified
-      --optional        Actually render any optional files,
-                        though they still won't be included
-      \
-"
+  -h  --help  -?        This help message.
+      --progress        Show a progress report.
+  -f  --force           Discard pre-rendered data.
+  -v  --verbose         Verbose.
+      --short           Short output.
+  -p  --process-id      Using PID as given after.
+  -d  --debug           Debugging mode.
+  -l  --lengthy         Very verbose debugging mode.
+  -x  --xml-only        Only process XML files.
+  -n  --name-only       Print output folder name.
+  -m  --mobile          Make mobile resource pack.
+  -s  --slow            Use slower render engine (Inkscape).
+  -q  --quick           Use quicker render engine (rsvg-convert).
+  -t  --time            Time operations (for debugging).
+  -b  --benchmark       Benchmark (for... benchmarking).
+  -w  --warn            Show warnings.
+  -o  --optimize        Optimize final PNG files.
+      --no-optimize     Do not optimize final PNG files.
+      --quiet           No output unless specified.
+      --optional        Actually render any optional files, though they still
+                        won't be included."
 }
 
 __start_debugging () {
@@ -87,17 +85,17 @@ __stop_debugging () {
     set +x
 }
 
-###############################################################
+################################################################################
 # Set variables from config
-###############################################################
+################################################################################
 
 # Master folder
 __working_dir="$(pwd)"
 
-###############################################################
+################################################################################
 # Read options
 __force_time "Read options" start
-###############################################################
+################################################################################
 
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
@@ -291,9 +289,9 @@ __time "Read options" end
 
 __time "Set variables" start
 
-###############################################################
+################################################################################
 # Fill the blanks that the config didn't fill
-###############################################################
+################################################################################
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
@@ -308,9 +306,9 @@ if [ -z "${__quick}" ]; then
     export __quick='1'
 fi
 
-###############################################################
+################################################################################
 # Derived variables
-###############################################################
+################################################################################
 
 # Rendered folder name
 __pack="${__name}-${__size}px"
@@ -330,9 +328,9 @@ else
 # end mobile if statement
 fi
 
-###############################################################
+################################################################################
 # Print pack name
-###############################################################
+################################################################################
 
 # if we're only supposed to print the pack name
 if [ "${__name_only}" = '1' ]; then
@@ -346,9 +344,9 @@ if [ "${__name_only}" = '1' ]; then
 # exit the name only if statement
 fi
 
-###############################################################
+################################################################################
 # Any warnings
-###############################################################
+################################################################################
 
 __calculated_log="$(__log2 "${__size}")"
 
@@ -356,9 +354,9 @@ if ! [ "${__size}" = "$(echo "2^${__calculated_log}" | bc)" ]; then
     __force_warn "Given size is not a power of 2"
 fi
 
-###############################################################
+################################################################################
 # Check software deps
-###############################################################
+################################################################################
 
 # check inkscape
 if which inkscape &> /dev/null; then
@@ -398,33 +396,33 @@ if [ "${__dry}" = '1' ]; then
     exit
 fi
 
-###############################################################
+################################################################################
 # If not only doing xml
 if [ "${__xml_only}" = '0' ]; then
 
 __time "Set up folders" start
 
-###############################################################
+################################################################################
 # Announce size
 __announce "Using size ${__size}px."
-###############################################################
+################################################################################
 # Announce PID
 __announce "Using PID ${__pid}."
-###############################################################
+################################################################################
 
-###############################################################
+################################################################################
 # Announce mobile if set on
 if [ "${__mobile}" = '1' ]; then
 
     __announce "Will make mobile resource pack."
 
 fi
-###############################################################
+################################################################################
 
-###############################################################
+################################################################################
 # Set up folders
 __announce "Setting up folders."
-###############################################################
+################################################################################
 
 # End conditional if only doing xml processing
 fi
@@ -437,7 +435,7 @@ fi
 # Make the temporary directory
 mkdir -p "${__tmp_dir}"
 
-###############################################################
+################################################################################
 # If not only doing xml
 if [ "${__xml_only}" = '0' ]; then
 
@@ -467,9 +465,9 @@ __time "Set up folders" end
 # End conditional if only doing xml processing
 fi
 
-###############################################################
+################################################################################
 # Split XML
-###############################################################
+################################################################################
 
 __time "Split XML" start
 
@@ -599,7 +597,7 @@ mv "${__xml_current}" './src/xml/'
 
 __time "Split XML" end
 
-###############################################################
+################################################################################
 # Check for files to __optimize
 __announce "Checking for files to optimize."
 
@@ -617,10 +615,10 @@ __popd
 
 __time "Found files to optimize" end
 
-###############################################################
+################################################################################
 # Inherit deps and cleanup
 __announce "Inheriting and creating dependencies and cleanup files."
-###############################################################
+################################################################################
 
 # End if statement whether to split xml again or not
 fi
@@ -775,14 +773,14 @@ __announce "Re-using XML files."
 # End if statement whether to split xml again or not
 fi
 
-###############################################################
+################################################################################
 # If not only xml splitting
 if [ "${__xml_only}" = '0' ]; then
 
-###############################################################
+################################################################################
 # List new and matching XML entries
 __announce "Listing new and matching XML entries."
-###############################################################
+################################################################################
 
 __time "Listed new and matching XML entries" start
 
@@ -835,10 +833,10 @@ grep -Fxf "${__old_xml_list}" "${__new_xml_list}" > "${__shared_xml_list}"
 
 __time "Listed new and matching XML entries" end
 
-###############################################################
+################################################################################
 # Check changes in XML files
 __announce "Checking changes in XML files."
-###############################################################
+################################################################################
 
 __time "Checked changes in XML files" start
 
@@ -922,10 +920,10 @@ __time "Checked hash changes" end
 
 __time "Checked changes in XML files" end
 
-###############################################################
+################################################################################
 # List new and matching source files
 __announce "Listing new and matching source files."
-###############################################################
+################################################################################
 
 __time "Listed new and matching source files" start
 
@@ -974,10 +972,10 @@ grep -Fxf "${__old_source_list}" "${__new_source_list}" > "${__shared_source_lis
 
 __time "Listed new and matching source files" end
 
-###############################################################
+################################################################################
 # Check changes in source files
 __announce "Checking changes in source files."
-###############################################################
+################################################################################
 
 __time "Checked for changes in source files" start
 
@@ -1064,7 +1062,7 @@ fi
 
 __time "Checked for changes in source files" end
 
-###############################################################
+################################################################################
 # Before we go on, let's recap. These are the files we want
 #
 # "${__changed_xml}"
@@ -1077,29 +1075,26 @@ __time "Checked for changes in source files" end
 #
 # So, the plan is to:
 #
-# Find all valid existing rendered items to bring across.
-# To do so, all files in "${__unchanged_xml}" should be checked
-# whether they exist, then put on a list. If yes, just
-# list. If not, add to a different list (re/render list)
+# Find all valid existing rendered items to bring across. To do so, all files in
+# "${__unchanged_xml}" should be checked whether they exist, then put on a list.
+# If yes, just list. If not, add to a different list (re/render list).
 #
-# Combine "${__changed_source}" and "${__changed_xml}", then
-# find any xml files that *depend* upon them. Then add
-# "${__changed_xml}" itself.
+# Combine "${__changed_source}" and "${__changed_xml}", then find any xml files
+# that *depend* upon them. Then add "${__changed_xml}" itself.
 #
-# Find entries only in pre-rendered list and not in depends
-# list to be re-rendered. Replace that list, and copy all files
-# to the new folder.
+# Find entries only in pre-rendered list and not in depends list to be
+# re-rendered. Replace that list, and copy all files to the new folder.
 #
-# Next, add files from "${__new_split_xml_list}" to that list.
-# These are new entries, and shouldn't have any problems
+# Next, add files from "${__new_split_xml_list}" to that list. These are new
+# entries, and shouldn't have any problems.
 #
-# At this point, we have a file with a list of files to render.
-# All resultant files have been cleaned as needed.
+# At this point, we have a file with a list of files to render. All resultant
+# files have been cleaned as needed.
 #
-###############################################################
+################################################################################
 # Checking files to re/render
 __announce "Checking for items to re/process."
-###############################################################
+################################################################################
 
 __time "Checked for items to re/process" start
 
@@ -1173,20 +1168,18 @@ rm "./${__pack}/.${__optimize_file}"
 
 # TODO - Make a more efficient method of doing this
 
-################################################################
+#################################################################################
 #
-# What's happening here is that all files are checked.
-# If it, or a dependency, has been changed, then it is cleaned
-# and added to the render list.
+# What's happening here is that all files are checked. If it, or a dependency,
+# has been changed, then it is cleaned and added to the render list.
 #
-# If it has not been changed, and exists, copy across and add
-# to the rendered list
+# If it has not been changed, and exists, copy across and add to the rendered
+# list.
 #
-# If it is not changed, but it not rendered (that is, the
-# rendered file was deleted for whatever reason, it is added to
-# the list to be rendered.
+# If it is not changed, but it not rendered (that is, the rendered file was
+# deleted for whatever reason, it is added to the list to be rendered.
 #
-################################################################
+#################################################################################
 
 __pushd "${__pack}"
 
@@ -1360,10 +1353,10 @@ if [ "${__list_changed}" = '1' ]; then
 
 else
 
-###############################################################
+################################################################################
 # Copy all source, xml and conf scripts
 __announce "Setting up files for processing."
-###############################################################
+################################################################################
 
 # copy src files into new pack folder
 cp -r "./src/"* "${__pack_new}"
@@ -1374,10 +1367,10 @@ rm -r "${__pack}"
 # rename the new pack to the regular pack
 mv "${__pack_new}" "${__pack}"
 
-###############################################################
+################################################################################
 # Render loop
 __announce "Starting to render."
-###############################################################
+################################################################################
 
 __pushd "${__pack}"
 
@@ -1550,8 +1543,7 @@ Won't create \".${__config//.\/xml/}\""
 # copy the config script out so we can use it
                 cp "${__config_script}" ./
 
-# execute the script, given the determined size and options set
-# in the config
+# execute the script, given the determined size and options set in the config
                 {
                 eval '\./'"$(basename "${__config_script}")" "${__tmp_size}" $(__get_value "${__config}" OPTIONS | tr '\n' ' ')
 
@@ -1588,8 +1580,8 @@ Won't create \".${__config//.\/xml/}\""
 
         fi
 
-# often enough breaking the loop also breaks an image this will
-# delete the image if it exists, since it's unreliable
+# often enough breaking the loop also breaks an image this will delete the image
+# if it exists, since it's unreliable
         if [ "${__break_loop}" = '1' ] && [ -e "./${__orig_config_name}" ]; then
             rm "./${__orig_config_name}"
         fi
@@ -1626,18 +1618,18 @@ trap - SIGINT
 # get out of the render directory
 __popd
 
-###############################################################
+################################################################################
 # Final stats
-###############################################################
+################################################################################
 
 __announce "Done rendering!"
 
 __time "Rendered ${__size}px" end
 
-###############################################################
+################################################################################
 # Make cleaned folder
 __announce "Making cleaned folder."
-###############################################################
+################################################################################
 
 __time "Made cleaned folder" start
 
@@ -1707,9 +1699,9 @@ __popd
 
 __time "Made cleaned folder" end
 
-###############################################################
+################################################################################
 # Make mobile pack if asked to
-###############################################################
+################################################################################
 
 # if a mobile pack is supposed to be made, and the mobile script
 # doesn't exist
@@ -1764,11 +1756,11 @@ if [ "${__mobile}" = '1' ]; then
 
 fi
 
-###############################################################
+################################################################################
 # End if only xml splitting
 fi
 
-###############################################################
+################################################################################
 # End if listing changed files
 fi
 
@@ -1799,15 +1791,16 @@ fi
 
 fi
 
-###############################################################
+################################################################################
 # General Cleanup
-###############################################################
+################################################################################
 
-# If we're debugging, don't clean up (it will be done on next
-# run anyway)
+# If we're debugging, don't clean up (it will be done on next run anyway)
 if [ "${__debug}" = '0' ]; then
     __announce "Cleaning up."
     rm -r "${__tmp_dir}"
 fi
+
+echo "${__break_loop}" > "./src/xml/loopstatus"
 
 exit
