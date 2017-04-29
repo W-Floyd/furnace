@@ -1700,11 +1700,7 @@ rm -r ./xml
 rm -r ./conf
 
 # remove all empty directories
-find . -type d | while read -r __dir; do
-    if ! [ "$(ls -A "${__dir}/")" ]; then
-        rmdir "${__dir}"
-    fi
-done
+__empdir
 
 # get back to the right directory
 __popd
@@ -1752,11 +1748,14 @@ if [ "${__mobile}" = '1' ]; then
 # get into the end pack folder
     __pushd "${__pack_end}"
 
-# execute the mobile script folder
+# execute the mobile script
     "./${__furnace_make_mobile_bin}" || __error "Make mobile script failed"
 
-# remove the mobile script folder
+# remove the mobile script
     rm "${__furnace_make_mobile_bin}"
+
+# remove all empty directories
+    __empdir
 
 # get back into the main directory
     __popd
