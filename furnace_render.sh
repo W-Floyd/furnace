@@ -662,7 +662,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
 
-    __get_values "${__xml}" DEPENDS CONFIG | sort | uniq | grep -v '^$' | while read -r __line; do
+    __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | grep -v '^$' | while read -r __line; do
         echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
     done
 
@@ -711,7 +711,7 @@ while read -r __xml; do
 
         touch "${__dep_list}"
 
-        __get_values "${__xml}" CONFIG CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee -a "${__dep_list}" | while read -r __suspect_dep; do
+        __get_values "${__xml}" SCRIPT CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee -a "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
 
@@ -1403,7 +1403,7 @@ __time "Rendered ${__size}px" start
 
 __pushd './src/xml/'
 
-__process_count="$(while read -r __item; do if ! [ -z "$(__get_value "${__item}" CONFIG)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
+__process_count="$(while read -r __item; do if ! [ -z "$(__get_value "${__item}" SCRIPT)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
 
 __popd
 
@@ -1488,7 +1488,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
         fi
 
 # get the name of the config script, and replace any macro locations
-        __config_script="$(__get_value "${__config}" CONFIG)"
+        __config_script="$(__get_value "${__config}" SCRIPT)"
 
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
