@@ -46,6 +46,41 @@ fi
 }
 
 ###############################################################
+#
+# __empdir
+#
+# Remove Empty Directories
+# Finds all empty directories, until no changes occur.
+#
+###############################################################
+
+__empdir () {
+
+__listing="$(find .)"
+
+__tmp_empdir_sub () {
+
+find . -type d | while read -r __dir; do
+    if ! [ "$(ls -A "${__dir}/")" ]; then
+        rmdir "${__dir}"
+    fi
+done
+
+}
+
+__tmp_empdir_sub
+
+__new_listing="$(find .)"
+
+until [ "${__listing}" = "${__new_listing}" ]; do
+    __listing="${__new_listing}"
+    __new_listing="$(find .)"
+    __tmp_empdir_sub
+done
+
+}
+
+###############################################################
 # XML Functions
 ###############################################################
 #
