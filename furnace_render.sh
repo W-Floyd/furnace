@@ -10,7 +10,7 @@ __verbose='0'
 __very_verbose='0'
 __force='0'
 __re_use_xml='0'
-export __pid="$$"
+export __id="$RANDOM"
 __debug='0'
 __xml_only='0'
 __name_only='0'
@@ -112,8 +112,8 @@ while ! [ "${#}" = '0' ]; do
 # So, if it's a number,
             if [ "${1}" -eq "${1}" ] 2>/dev/null; then
 
-# set the PID to this
-                export __pid="${1}"
+# set the ID to this
+                export __id="${1}"
 
 # If it isn't though,
             else
@@ -295,7 +295,7 @@ __time "Set variables" start
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
-    __tmp_dir="/tmp/furnace/${__name}_${__pid}"
+    __tmp_dir="/tmp/furnace/${__name}_${__id}"
 else
     __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
@@ -407,7 +407,7 @@ __time "Set up folders" start
 __announce "Using size ${__size}px."
 ################################################################################
 # Announce PID
-__announce "Using PID ${__pid}."
+__announce "Using ID ${__id}."
 ################################################################################
 
 ################################################################################

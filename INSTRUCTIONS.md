@@ -19,7 +19,7 @@ __max_optional
 __ignore\_max\_optional  
 
 The following variables may be used:
-__pid
+__id
 
 # catalogue.xml
 ## Required
