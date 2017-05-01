@@ -1622,7 +1622,7 @@ __popd
 # Final stats
 ################################################################################
 
-__announce "Done rendering!"
+__announce "Done rendering."
 
 __time "Rendered ${__size}px" end
 
