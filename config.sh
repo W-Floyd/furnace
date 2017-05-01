@@ -8,7 +8,7 @@
 #__sizes='1 2 4 8 16 32 64 128 256 512 1024 2048'
 
 # Temporary directory to use.
-# Defaults to /tmp/texpack${__pid} if missing.
+# Defaults to /tmp/furnace/${__name}_${__pid} if missing.
 #__tmp_dir="$(pwd)/tmp/${__pid}"
 
 # Script to use for mobile conversion.

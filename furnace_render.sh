@@ -295,7 +295,7 @@ __time "Set variables" start
 
 # set tmp_dir if not set already
 if [ -z "${__tmp_dir}" ]; then
-    __tmp_dir="/tmp/furnace/texpack${__pid}"
+    __tmp_dir="/tmp/furnace/${__name}_${__pid}"
 else
     __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
@@ -547,6 +547,10 @@ if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/
     mv "./src/xml/${__optimize_file}" "${__optimize_list}"
 
     mv "./src/xml/${__list_name}" "${__list_file}"
+
+    if [ -e "./src/xml/loopstatus" ]; then
+        rm "./src/xml/loopstatus"
+    fi
 
 # end if statement whether the catalogues are the same
 fi

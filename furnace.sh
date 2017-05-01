@@ -713,6 +713,17 @@ else
     "${__furnace_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
 fi
 
+if [ -e "./src/xml/loopstatus" ]; then
+
+    __loop_status="$(cat "./src/xml/loopstatus")"
+    rm "./src/xml/loopstatus"
+
+else
+
+    __loop_status='0'
+
+fi
+
 }
 
 __render_and_pack () {
@@ -858,25 +869,30 @@ else
         fi
 
         if [ "${__list_changed}" = '1' ]; then
+
             __just_render "${__size}"
+
             if [ "${__last_size}" = '0' ]; then
+
                 echo
+
             fi
+
         else
 
             if [ "${__size}" -gt "${__max_optimize}" ] && [ "${__ignore_max_optimize}" = '0' ] && [ "${__should_optimize}" = '1' ]; then
 
                 if [ "${__verbose}" = '1' ]; then
+
                     __force_announce "Size \"${__size}\" is larger than the max optimize size \"${__max_optimize}\", not optimizing."
+
                 fi
+
             fi
 
             __sub_loop "${__size}"
 
         fi
-
-        __loop_status="$(cat "./src/xml/loopstatus")"
-        rm "./src/xml/loopstatus"
 
         if [ "${__loop_status}" = '1' ]; then
             exit
