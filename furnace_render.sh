@@ -611,8 +611,9 @@ __time "Found files to optimize" start
 
 __pushd ./src/xml/
 
-# NOTE: We can shortcut with grep here since it should never be
-# written any other way than this
+# NOTE: We can shortcut with grep here since it should never be written any way
+# other than this. Note that this is fragile, and is only done in order to save
+# time.
 grep -rlw '<IMAGE>YES</IMAGE>' | grep -F "$(grep -rlw '<KEEP>YES</KEEP>')" | sed 's#^#\./#' | sort | uniq > "${__optimize_list}"
 
 __popd
@@ -1309,17 +1310,18 @@ done
 __time "Copied existing files" start
 
 if [ -s "${__copy_list}" ]; then
+# This makes a bunch of directories as needed for copying
     mapfile -t __dir_array <<< "$(sed "s#^#${__working_dir}/${__pack_new}/#" < "${__copy_list}")"
     mkdir -p "${__dir_array[@]%/*}"
 fi
 
 while read -r __xml_name; do
 
-    { cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null || __force_warn "File './${__xml_name} does not exist even though we just checked"; } &
+    cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null &
 
-    echo "./${__xml_name}" >> "${__rendered_list}"
+    echo "./${__xml_name}"
 
-done < "${__copy_list}"
+done < "${__copy_list}" >> "${__rendered_list}"
 
 sort "${__render_list}" | uniq > "${__render_list}_backup"
 
