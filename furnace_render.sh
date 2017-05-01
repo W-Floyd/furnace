@@ -1173,7 +1173,7 @@ rm "./${__pack}/.${__optimize_file}"
 
 # TODO - Make a more efficient method of doing this
 
-#################################################################################
+################################################################################
 #
 # What's happening here is that all files are checked. If it, or a dependency,
 # has been changed, then it is cleaned and added to the render list.
@@ -1184,7 +1184,7 @@ rm "./${__pack}/.${__optimize_file}"
 # If it is not changed, but it not rendered (that is, the rendered file was
 # deleted for whatever reason, it is added to the list to be rendered.
 #
-#################################################################################
+################################################################################
 
 __pushd "${__pack}"
 
@@ -1196,24 +1196,30 @@ while read -r __xml; do
 
     fi
 
-done < "${__list_file}"
+done < "${__list_file}" &
 
 __popd
 
 # Get into the dependency folder
 __pushd "${__dep_list_folder}"
 
+{
+
 # List files that depend on changed files
-grep -rlxf "${__changed_both}" | sed 's#^#./#' >> "${__list_file_proc}"
+grep -rlxf "${__changed_both}" | sed 's#^#./#'
 
 # List ITEMS that have changed
-grep -Fxf "${__changed_both}" "${__new_xml_list}" >> "${__list_file_proc}"
+grep -Fxf "${__changed_both}" "${__new_xml_list}"
+
+} >> "${__list_file_proc}" &
 
 # List all deps
-find . -type f -exec cat {} + | sort | uniq > "${__all_deps}"
+find . -type f -exec cat {} + | sort | uniq > "${__all_deps}" &
 
 # Get back to main directory
 __popd
+
+wait
 
 # List any files in the dep list that are not on the file list
 grep -Fxvf "${__list_file}" "${__all_deps}" >> "${__check_list}"
