@@ -1182,7 +1182,7 @@ rm "./${__pack}/.${__optimize_file}"
 # list.
 #
 # If it is not changed, but it not rendered (that is, the rendered file was
-# deleted for whatever reason, it is added to the list to be rendered.
+# deleted for whatever reason), it is added to the list to be rendered.
 #
 ################################################################################
 
@@ -1371,10 +1371,12 @@ __announce "Setting up files for processing."
 ################################################################################
 
 # copy src files into new pack folder
-cp -r "./src/"* "${__pack_new}"
+cp -r "./src/"* "${__pack_new}" &
 
 # remove old pack
-rm -r "${__pack}"
+rm -r "${__pack}" &
+
+wait
 
 # rename the new pack to the regular pack
 mv "${__pack_new}" "${__pack}"
@@ -1386,9 +1388,8 @@ __announce "Starting to render."
 
 __pushd "${__pack}"
 
-touch "${__render_list}_"
-
 if [ "${__render_optional}" = '0' ]; then
+    touch "${__render_list}_"
     while read -r __item; do
         __config="./xml/${__item//.\//}"
         if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
@@ -1396,8 +1397,6 @@ if [ "${__render_optional}" = '0' ]; then
         fi
     done < "${__render_list}"
     mv "${__render_list}_" "${__render_list}"
-else
-    rm "${__render_list}_"
 fi
 
 __popd
@@ -1424,8 +1423,6 @@ __pushd "${__pack}"
 __set_break_loop () {
 __break_loop='1'
 }
-
-__benchmark_bit='1'
 
 __benchmark_time () {
 
