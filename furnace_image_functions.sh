@@ -45,6 +45,11 @@ fi
 ###############################################################
 
 __vector_render () {
+
+if [ -z "${__vector_scale}" ]; then
+    export __vector_scale='128'
+fi
+
 if [ -z "${__quick}" ]; then
     export __quick='1'
     __force_warn "__quick has not been set correctly. Defaulting to rsvg-convert"
@@ -66,28 +71,31 @@ if ! [ "$(__oext "${2}")" = 'svg' ]; then
     __error "File \"${2}\" is not an svg file"
 fi
 
-__dpi="$(echo "(96*${1})/128" | bc -l | sed 's/0*$//')"
+__dpi="$(echo "(96*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
 if [ "${__quick}" = '1' ]; then
-# GOD awful hack to catch svg size, since rsvg-convert seems
-# buggy
-# TODO
-# FIX THIS vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     rsvg-convert \
-    --width="$(echo "($(grep "^   width=\"*\"" < "${2}" | sed -e 's/.*="//' -e 's/"$//')*${1})/128" | bc)" \
+    -z "$(bc -l <<< "${1}/${__vector_scale}" | __strip_zero)" \
     -a \
     "${2}" \
     -o "$(__mext "${2}").png" 1> /dev/null
-    convert "$(__mext "${2}").png" -define png:color-type=6 "$(__mext "$2")_.png"
-    mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
 
 elif [ "${__quick}" = '0' ]; then
     inkscape \
     --export-dpi="${__dpi}" \
     --export-png "$(__mext "${2}").png" "${2}" 1> /dev/null
+fi
+
+if ! [ -e "$(__mext "${2}").png" ]; then
+    __force_warn "File \""$(__mext "${2}").png"\" was not rendered"
+    return 1
+else
+
     convert "$(__mext "${2}").png" -define png:color-type=6 "$(__mext "${2}")_.png"
     mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
+
 fi
+
 }
 
 ###############################################################
