@@ -65,8 +65,6 @@ Options:
   -x  --xml-only        Only process XML files.
   -n  --name-only       Print output folder name.
   -m  --mobile          Make mobile resource pack.
-  -s  --slow            Use slower render engine (Inkscape).
-  -q  --quick           Use quicker render engine (rsvg-convert).
   -t  --time            Time operations (for debugging).
   -b  --benchmark       Benchmark (for... benchmarking).
   -w  --warn            Show warnings.
@@ -201,16 +199,6 @@ while ! [ "${#}" = '0' ]; do
                     __mobile='1'
                     ;;
 
-# whether to use quick render engine
-                "-s" | "--slow")
-                    export __quick='0'
-                    ;;
-
-# whether to use quick render engine
-                "-q" | "--quick")
-                    export __quick='1'
-                    ;;
-
 # whether to time functions
                 "-t" | "--time")
                     __time='1'
@@ -300,12 +288,6 @@ else
     __warn "Using custom temporary directory \"${__tmp_dir}\""
 fi
 
-# set quick if not set already
-if [ -z "${__quick}" ]; then
-    __warn "Quick/Slow mode not set, defaulting to quick"
-    export __quick='1'
-fi
-
 ################################################################################
 # Derived variables
 ################################################################################
@@ -373,21 +355,6 @@ if which rsvg-convert &> /dev/null; then
 # if that did return an error, we know it doesn't exist
 else
     __has_rsvg_convert='0'
-fi
-
-# if inkscape exists, but rsvg-convert doesn't exist, and we're
-# wanting to use rsvg-convert, say so and force inkscape
-if [ "${__has_inkscape}" = '1' ] && [ "${__has_rsvg_convert}" = '0' ] && [ "${__quick}" = '1' ]; then
-    __force_warn "Missing rsvg-convert. Cannot continue in quick mode.
-Please install 'librsvg-devel', changing to inkscape"
-    export __quick='0'
-
-# if rsvg-convert exists, but inkscape doesn't exist, and we're
-# wanting to use inkscape, say so and force rsvg-convert
-elif [ "${__has_inkscape}" = '0' ] && [ "${__has_rsvg_convert}" = '1' ] && [ "${__quick}" = '0' ]; then
-    __force_warn "Missing Inkscape. Must continue in quick mode.
-Please install 'inkscape', changing to rsvg-convert"
-    export __quick='1'
 fi
 
 __time "Set variables" end

@@ -1,30 +1,29 @@
-###############################################################
+################################################################################
 # Image Functions
-###############################################################
+################################################################################
 
-###############################################################
+################################################################################
 #
 # __pngchunks <FILE.png>
 #
-# Finds the chunks in a PNG file - currently being used to test
-# for changed colour profiles with zopflipng, since Minecraft is
-# borked, and doesn't seem to like anything other than
-# color_type 6
+# Finds the chunks in a PNG file - currently being used to test for changed
+# colour profiles when optimizing, since Minecraft is borked, and doesn't seem
+# to like color_type 0 and color_type 4.
 #
-###############################################################
+################################################################################
 
 __pngchunks () {
 identify -verbose "${1}" | pcregrep -M " Properties(\n|.)* Artifacts:" | sed -e '1d' -e '$d' | sed 's/ *//' | grep '^png'
 }
 
-###############################################################
+################################################################################
 #
 # __minecraft_verify <FILE.png>
 #
-# Checks if an image has color_type's known not be to loaded
-# correctly by Minecraft. If all clear, returns 0, if failed, 1
+# Checks if an image has "color_type"s known not be to loaded correctly by
+# Minecraft. If all clear, returns 0, if failed, 1.
 #
-###############################################################
+################################################################################
 
 __minecraft_verify () {
 local __color_type="$(__pngchunks "${1}" | grep '^png:IHDR.color_type:' | sed 's/.* \(.\) .*/\1/')"
@@ -35,56 +34,64 @@ else
 fi
 }
 
-###############################################################
+################################################################################
+# Vector Render Functions
+################################################################################
+#
+# In all cases:
+# __vector_render_<ENGINE> <RES> <FILE.svg>
+#
+# <ENGINE> Render
+# Accepts a SVG file as an input, processes with <ENGINE>.
+#
+################################################################################
+
+__vector_render_inkscape () {
+
+local __dpi="$(echo "(96*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
+
+inkscape \
+--export-dpi="${__dpi}" \
+--export-png "$(__mext "${2}").png" "${2}" 1> /dev/null
+
+}
+
+__vector_render_rsvg-convert () {
+
+rsvg-convert \
+-z "$(bc -l <<< "${1}/${__vector_scale}" | __strip_zero)" \
+-a \
+"${2}" \
+-o "$(__mext "${2}").png" 1> /dev/null
+
+}
+
+
+
+################################################################################
 #
 # __vector_render <RES> <FILE.svg>
 #
 # Render Vector Image
 # Renders the specified .svg to a .png of the same name
 #
-###############################################################
+################################################################################
 
 __vector_render () {
 
+local __prefix='vector_render'
+
+__choose_function "${__prefix}" -e -d 'vector rendering' -p 'rsvg-convert inkscape'
+
 if [ -z "${__vector_scale}" ]; then
     export __vector_scale='128'
-fi
-
-if [ -z "${__quick}" ]; then
-    export __quick='1'
-    __force_warn "__quick has not been set correctly. Defaulting to rsvg-convert"
-fi
-
-if ! [ "${__vector_render_check}" = '1' ]; then
-
-    if ! which inkscape &> /dev/null && [ "${__quick}" = '0' ]; then
-        __error "Inkscape is not installed"
-    elif ! which rsvg-convert &> /dev/null && [ "${__quick}" = '1' ]; then
-        __error "rsvg-convert is not installed"
-    fi
-
-    __vector_render_check='1'
-
 fi
 
 if ! [ "$(__oext "${2}")" = 'svg' ]; then
     __error "File \"${2}\" is not an svg file"
 fi
 
-__dpi="$(echo "(96*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
-
-if [ "${__quick}" = '1' ]; then
-    rsvg-convert \
-    -z "$(bc -l <<< "${1}/${__vector_scale}" | __strip_zero)" \
-    -a \
-    "${2}" \
-    -o "$(__mext "${2}").png" 1> /dev/null
-
-elif [ "${__quick}" = '0' ]; then
-    inkscape \
-    --export-dpi="${__dpi}" \
-    --export-png "$(__mext "${2}").png" "${2}" 1> /dev/null
-fi
+__run_routine "${__prefix}" "${1}" "${2}"
 
 if ! [ -e "$(__mext "${2}").png" ]; then
     __force_warn "File \""$(__mext "${2}").png"\" was not rendered"
@@ -98,7 +105,7 @@ fi
 
 }
 
-###############################################################
+################################################################################
 #
 # __gimp_export <FILE.xcf>
 #
@@ -109,7 +116,7 @@ fi
 # http://stackoverflow.com/a/5846727/7578643
 # and wrapped up as a function.
 #
-###############################################################
+################################################################################
 
 __gimp_export () {
 
@@ -151,14 +158,14 @@ __gimp_sub "${1}" &> /dev/null
 
 }
 
-###############################################################
+################################################################################
 #
 # __krita_export <FILE.kra>
 #
 # Krita Export
 # Exports a given Krita file to a PNG file of the same name
 #
-###############################################################
+################################################################################
 
 __krita_export () {
 
@@ -182,9 +189,9 @@ krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 
 }
 
-###############################################################
+################################################################################
 # Optimizer Functions
-###############################################################
+################################################################################
 #
 # In all cases:
 # __optimize_<OPTIMIZER> <IMAGE.png>
@@ -193,7 +200,7 @@ krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 # Accepts a PNG file as an input, optimizes with <OPTIMIZER> and
 # replaces if smaller.
 #
-###############################################################
+################################################################################
 
 # with -nc set, it seems to be loaded perfectly by Minecraft,
 # because the color_type is retained
@@ -258,46 +265,7 @@ else
 fi
 }
 
-###############################################################
-#
-# __choose_optimizer
-#
-# Choose an optimizer
-# Chooses an optimizer from a list, based on order, then
-# availability
-#
-###############################################################
-
-__choose_optimizer () {
-__optimizer=''
-
-local __possible_optimizers='optipng
-pngcrush
-zopflipng'
-
-__sub_check () {
-while read -r __possible_optimizer; do
-
-    if __check_optimizer "${__possible_optimizer}"; then
-        __optimizer="${__possible_optimizer}"
-        break
-    fi
-
-done <<< "${1}"
-}
-
-__sub_check "${__possible_optimizers}"
-
-if [ -z "${__optimizer}" ]; then
-    __sub_check "${__list_optimizers}"
-    if [ -z "${__optimizer}" ]; then
-        __warn "No valid optimizer is available, disabling optimization"
-        export __no_optimize='1'
-    fi
-fi
-}
-
-###############################################################
+################################################################################
 #
 # __optimize <IMAGE.png>
 #
@@ -306,25 +274,27 @@ fi
 # replaces if smaller. Will ignore if given file is not a
 # '.png' file.
 #
-###############################################################
+################################################################################
 
 __optimize () {
 
-if [ -z "${__optimizer}" ]; then
-    __choose_optimizer
-fi
+local __prefix='optimize'
 
-if [ "$(__oext "${1}")" = 'png' ]; then
+__choose_function "${__prefix}" -d 'optimization' -p 'optipng pngcrush zopflipng'
 
-    if __check_optimizer "${__optimizer}"; then
-        "__optimize_${__optimizer}" "${1}"
+if ! __test_routine "${__prefix}"; then
+    __force_warn "No valid optimizer is available, disabling optimization"
+    export __no_optimize='1'
+else
+
+    if [ "$(__oext "${1}")" = 'png' ]; then
+        __run_routine "${__prefix}" "${1}"
     else
-        __error "Optimizer \"${__optimizer}\" is not valid"
+        __force_warn "File \"${1}\" cannot be optimized."
     fi
 
-else
-    __force_warn "File \"${1}\" cannot be optimized."
 fi
+
 }
 
 ################################################################
@@ -348,9 +318,9 @@ fi
 
 }
 
-###############################################################
+################################################################################
 # Composition functions
-###############################################################
+################################################################################
 #
 # __overlay <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
@@ -358,158 +328,158 @@ fi
 # Composites specified images, one on the other
 # Same as src-over, but this is easier to remember
 #
-###############################################################
+################################################################################
 
 __overlay () {
 __clip_src_over "${1}" "${2}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __multiply <BASE.png> <OVERLAY_TO_MULTIPLY.png> <OUTPUT.png>
 #
 # Multiply Images
 # Composites specified images, with a multiply blending method
 #
-###############################################################
+################################################################################
 
 __multiply () {
 composite -define png:color-type=6 -compose Multiply "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __screen <BASE.png> <OVERLAY_TO_SCREEN.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with a screen blending method
 #
-###############################################################
+################################################################################
 
 __screen () {
 composite -define png:color-type=6 -compose Screen "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_src_over <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with src-over alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_src_over () {
 composite -define png:color-type=6 -compose src-over "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_dst_over <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with dst-over alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_dst_over () {
 composite -define png:color-type=6 -compose dst-over "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_src_in <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with src-in alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_src_in () {
 composite -define png:color-type=6 -compose src-in "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_dst_in <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with dst-in alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_dst_in () {
 composite -define png:color-type=6 -compose dst-in "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_src_out <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with src-out alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_src_out () {
 composite -define png:color-type=6 -compose src-out "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_dst_out <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with dst-out alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_dst_out () {
 composite -define png:color-type=6 -compose dst-out "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_src_atop <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with src-atop alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_src_atop () {
 composite -define png:color-type=6 -compose src-atop "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_dst_atop <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with dst-atop alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_dst_atop () {
 composite -define png:color-type=6 -compose dst-atop "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 #
 # __clip_xor <BASE.png> <OVERLAY.png> <OUTPUT.png>
 #
 # Screen Images
 # Composites specified images, with xor alpha blending
 #
-###############################################################
+################################################################################
 
 __clip_xor () {
 composite -define png:color-type=6 -compose xor "${2}" "${1}" "${3}"
 }
 
-###############################################################
+################################################################################
 # Image manipulation functions
-###############################################################
+################################################################################
 #
 # __fade <INPUT> <OUTPUT> <AMOUNT>
 #
@@ -517,7 +487,7 @@ composite -define png:color-type=6 -compose xor "${2}" "${1}" "${3}"
 # Makes an image transparent. Note that AMOUNT must be a value
 # 0-1, 0 being fully transparent, 1 being unchanged
 #
-###############################################################
+################################################################################
 
 __fade () {
 if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
@@ -533,7 +503,7 @@ fi
 
 }
 
-###############################################################
+################################################################################
 #
 # __tile <FILE> <GRID> <OUTPUT> <DIVIDER>
 #
@@ -541,7 +511,7 @@ fi
 # Tiles image at the specified grid size, with an optional
 # divider width
 #
-###############################################################
+################################################################################
 
 __tile () {
 
@@ -561,7 +531,7 @@ fi
 
 }
 
-###############################################################
+################################################################################
 #
 # __custom_tile <FILE1> <FILE2> ... <GRID> <SPACER> <OUTPUT>
 #
@@ -573,7 +543,7 @@ fi
 # Example:
 # __custom_tile dirt.png grass.png plank.png plank.png 2x2 1 mash.png
 #
-###############################################################
+################################################################################
 
 __custom_tile () {
 if [ "${#}" -lt '4' ]; then
@@ -596,7 +566,7 @@ fi
 
 }
 
-###############################################################
+################################################################################
 #
 # __crop <INPUT> <RESOLUTION> <X-CORD> <Y-CORD> <OUTPUT>
 #
@@ -615,13 +585,13 @@ fi
 # That will crop the top-left square, assuming a resolution of
 # 512px
 #
-###############################################################
+################################################################################
 
 __crop () {
 convert "${1}" -crop "${2}x${2}+$(echo "${3}*${2}" | bc)+$(echo "${4}*${2}" | bc)" "${5}"
 }
 
-###############################################################
+################################################################################
 #
 # __rotate <IMAGE> <STEP>
 #
@@ -635,7 +605,7 @@ convert "${1}" -crop "${2}x${2}+$(echo "${3}*${2}" | bc)+$(echo "${4}*${2}" | bc
 # 3, -1 = 270 degrees
 # 4, -4 = 360 degrees
 #
-###############################################################
+################################################################################
 
 __rotate () {
 case "${2}" in
@@ -672,7 +642,7 @@ mogrify -rotate "${__angle}" "${1}"
 
 }
 
-###############################################################
+################################################################################
 #
 # __rotate_exact <INPUT.png> <OUTPUT.png> <AMOUNT>
 #
@@ -682,7 +652,7 @@ mogrify -rotate "${__angle}" "${1}"
 # 0.0 = 0 degrees
 # 0.5 = 180 degrees
 # 1.0 = 360 degrees
-###############################################################
+################################################################################
 
 __rotate_exact () {
 
@@ -690,7 +660,7 @@ convert -background none -define png:color-type=6 -distort SRT "$(bc <<< "${3}*3
 
 }
 
-###############################################################
+################################################################################
 #
 # __shift <IMAGE> <PROPORTION>
 #
@@ -698,7 +668,7 @@ convert -background none -define png:color-type=6 -distort SRT "$(bc <<< "${3}*3
 # Tiles an image vertically, then crops at the specified
 # proportion. Equivalent to looping by shifting UP
 #
-###############################################################
+################################################################################
 
 __shift () {
 __tile "${1}" 1x2 "${1}"_
@@ -707,12 +677,12 @@ convert "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(ec
 mv "${1}"_ "${1}"
 }
 
-###############################################################
+################################################################################
 # Export functions
-###############################################################
+################################################################################
 #
 # Do this so that any child shells have these functions
-###############################################################
+################################################################################
 for __function in $(compgen -A function); do
 	export -f ${__function}
 done

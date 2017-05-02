@@ -5,7 +5,6 @@ __verbose='0'
 __very_verbose_pack='0'
 __install='0'
 __mobile='0'
-__quick='1'
 __time='0'
 __benchmark='0'
 __force='0'
@@ -97,7 +96,6 @@ General Options:
 Render Options:
   -f  --force-render        Discard pre-rendered data.
   -m  --mobile              Make mobile resource pack as well.
-  -s  --slow                Use Inkscape instead of rsvg-convert.
 
   -o  --optimize            Optimize final PNG files.
       --no-optimize         Do not optimize final PNG files.
@@ -189,10 +187,6 @@ case "${1}" in
 
     "m" | "--mobile")
         __mobile='1'
-        ;;
-
-    "s" | "--slow")
-        __quick='0'
         ;;
 
     "t" | "--time")
@@ -413,8 +407,8 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         "--optimizer")
-            if __check_optimizer "${1}"; then
-                __optimizer="${1}"
+            if __test_function 'optimizer' "${1}"; then
+                __function_optimizer="${1}"
             else
                 __error "Given input is not a valid optimizer"
             fi
@@ -550,14 +544,6 @@ if [ "${__clean_xml}" = '1' ] && [ -d './src/xml/' ]; then
     rm -r './src/xml/'
 fi
 
-if [ "${__should_optimize}" = '1' ] && [ -z "${__optimizer}" ]; then
-    __choose_optimizer
-elif [ "${__should_optimize}" = '1' ]; then
-    if ! __check_optimizer "${__optimizer}"; then
-        __choose_optimizer
-    fi
-fi
-
 ################################################################################
 
 if [ "${__use_custom_size}" = '0' ] && [ -z "${__sizes}" ]; then
@@ -621,10 +607,6 @@ __options="${1}"
 
 if [ "${__mobile}" = '1' ]; then
     __options="${__options} -m"
-fi
-
-if [ "${__quick}" = '0' ]; then
-    __options="${__options} -s"
 fi
 
 if [ "${__time}" = '1' ]; then

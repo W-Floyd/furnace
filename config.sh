@@ -20,10 +20,6 @@
 # need when rendering images.
 #__custom_function_bin='./functions.sh'
 
-# Whether or not to render in quick mode (if applicable).
-# Defaults to quick mode if missing.
-#__quick='1'
-
 # Whether or not the final images should be optimized.
 # Defaults to no optimization if missing.
 #__should_optimize='1'
