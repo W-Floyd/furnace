@@ -1,9 +1,9 @@
-# Furnace
-## A Minecraft resource pack builder
-## Undergoing major changes (in another branch). Here be dragons.
-
 ![Logo](https://github.com/W-Floyd/furnace/raw/master/logo.png)
+### Furnace
+#### A Minecraft resource pack builder
+##### Undergoing major changes (in another branch). Here be dragons.
 
+#### Installation
 cd into an appropriate folder, then run:
 
 ```
@@ -12,6 +12,8 @@ cd furnace
 sudo ln -s "$(pwd)/furnace.sh" "/usr/bin/furnace"  
 sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/furnace"  
 ```
+
+#### Instructions
 
 Then you can run `furnace` in the appropriate folder, and it should render.
 Run `furnace -h` for help. 
@@ -25,6 +27,8 @@ If, however, it was because you forget some dependencies and it tried to use a f
 It is wise to render fresh packs upon significant script changes.
 
 ***
+
+#### Requirements
 
 Required:
 * pcregrep
@@ -41,13 +45,13 @@ Where it really comes into its own is doing the boring jobs, like overlaying a w
 
 ***
 
-### Some notes
+#### Some notes
 
 Personally, I see no difference between 512px and 1024px at 4K unless I mash myself up close to some blocks and look close, so I recommend 512px as a maximum for day to day use. You're free to do what you like though...
 
 A good rule of thumb - if you can't render it, you can't play it, or the size below it.
 
-### Known issues
+#### Known issues
 
 Sizes above 1024px **will not** not to be loaded in Minecraft at all, so 1024px is the largest default size.
 
