@@ -10,9 +10,7 @@ Also to be considered are default values for KEEP, IMAGE and OPTIONAL.
 KEEP should default to NO, IMAGE to YES (better yet, check the files name for extension when field is missing), OPTIONAL to NO.
 Only required field should be NAME.  
 
-Expose the hardwired 128 base size as a variable, but default to 128 (in function) if not set.  
-
-Allow specifying the svg DPI, since some poor soul out there must be using the older version of Inkscape.  
+Allow specifying the svg DPI, optionally per image.  
 
 ***
 
