@@ -690,10 +690,12 @@ fi
 
 ################################################################################
 #
-# __choose_function <PREFIX> <OPTIONAL_FLAGS>
+# __choose_function <OPTIONAL_FLAGS> <PREFIX>
 #
 # Choose Function
 # Chooses a function that exists, given the prefix of the function.
+# NOTE - It is important to declare the PREFIX *LAST*
+#
 # Optional flags include:
 #   -e                  Error out if missing
 #   -d <DESCRIPTION>    Description to be used when reporting that no function
@@ -729,6 +731,7 @@ local __should_force='0'
 local __preference_list=''
 local __description=''
 local __function_prefix=''
+local __function_name=''
 
 if ! [ "${#}" = 0 ]; then
 
@@ -769,6 +772,14 @@ ${1}"
 
 	                *)
 	                    __function_prefix="${1}"
+	                    __function_name="__function_${__function_prefix}"
+# Neat trick I found here:
+# http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
+# Means no more eval sodomy :3
+	                    if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ] && __test_function "${__function_prefix}" "${!__function_name}"; then
+                            return 0
+                        fi
+
                         ;;
 
                 esac
@@ -785,19 +796,6 @@ ${1}"
 else
 
     __error "No options passed"
-
-fi
-
-local __function_name="__function_${__function_prefix}"
-
-# Neat trick I found here:
-# http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
-# Means no more eval sodomy :3
-if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ]; then
-
-    if __test_function "${__function_prefix}" "${!__function_name}"; then
-        return 0
-    fi
 
 fi
 
