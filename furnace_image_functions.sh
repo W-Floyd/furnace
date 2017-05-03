@@ -48,7 +48,7 @@ fi
 
 __vector_render_inkscape () {
 
-local __dpi="$(echo "(96*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
+local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
 inkscape \
 --export-dpi="${__dpi}" \
@@ -68,7 +68,7 @@ rsvg-convert \
 
 __vector_render_convert () {
 
-local __dpi="$(echo "(96*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
+local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
 convert \
 -define png:color-type=6 \
@@ -93,6 +93,10 @@ __vector_render () {
 local __prefix='vector_render'
 
 __choose_function "${__prefix}" -e -d 'vector rendering' -p 'rsvg-convert inkscape convert'
+
+if [ -z "${__vector_ppi}" ]; then
+    export __vector_ppi='96'
+fi
 
 if [ -z "${__vector_scale}" ]; then
     export __vector_scale='128'
