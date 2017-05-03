@@ -407,7 +407,7 @@ while ! [ "${#}" = '0' ]; do
             ;;
 
         "--optimizer")
-            if __test_function 'optimizer' "${1}"; then
+            if __test_function 'optimize' "${1}"; then
                 __function_optimizer="${1}"
             else
                 __error "Given input is not a valid optimizer"

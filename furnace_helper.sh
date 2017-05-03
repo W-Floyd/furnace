@@ -15,7 +15,7 @@ while ! [ "${#}" = '0' ]; do
     case "${1}" in
 
         "--optimizer")
-            __list_optimizers
+            __list_functions 'optimize'
             exit 0
             ;;
 
