@@ -62,3 +62,24 @@
 # that have not been converted, this value will need to be set.
 # Defaults to 96 if missing, as that's the new standard.
 #__vector_ppi='96'
+
+################################################################################
+# Routines
+################################################################################
+#
+# Routines that may be specified in the config.
+#
+
+# What routine to use for SVG rendering.
+# Default values include:
+# rsvg-convert
+# inkscape
+# convert
+#__function_vector_render='rsvg-convert'
+
+# What routine to use for PNG optimization.
+# Default values include:
+# optipng
+# pngcrush
+# zopflipng
+#__function_optimizer='optipng'
