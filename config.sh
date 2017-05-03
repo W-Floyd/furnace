@@ -54,3 +54,11 @@
 # override per script).
 # Defaults to 128 if missing.
 #__vector_scale='128'
+
+# PPI that vector images are assumed to be created at (should be possible to
+# override per script).
+# Note that this value is available as Inkscape used to use a non-standard
+# value of 90. When using an older version of Inkscape, or when processing files
+# that have not been converted, this value will need to be set.
+# Defaults to 96 if missing, as that's the new standard.
+#__vector_ppi='96'
