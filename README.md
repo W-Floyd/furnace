@@ -47,7 +47,7 @@ Where it really comes into its own is doing the boring jobs, like overlaying a w
 
 ## Some notes
 
-Personally, I see no difference between 512px and 1024px at 4K unless I mash myself up close to some blocks and look close, so I recommend 512px as a maximum for day to day use. You're free to do what you like though...
+Personally, I see no difference between 512px and 1024px at 4K unless I mash myself up close to some blocks and look close, so I recommend 512px as a maximum for day to day use. You're free to do what you like, though you'll need more than 16GB RAM to render 4096px.
 
 A good rule of thumb - if you can't render it, you can't play it, or the size below it.
 
