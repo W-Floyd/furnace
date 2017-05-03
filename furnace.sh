@@ -575,9 +575,9 @@ if [ -z "${__max_optimize}" ]; then
             fi
         done <<< "${__sizes}"
         if [ "${__should_warn_size}" = '1' ]; then
-            __force_warn "Default maximum optimization size is \"${__default_max_optimize}\", some sizes will not
-be optimized. Use --force-optimize to override this, or set a
-new maximum with --max-optimize <SIZE>"
+            __force_warn "Default maximum optimization size is \"${__default_max_optimize}\",
+some sizes will not be optimized. Use --force-optimize to override this, or set
+a new maximum with --max-optimize <SIZE>"
         fi
     fi
 fi
@@ -594,9 +594,9 @@ if [ -z "${__max_optional}" ]; then
             fi
         done <<< "${__sizes}"
         if [ "${__should_warn_size}" = '1' ]; then
-            __force_warn "Default maximum optional size is \"${__default_max_optional}\", some sizes will not have optional
-images rendered. Use --force-optional to override this, or set a
-new maximum with --max-optional <SIZE>"
+            __force_warn "Default maximum optional size is \"${__default_max_optional}\",
+some sizes will not have optional images rendered. Use --force-optional to
+override this, or set a new maximum with --max-optional <SIZE>"
         fi
     fi
 fi
