@@ -153,7 +153,7 @@ __check_input () {
 
 case "${1}" in
 
-    "h" |"?")
+    "h" | "?")
         __usage_short
         exit 77
         ;;
