@@ -255,6 +255,109 @@ exit 1
 }
 
 ################################################################################
+# Hashing Functions
+################################################################################
+#
+# In all cases:
+# ... | __hash_<ENGINE> <INPUTS>
+#
+# <ENGINE> Hash
+# Hashes files. Meant to be gnu tools, that all follow the same formatting.
+#
+################################################################################
+
+__hash_md5sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+md5sum "${@}" <<< "${__pipe}"
+
+}
+
+__hash_sha1sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+sha1sum "${@}" <<< "${__pipe}"
+
+}
+
+__hash_sha224sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+sha224sum "${@}" <<< "${__pipe}"
+
+}
+
+__hash_sha256sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+sha256sum "${@}" <<< "${__pipe}"
+
+}
+
+__hash_sha384sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+sha384sum "${@}" <<< "${__pipe}"
+
+}
+
+__hash_sha512sum () {
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+sha512sum "${@}" <<< "${__pipe}"
+
+}
+
+################################################################################
+#
+# __hash <INPUTS>
+#
+# Hash
+# Hash file, so that testing different programs can be done easily.
+#
+################################################################################
+
+__hash () {
+
+local __prefix='hash'
+
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
+__choose_function -e -d 'file hashing' -p 'md5sum' "${__prefix}"
+
+__run_routine "${__prefix}" "${@}" <<< "${__pipe}"
+
+}
+
+################################################################################
 #
 # __hash_folder <FILE> <EXCLUDEDIR>
 #
@@ -610,89 +713,6 @@ cat | sed -e 's/^[ |\t]*//' -e '/^#/d' | sed '/^$/d'
 __funiq () {
 
 cat | sed '/^$/d' | awk '!cnts[$0]++'
-
-}
-
-################################################################################
-# Hashing Functions
-################################################################################
-#
-# In all cases:
-# ... | __hash_<ENGINE> <INPUTS>
-#
-# <ENGINE> Hash
-# Hashes files. Meant to be gnu tools, that all follow the same formatting.
-#
-################################################################################
-
-__hash_md5sum () {
-if read -r -t 0; then
-    cat | md5sum "${@}"
-else
-    md5sum "${@}"
-fi
-}
-
-__hash_sha1sum () {
-if read -r -t 0; then
-    cat | sha1sum "${@}"
-else
-    sha1sum "${@}"
-fi
-}
-
-__hash_sha224sum () {
-if read -r -t 0; then
-    cat | sha224sum "${@}"
-else
-    sha224sum "${@}"
-fi
-}
-
-__hash_sha256sum () {
-if read -r -t 0; then
-    cat | sha256sum "${@}"
-else
-    sha256sum "${@}"
-fi
-}
-
-__hash_sha384sum () {
-if read -r -t 0; then
-    cat | sha384sum "${@}"
-else
-    sha384sum "${@}"
-fi
-}
-
-__hash_sha512sum () {
-if read -r -t 0; then
-    cat | sha512sum "${@}"
-else
-    sha512sum "${@}"
-fi
-}
-
-################################################################################
-#
-# __hash <INPUTS>
-#
-# Hash
-# Hash file, so that testing different programs can be done easily.
-#
-################################################################################
-
-__hash () {
-
-local __prefix='hash'
-
-__choose_function -e -d 'file hashing' -p 'md5sum' "${__prefix}"
-
-if read -r -t 0; then
-    cat | __run_routine "${__prefix}" "${@}"
-else
-    __run_routine "${__prefix}" "${@}"
-fi
 
 }
 
