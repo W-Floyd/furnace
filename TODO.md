@@ -1,7 +1,6 @@
 # TODO list
 
 ***
-## Easy to do
 #### Render script
 Add \_\_check\_field function to ensure a field exists. Act accordingly (\_\_error out when required)  
 
@@ -9,8 +8,6 @@ For starters, allow not having SCRIPT, SIZE, OPTIONS, DEPENDS, CLEANUP, and COMM
 Also to be considered are default values for KEEP, IMAGE and OPTIONAL.
 KEEP should default to NO, IMAGE to YES (better yet, check the files name for extension when field is missing), OPTIONAL to NO.
 Only required field should be NAME.  
-
-Allow specifying the svg DPI, optionally per image.  
 
 ***
 
