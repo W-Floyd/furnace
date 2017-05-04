@@ -1,3 +1,12 @@
+__check_var () {
+if [ -z "${!1}" ]; then
+    echo "${1} not declared, exiting."
+    exit 1
+fi
+}
+
+__check_var __run_dir
+
 export __furnace_functions_bin="${__run_dir}/furnace_functions.sh"
 export __furnace_image_functions_bin="${__run_dir}/furnace_image_functions.sh"
 export __furnace_render_bin="${__run_dir}/furnace_render.sh"
@@ -8,9 +17,11 @@ export __catalogue='catalogue.xml'
 export PS4='Line ${LINENO}: '
 
 # get functions from file
+__check_var __furnace_functions_bin
 source "${__furnace_functions_bin}" &> /dev/null || { echo "Failed to load functions \"${__furnace_functions_bin}\""; exit 1; }
 
 # get functions from file
+__check_var __furnace_image_functions_bin
 source "${__furnace_image_functions_bin}" &> /dev/null || __error "Failed to load image functions \"${__furnace_image_functions_bin}\""
 
 ################################################################
@@ -26,13 +37,13 @@ else
 compgen -A variable > /tmp/tmpvars'
 
         cat '/tmp/config.sh'
-        
+
         echo \
 'compgen -A variable > /tmp/tmpvars2
 for __variable in $(grep -Fxvf /tmp/tmpvars /tmp/tmpvars2); do
     export "${__variable}"
 done'
-)" 
+)"
         echo "${__tmpvar}" > '/tmp/config.sh'
         source '/tmp/config.sh' || __error "Config file has an error"
         rm '/tmp/config.sh'

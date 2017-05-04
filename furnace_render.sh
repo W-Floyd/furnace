@@ -986,7 +986,9 @@ __pushd "./${__pack}"
 __hash_folder "${__source_hash_old}" xml
 
 if [ -s "${__shared_source_list}" ]; then
-    md5sum $(tr '\n' ' ' < "${__shared_source_list}") >> "${__shared_source_list_hash}"
+    while read -r __line; do
+        md5sum "${__line}"
+    done < "${__shared_source_list}" >> "${__shared_source_list_hash}"
 fi
 
 # Get back to main directory

@@ -20,7 +20,7 @@ while ! [ "${#}" = '0' ]; do
     shift
 done
 
-if read -t 0; then
+if read -r -t 0; then
     cat | while read -r __value; do
         __tmp_mext_sub "${__value}"
     done
@@ -49,7 +49,7 @@ while ! [ "${#}" = '0' ]; do
     shift
 done
 
-if read -t 0; then
+if read -r -t 0; then
     cat | while read -r __value; do
         __tmp_oext_sub "${__value}"
     done
@@ -859,7 +859,7 @@ local __function_name="__function_${__function_prefix}"
 
 local __routine_name="__${__function_prefix}_${!__function_name}"
 
-"${__routine_name}" $@
+"${__routine_name}" "${@}"
 
 }
 
