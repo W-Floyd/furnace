@@ -92,7 +92,7 @@ __vector_render () {
 
 local __prefix='vector_render'
 
-__choose_function "${__prefix}" -e -d 'vector rendering' -p 'rsvg-convert inkscape convert'
+__choose_function -e -d 'vector rendering' -p 'rsvg-convert inkscape convert' "${__prefix}"
 
 if [ -z "${__vector_ppi}" ]; then
     export __vector_ppi='96'
@@ -295,7 +295,7 @@ __optimize () {
 
 local __prefix='optimize'
 
-__choose_function "${__prefix}" -d 'optimization' -p 'optipng pngcrush zopflipng'
+__choose_function -d 'optimization' -p 'optipng pngcrush zopflipng' "${__prefix}"
 
 if ! __test_routine "${__prefix}"; then
     __force_warn "No valid optimizer is available, disabling optimization"

@@ -480,8 +480,8 @@ __pushd ./src/xml
 # if the catalogue exists
 if [ -e "${__catalogue}" ]; then
 
-# get the md5sum hash of the catalogue
-    __old_catalogue_hash="$(md5sum "${__catalogue}" | sed 's/ .*//')"
+# get the hash of the catalogue
+    __old_catalogue_hash="$(__hash "${__catalogue}" | sed 's/ .*//')"
 
 # remove the catalogue
     rm "${__catalogue}"
@@ -492,8 +492,8 @@ fi
 # get back into the main directory
 __popd
 
-# md5sum hash the current catalogue
-__new_catalogue_hash="$(md5sum "${__cleaned_catalogue}" | sed 's/ .*//')"
+# hash the current catalogue
+__new_catalogue_hash="$(__hash "${__cleaned_catalogue}" | sed 's/ .*//')"
 
 # if the new catalogue is the same as the old catalogue, then
 if [ "${__old_catalogue_hash}" = "${__new_catalogue_hash}" ] && [ -e "./src/xml/${__tsort_file}" ] && [ -d "./src/xml/${__dep_list_name}" ] && [ -e "./src/xml/${__cleanup_file}" ] && [ -e "./src/xml/${__optimize_file}" ] && [ -e "./src/xml/${__list_name}" ]; then
@@ -852,7 +852,7 @@ fi
 
 __time "Checked hash changes" start
 
-if ! [ "$(md5sum < "${__new_hashes}")" = "$(md5sum < "${__old_hashes}")" ]; then
+if ! [ "$(__hash < "${__new_hashes}")" = "$(__hash < "${__old_hashes}")" ]; then
 
 # For every file in the shared xml list,
 while read -r __shared; do
@@ -987,14 +987,14 @@ __hash_folder "${__source_hash_old}" xml
 
 if [ -s "${__shared_source_list}" ]; then
     while read -r __line; do
-        md5sum "${__line}"
+        __hash "${__line}"
     done < "${__shared_source_list}" >> "${__shared_source_list_hash}"
 fi
 
 # Get back to main directory
 __popd
 
-if ! [ "$(sort "${__shared_source_list_hash}" | md5sum)" = "$(sort "${__source_hash_new}" | md5sum)" ]; then
+if ! [ "$(sort "${__shared_source_list_hash}" | __hash)" = "$(sort "${__source_hash_new}" | __hash)" ]; then
 
 # For every file in the shared xml list,
 while read -r __shared; do
