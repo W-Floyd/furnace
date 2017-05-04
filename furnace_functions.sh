@@ -271,8 +271,18 @@ else
 fi
 
 if ! [ -z "${__listing}" ]; then
-    md5sum ${__listing} > "${1}"
+
+    {
+
+    md5sum $(grep -v ' ' <<< "${__listing}") >> "${1}"
+
+    grep ' ' <<< "${__listing}" | sed '/^$/d' | while read -r __file; do
+        md5sum "${__file}"
+    done
+
+    } > "${1}"
 fi
+
 }
 
 ################################################################################
