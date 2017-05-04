@@ -538,7 +538,7 @@ fi
 
 local __imgseq=$(for __tile in $(seq 1 "$(echo "${2}" | sed 's/x/\*/' | bc)"); do echo -n "${1} "; done)
 
-montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" "${__imgseq}" "${3}" 2> /dev/null
+montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
 
 if ! [ -e "${3}" ]; then
     __force_warn "File \"${3}\" was not produced when tiling"
@@ -573,7 +573,7 @@ local __grid="$(eval "echo \"\${$((__num_options-2))}\"")"
 
 local __imgseq="$(for __num in $(seq 1 "$((__num_options-3))"); do echo -n "$(eval "echo \"\${$((__num))}\"") "; done)"
 
-montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" "${__imgseq}" "${__output}" 2> /dev/null
+montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
 
 if ! [ -e "${__output}" ]; then
     __force_warn "File \"${__output}\" was not produced when custom tiling"
