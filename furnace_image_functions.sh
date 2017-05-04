@@ -220,7 +220,7 @@ krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 # with -nc set, it seems to be loaded perfectly by Minecraft,
 # because the color_type is retained
 __optimize_optipng () {
-local __tmpname="/tmp/$$)"
+local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 
 optipng -strip all -nc -silent -force "${__file}" -out "${__tmpname}"
@@ -238,7 +238,7 @@ fi
 # Should be be okay with -noreduce, but is stupid and changes it
 # anyway, so it's checked for color_type correctness
 __optimize_pngcrush () {
-local __tmpname="/tmp/$$)"
+local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 
 pngcrush -noreduce -force "${__file}" "${__tmpname}" &> /dev/null
@@ -261,7 +261,7 @@ fi
 # we attempt to optimize anyway, then check the chunk, because
 # Minecraft is stupid and won't load greyscale images correctly
 __optimize_zopflipng () {
-local __tmpname="/tmp/$$)"
+local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 
 zopflipng -q --always_zopflify "${__file}" "${__tmpname}" &> /dev/null
