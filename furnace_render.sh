@@ -542,8 +542,8 @@ __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 # Get the NAME of this ITEM
     __item_name="$(__get_value_piped NAME <<< "${__tmp_read}")"
 
-# Make the correct directory for dumping the xml into an
-# appropriately named file
+# Make the correct directory for dumping the xml into an appropriately named
+# file
 
     __goal_dir="${__xml_current}/${__item_name//.\//}"
 

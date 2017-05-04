@@ -121,8 +121,8 @@ Graphing Options:
                             graph, use '', '.*', or nothing. May be specified
                             multiple times. Supports regex.
   --graph-format <FORMAT>   Specifies the format to graph to. Defaults to png.
-  --graph-seed <SEED>       Seed to use when graphing. Defaults to a random seed
-                            when unspecified.
+  --graph-seed <SEED>       Seed to use when graphing. Defaults to a random
+                            seed when unspecified.
   --grapher <GRAPHER>       Graphviz tool to use when graphing. Defaults to
                             neato.
   --graph-output <NAME>     Name to use when outputting a graph. Default output
