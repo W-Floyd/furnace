@@ -603,36 +603,37 @@ exit 1
 ################################################################################
 
 __force_time () {
-local __message="$(echo "${1}" | __hash | sed 's/ .*//')"
+local __message="$(__hash <<< "${1}" | sed 's/ .*//')"
 
-if [ -z "${2}" ] || [ -z "${1}" ]; then
-    __force_warn "Missing option in time function."
+if ! [ "${#}" = '2' ]; then
+    __force_warn "Invalid number of options for time function"
 else
 
 if [ "${2}" = 'start' ]; then
     export "__function_start_time${__message}"="$(date +%s.%N)"
+    return 0
 elif [ "${2}" = 'end' ]; then
     export "__function_end_time${__message}"="$(date +%s.%N)"
+else
+    if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
+        __force_warn "Invalid option \"${2}\" to time function"
+    fi
+    return 1
 fi
 
 if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    if [ -z "${2}" ]; then
-        __force_warn "No input to __time function, disabling timer."
-        __time='0'
-    else
+    local __f_start="__function_start_time${__message}"
+    local __f_end="__function_end_time${__message}"
 
-        if [ "${2}" = 'end' ]; then
-            local __f_start="__function_start_time${__message}"
-            local __f_end="__function_end_time${__message}"
-
-            __format_text "\e[32mTIME\e[39m" "${1} in $(bc <<< "${!__f_end}-${!__f_start}") seconds" ""
-
-
-        elif ! [ "${2}" = 'start' ]; then
-            __force_warn "Invalid input to __time, '${2}'"
-        fi
-
+    if [ -z "${!__f_start}" ]; then
+        __force_warn "Timer for \"${1}\" was never started"
+        return 1
+    elif [ -z "${!__f_end}" ]; then
+        __force_warn "Timer for \"${1}\" failed to end"
+        return 1
     fi
+
+    __format_text "\e[32mTIME\e[39m" "${1} in $(bc <<< "${!__f_end}-${!__f_start}") seconds" ""
 fi
 
 fi
