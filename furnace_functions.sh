@@ -85,7 +85,7 @@ fi
 
 __empdir () {
 
-__listing="$(find .)"
+__listing="$(find . | sort)"
 
 __tmp_empdir_sub () {
 
@@ -103,7 +103,7 @@ __new_listing="$(find .)"
 
 until [ "${__listing}" = "${__new_listing}" ]; do
     __listing="${__new_listing}"
-    __new_listing="$(find .)"
+    __new_listing="$(find . | sort)"
     __tmp_empdir_sub
 done
 

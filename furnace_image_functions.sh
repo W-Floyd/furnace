@@ -561,17 +561,25 @@ fi
 ################################################################################
 
 __custom_tile () {
+
 if [ "${#}" -lt '4' ]; then
     __error "Not enough options specified for __custom_tile"
 fi
 
-local __num_options="${#}"
+__num_sub () {
+__option_num="$((__option_num-1))"
+}
 
-local __output="$(eval "echo \"\${$((__num_options))}\"")"
-local __spacer="$(eval "echo \"\${$((__num_options-1))}\"")"
-local __grid="$(eval "echo \"\${$((__num_options-2))}\"")"
+local __option_num="${#}"
 
-local __imgseq="$(for __num in $(seq 1 "$((__num_options-3))"); do echo -n "$(eval "echo \"\${$((__num))}\"") "; done)"
+local __output="${!__option_num}"
+__num_sub
+local __spacer="${!__option_num}"
+__num_sub
+local __grid="${!__option_num}"
+__num_sub
+
+local __imgseq="$(for __num in $(seq 1 "${__option_num}"); do echo -n "${!__num} "; done)"
 
 montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
 
