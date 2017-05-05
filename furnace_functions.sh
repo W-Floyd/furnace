@@ -964,6 +964,12 @@ fi
 
 __run_routine () {
 
+if read -r -t 0; then
+    local __pipe="$(cat)"
+else
+    local __pipe=''
+fi
+
 local __function_prefix="${1}"
 shift
 
@@ -973,11 +979,7 @@ local __function_name="__function_${__function_prefix}"
 
 local __routine_name="__${__function_prefix}_${!__function_name}"
 
-if read -r -t 0; then
-    cat | "${__routine_name}" "${@}"
-else
-    "${__routine_name}" "${@}"
-fi
+"${__routine_name}" "${@}" <<< "${__pipe}"
 
 }
 
