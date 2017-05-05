@@ -983,18 +983,14 @@ __popd
 __pushd "./${__pack}"
 
 # Hash source files into designated file, excluding xml files
-__hash_folder "${__source_hash_old}" xml
-
-if [ -s "${__shared_source_list}" ]; then
-    while read -r __file; do
-        __hash "${__file}"
-    done < "${__shared_source_list}" > "${__shared_source_list_hash}"
-fi
+find . -type f | grep -Fxf "${__shared_source_list}" | while read -r __file; do
+    __hash "${__file}"
+done > "${__source_hash_old}"
 
 # Get back to main directory
 __popd
 
-if ! [ "$(sort "${__shared_source_list_hash}" | __hash_piped)" = "$(sort "${__source_hash_new}" | __hash_piped)" ]; then
+if ! [ "$(sort "${__source_hash_old}" | __hash_piped)" = "$(sort "${__source_hash_new}" | __hash_piped)" ]; then
 
 # For every file in the shared xml list,
 while read -r __shared; do
@@ -1020,7 +1016,7 @@ else
 
     if [ "${__list_changed}" = '0' ]; then
 
-        __force_announce "No changes to source."
+        __announce "No changes to source."
 
     fi
 
