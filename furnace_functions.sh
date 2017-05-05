@@ -634,7 +634,7 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_change
         return 1
     fi
 
-    __format_text "\e[32mTIME\e[39m" "${1} in $(bc <<< "${!__f_end}-${!__f_start}") seconds" ""
+    __format_text "\e[32mTIME\e[39m" "$(bc <<< "${!__f_end}-${!__f_start}" | sed 's/^\./0./') seconds - ${1}" ""
 fi
 
 fi
