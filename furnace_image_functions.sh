@@ -2,6 +2,8 @@
 # Image Functions
 ################################################################################
 
+__imagemagick_define='-define png:color-type=6'
+
 ################################################################################
 #
 # __pngchunks <FILE.png>
@@ -71,7 +73,7 @@ __vector_render_convert () {
 local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
 convert \
--define png:color-type=6 \
+${__imagemagick_define} \
 -background none \
 -density "${__dpi}" \
 "${2}" \
@@ -113,7 +115,7 @@ if ! [ -e "$(__mext "${2}").png" ]; then
     return 1
 else
 
-    convert "$(__mext "${2}").png" -define png:color-type=6 "$(__mext "${2}")_.png"
+    convert "$(__mext "${2}").png" ${__imagemagick_define} "$(__mext "${2}")_.png"
     mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
 
 fi
@@ -326,7 +328,7 @@ fi
 __resize () {
 
 if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
-    convert "${2}" -define png:color-type=6 -scale "$(echo "${1}*100" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
+    convert "${2}" ${__imagemagick_define} -scale "$(echo "${1}*100" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
 else
     __force_warn "File ${2} is not a PNG image and cannot be resized"
 fi
@@ -359,7 +361,7 @@ __clip_src_over "${1}" "${2}" "${3}"
 ################################################################################
 
 __multiply () {
-composite -define png:color-type=6 -compose Multiply "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose Multiply "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -372,7 +374,7 @@ composite -define png:color-type=6 -compose Multiply "${2}" "${1}" "${3}"
 ################################################################################
 
 __screen () {
-composite -define png:color-type=6 -compose Screen "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose Screen "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -385,7 +387,7 @@ composite -define png:color-type=6 -compose Screen "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_over () {
-composite -define png:color-type=6 -compose src-over "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose src-over "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -398,7 +400,7 @@ composite -define png:color-type=6 -compose src-over "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_over () {
-composite -define png:color-type=6 -compose dst-over "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose dst-over "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -411,7 +413,7 @@ composite -define png:color-type=6 -compose dst-over "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_in () {
-composite -define png:color-type=6 -compose src-in "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose src-in "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -424,7 +426,7 @@ composite -define png:color-type=6 -compose src-in "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_in () {
-composite -define png:color-type=6 -compose dst-in "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose dst-in "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -437,7 +439,7 @@ composite -define png:color-type=6 -compose dst-in "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_out () {
-composite -define png:color-type=6 -compose src-out "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose src-out "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -450,7 +452,7 @@ composite -define png:color-type=6 -compose src-out "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_out () {
-composite -define png:color-type=6 -compose dst-out "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose dst-out "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -463,7 +465,7 @@ composite -define png:color-type=6 -compose dst-out "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_atop () {
-composite -define png:color-type=6 -compose src-atop "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose src-atop "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -476,7 +478,7 @@ composite -define png:color-type=6 -compose src-atop "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_atop () {
-composite -define png:color-type=6 -compose dst-atop "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose dst-atop "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -489,7 +491,7 @@ composite -define png:color-type=6 -compose dst-atop "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_xor () {
-composite -define png:color-type=6 -compose xor "${2}" "${1}" "${3}"
+composite ${__imagemagick_define} -compose xor "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -508,7 +510,7 @@ __fade () {
 if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
 
     local __tmptrans=$(echo '1/'"${3}" | bc)
-    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" -define png:color-type=6 "${2}"
+    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" ${__imagemagick_define} "${2}"
 
 else
 
@@ -679,7 +681,7 @@ mogrify -rotate "${__angle}" "${1}"
 
 __rotate_exact () {
 
-convert -background none -define png:color-type=6 -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
+convert -background none ${__imagemagick_define} -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
 
 }
 
