@@ -852,7 +852,7 @@ fi
 
 __time "Checked hash changes" start
 
-if ! [ "$(__hash < "${__new_hashes}")" = "$(__hash < "${__old_hashes}")" ]; then
+if ! [ "$(__hash_piped < "${__new_hashes}")" = "$(__hash_piped < "${__old_hashes}")" ]; then
 
 # For every file in the shared xml list,
 while read -r __shared; do
@@ -986,15 +986,15 @@ __pushd "./${__pack}"
 __hash_folder "${__source_hash_old}" xml
 
 if [ -s "${__shared_source_list}" ]; then
-    while read -r __line; do
-        __hash "${__line}"
-    done < "${__shared_source_list}" >> "${__shared_source_list_hash}"
+    while read -r __file; do
+        __hash "${__file}"
+    done < "${__shared_source_list}" > "${__shared_source_list_hash}"
 fi
 
 # Get back to main directory
 __popd
 
-if ! [ "$(sort "${__shared_source_list_hash}" | __hash)" = "$(sort "${__source_hash_new}" | __hash)" ]; then
+if ! [ "$(sort "${__shared_source_list_hash}" | __hash_piped)" = "$(sort "${__source_hash_new}" | __hash_piped)" ]; then
 
 # For every file in the shared xml list,
 while read -r __shared; do

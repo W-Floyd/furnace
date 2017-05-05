@@ -67,3 +67,7 @@ while read -r __dep; do
 		__error "Please install \"${__dep}\""
 	fi
 done <<< "pcregrep"
+
+################################################################
+
+__choose_function -e -d 'file hashing' -p 'md5sum' 'hash'

@@ -195,7 +195,7 @@ done
 __get_values_piped () {
 local __pipe="$(cat)"
 for __input in "$@"; do
-    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
+    echo "${__pipe}" | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
     shift
 done
 }
@@ -268,67 +268,55 @@ exit 1
 
 __hash_md5sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | md5sum "${@}"
 else
-    local __pipe=''
+    md5sum "${@}"
 fi
-
-md5sum "${@}" <<< "${__pipe}"
 
 }
 
 __hash_sha1sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | sha1sum "${@}"
 else
-    local __pipe=''
+    sha1sum "${@}"
 fi
-
-sha1sum "${@}" <<< "${__pipe}"
 
 }
 
 __hash_sha224sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | sha224sum "${@}"
 else
-    local __pipe=''
+    sha224sum "${@}"
 fi
-
-sha224sum "${@}" <<< "${__pipe}"
 
 }
 
 __hash_sha256sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | sha256sum "${@}"
 else
-    local __pipe=''
+    sha256sum "${@}"
 fi
-
-sha256sum "${@}" <<< "${__pipe}"
 
 }
 
 __hash_sha384sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | sha384sum "${@}"
 else
-    local __pipe=''
+    sha384sum "${@}"
 fi
-
-sha384sum "${@}" <<< "${__pipe}"
 
 }
 
 __hash_sha512sum () {
 if read -r -t 0; then
-    local __pipe="$(cat)"
+    cat | sha512sum "${@}"
 else
-    local __pipe=''
+    sha512sum "${@}"
 fi
-
-sha512sum "${@}" <<< "${__pipe}"
 
 }
 
@@ -343,17 +331,30 @@ sha512sum "${@}" <<< "${__pipe}"
 
 __hash () {
 
-local __prefix='hash'
+__debug_toggle off
 
-if read -r -t 0; then
-    local __pipe="$(cat)"
-else
-    local __pipe=''
-fi
+"${__function_hash}" "${@}"
 
-__choose_function -e -d 'file hashing' -p 'md5sum' "${__prefix}"
+__debug_toggle on
 
-__run_routine "${__prefix}" "${@}" <<< "${__pipe}"
+}
+
+################################################################################
+#
+# ... | __hash_piped
+#
+# Hash Piped
+# Hash piped intput, so that testing different programs can be done easily.
+#
+################################################################################
+
+__hash_piped () {
+
+__debug_toggle off
+
+cat | "${__function_hash}" "${@}"
+
+__debug_toggle on
 
 }
 
@@ -377,7 +378,7 @@ if ! [ -z "${__listing}" ]; then
 
     {
 
-    __hash $(grep -v ' ' <<< "${__listing}") >> "${1}"
+    __hash $(grep -v ' ' <<< "${__listing}" | tr '\n' ' ') >> "${1}"
 
     grep ' ' <<< "${__listing}" | sed '/^$/d' | while read -r __file; do
         __hash "${__file}"
@@ -718,6 +719,28 @@ cat | sed '/^$/d' | awk '!cnts[$0]++'
 }
 
 ################################################################################
+#
+# __debug_toggle <on/off>
+#
+# Debug Toggle
+# To be used in functions that do not need debugging (especially
+# __choose_function) be sure to surn it back on when you're done!
+#
+################################################################################
+
+__debug_toggle () {
+set +x
+if [ "${__very_verbose}" = '1' ] ; then
+    if [ "${1}" = 'on' ]; then
+        set -x
+    elif ! [ "${1}" = 'off' ]; then
+        set -x
+        __force_warn "Invalid option \"${1}\" passed to __debug_toggle"
+    fi
+fi
+}
+
+################################################################################
 # Function Functions
 ################################################################################
 #
@@ -840,6 +863,9 @@ fi
 ################################################################################
 
 __choose_function () {
+
+__debug_toggle off
+
 local __should_error='0'
 local __should_force='0'
 local __preference_list=''
@@ -891,6 +917,7 @@ ${1}"
 # http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
 # Means no more eval sodomy :3
 	                    if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ] && __test_function "${__function_prefix}" "${!__function_name}"; then
+	                        __debug_toggle off on
                             return 0
                         fi
 
@@ -908,6 +935,8 @@ ${1}"
     done
 
 else
+
+    __debug_toggle on
 
     __error "No options passed"
 
@@ -936,12 +965,15 @@ if ! __test_routine "${__function_prefix}"; then
     local __message="No valid routine for ${__description} found"
 
     if [ "${__should_error}" = '1' ]; then
+        __debug_toggle on
         __error "${__message}"
     else
         __force_warn "${__message}"
     fi
 
 fi
+
+__debug_toggle on
 
 }
 
@@ -964,6 +996,8 @@ fi
 
 __run_routine () {
 
+__debug_toggle off
+
 if read -r -t 0; then
     local __pipe="$(cat)"
 else
@@ -973,13 +1007,19 @@ fi
 local __function_prefix="${1}"
 shift
 
+__debug_toggle on
+
 __choose_function "${__function_prefix}"
+
+__debug_toggle off
 
 local __function_name="__function_${__function_prefix}"
 
 local __routine_name="__${__function_prefix}_${!__function_name}"
 
-"${__routine_name}" "${@}" <<< "${__pipe}"
+__debug_toggle on
+
+echo "${__pipe}" | "${__routine_name}" "${@}"
 
 }
 
