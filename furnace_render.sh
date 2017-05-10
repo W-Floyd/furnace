@@ -876,7 +876,7 @@ done < "${__shared_xml_list}"
 
 else
 
-    __announce "No changes to XML."
+    __force_announce "No changes to XML."
 
     if [ -e "${__unchanged_xml}" ]; then
 
@@ -1016,7 +1016,7 @@ else
 
     if [ "${__list_changed}" = '0' ]; then
 
-        __announce "No changes to source."
+        __force_announce "No changes to source."
 
     fi
 
