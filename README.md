@@ -9,8 +9,8 @@ cd into an appropriate folder, then run:
 ```
 git clone https://github.com/W-Floyd/furnace.git
 cd furnace
-sudo ln -s "$(pwd)/furnace.sh" "/usr/bin/furnace"  
-sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/furnace"  
+sudo ln -s "$(pwd)/furnace.sh" "/usr/bin/furnace"
+sudo ln -s "$(pwd)/autocomplete.sh" "/usr/share/bash-completion/completions/furnace"
 ```
 
 ## Instructions
