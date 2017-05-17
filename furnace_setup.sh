@@ -63,10 +63,18 @@ if ! [ -z "${__custom_function_bin}" ]; then
 fi
 
 while read -r __dep; do
-	if ! which "${__dep}" &> /dev/null; then
-		__error "Please install \"${__dep}\""
-	fi
+    if ! which "${__dep}" &> /dev/null; then
+        __error "Please install \"${__dep}\""
+    fi
 done <<< "pcregrep"
+
+if ! [ -z "${__pack_depends}" ]; then
+    for __dep in ${__pack_depends}; do
+        if ! which "${__dep}" &> /dev/null; then
+            __error "Please install \"${__dep}\" to render this pack"
+        fi
+    done
+fi
 
 ################################################################
 

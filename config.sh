@@ -63,6 +63,11 @@
 # Defaults to 96 if missing, as that's the new standard.
 #__vector_ppi='96'
 
+# Required software for the pack. This is a semi-temporary measure, I need to
+# muck out the IM calls and make sure they're verified, probably like optimizers
+# and renderers.
+#__depends='convert composite montage mogrify identify'
+
 ################################################################################
 # Routines
 ################################################################################
@@ -78,6 +83,7 @@
 #__function_vector_render='rsvg-convert'
 
 # What routine to use for PNG optimization.
+# TODO finish this section
 # Default values include:
 # optipng
 # pngcrush
