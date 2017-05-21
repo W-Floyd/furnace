@@ -195,7 +195,7 @@ done
 __get_values_piped () {
 local __pipe="$(cat)"
 for __input in "$@"; do
-    echo "${__pipe}" | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
+    pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
     shift
 done
 }
@@ -473,8 +473,8 @@ local __front_pad="$(__print_pad "${__clipped_size}") - "
 echo -ne "${__front_pad}"
 local __pad=''
 
-if [ "$(echo "${2}" | wc -l)" -gt '1' ]; then
-    echo "${2}" | head -n -1 | while read -r __line; do
+if [ "$(wc -l <<< "${2}")" -gt '1' ]; then
+    head -n -1 <<< "${2}" | while read -r __line; do
         if [ -z "${__pad}" ]; then
             echo -e "${__pad}${__line}"
             local __pad="$(__print_pad "${__desired_size}")"
@@ -483,7 +483,7 @@ if [ "$(echo "${2}" | wc -l)" -gt '1' ]; then
         fi
     done
     local __pad="$(__print_pad "${__desired_size}")"
-    echo -e "${__pad}$(echo "${2}" | tail -n 1)${3}"
+    echo -e "${__pad}$(tail -n 1 <<< "${2}")${3}"
 else
     echo -e "${2}${3}"
 fi
@@ -1019,7 +1019,7 @@ local __routine_name="__${__function_prefix}_${!__function_name}"
 
 __debug_toggle on
 
-echo "${__pipe}" | "${__routine_name}" "${@}"
+"${__routine_name}" "${@}" <<< "${__pipe}"
 
 }
 

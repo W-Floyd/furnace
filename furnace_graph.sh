@@ -76,12 +76,12 @@ echo "
     node [style=filled, shape=record, color=\"black\" fillcolor=\"lightgray\" ];
 " >> "${__graph}"
 
-echo "${__dep_list}" | grep -v "${__files}" | grep -v '^$' | sed 's/.*/    "&";/' | sort | uniq >> "${__graph}"
+grep -v "${__files}" <<< "${__dep_list}" | grep -v '^$' | sed 's/.*/    "&";/' | sort | uniq >> "${__graph}"
 
 __dep_list="$(grep -x "${__files}" <<< "${__list}")
 ${__dep_list}"
 
-__dep_list="$(echo "${__dep_list}" | grep -v '^$')"
+__dep_list="$(grep -v '^$' <<< "${__dep_list}")"
 
 if [ "${__use_files}" = '1' ] && [ "${7}" = '0' ]; then
     echo "
@@ -91,7 +91,7 @@ fi
 
 if ! [ -z "${__dep_list}" ]; then
 
-    __dep_list="$(echo "${__dep_list}" | grep -v '^$' | sort | uniq)"
+    __dep_list="$(grep -v '^$' <<< "${__dep_list}" | sort | uniq)"
 
     echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
 
@@ -119,7 +119,7 @@ if ! [ -z "${__dep_list}" ]; then
 
         if [ "${__use_files}" = '1' ]; then
 
-            if echo "${__name}" | grep -Fxq "${__dep_list}"; then
+            if grep -Fxq "${__dep_list}" <<< "${__name}"; then
                 __tmp_func
             fi
 

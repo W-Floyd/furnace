@@ -1319,7 +1319,7 @@ if [ "${__list_changed}" = '1' ]; then
         __force_announce "No changes to \"${__size}\""
     else
         __force_announce "Changes to \"${__size}\":"
-        echo "${__changed}" | tac | while read -r __change; do
+        tac <<< "${__changed}" | while read -r __change; do
             __format_text "\e[36m${__size}\e[39m" "File \"${__change}\" has changed." ""
         done
     fi

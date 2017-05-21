@@ -20,7 +20,7 @@ if [ "$(__get_value "/tmp/readrangetmp" KEEP)" = 'YES' ]; then
 	    echo "${__common}" >> "/tmp/commontmp"
 	else
 	    __get_value "/tmp/readrangetmp" NAME >> "/tmp/nametmp"
-	    __un_named="$(echo "${__un_named}+1" | bc)"
+	    __un_named="$(bc <<< "${__un_named}+1")"
 	fi
 fi
 

@@ -349,13 +349,13 @@ if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
 
     __check_input "${1}"
 
-elif echo "${1}" | grep '^--.*' &> /dev/null; then
+elif  grep '^--.*' <<< "${1}" &> /dev/null; then
 
     __check_input "${1}"
 
-elif echo "${1}" | grep '^-.*' &> /dev/null; then
+elif grep '^-.*' <<< "${1}" &> /dev/null; then
 
-    __letters="$(echo "${1}" | cut -c 2- | sed 's/./& /g')"
+    __letters="$(cut -c 2- <<< "${1}" | sed 's/./& /g')"
 
     for __letter in ${__letters}; do
 
@@ -428,10 +428,10 @@ while ! [ "${#}" = '0' ]; do
                 __force_warn "Size is not important when graphing, and will be ignored"
             else
                 if [ -z "${__graph_files}" ]; then
-                    __graph_files="$(echo "${1}" | tr ',' '\n')"
+                    __graph_files="$(tr ',' '\n' <<< "${1}")"
                 else
                     __graph_files="${__graph_files}
-$(echo "${1}" | tr ',' '\n')"
+$(tr ',' '\n' <<< "${1}")"
                 fi
             fi
             ;;

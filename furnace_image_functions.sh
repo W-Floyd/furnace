@@ -328,7 +328,7 @@ fi
 __resize () {
 
 if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
-    convert "${2}" ${__imagemagick_define} -scale "$(echo "${1}*100" | bc -l | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
+    convert "${2}" ${__imagemagick_define} -scale "$(bc -l <<< "${1}*100" | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
 else
     __force_warn "File ${2} is not a PNG image and cannot be resized"
 fi
@@ -538,7 +538,7 @@ else
 	local __spacer=0
 fi
 
-local __imgseq=$(for __tile in $(seq 1 "$(echo "${2}" | sed 's/x/\*/' | bc)"); do echo -n "${1} "; done)
+local __imgseq=$(for __tile in $(seq 1 "$(sed 's/x/\*/' <<< "${2}" | bc)"); do echo -n "${1} "; done)
 
 montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
 
@@ -613,7 +613,7 @@ fi
 ################################################################################
 
 __crop () {
-convert "${1}" -crop "${2}x${2}+$(echo "${3}*${2}" | bc)+$(echo "${4}*${2}" | bc)" "${5}"
+convert "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
 }
 
 ################################################################################
