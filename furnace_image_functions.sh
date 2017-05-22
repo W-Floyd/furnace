@@ -287,9 +287,8 @@ fi
 # __optimize <IMAGE.png>
 #
 # Optimize Image
-# Accepts a PNG file as an input, optimizes with optipng, and
-# replaces if smaller. Will ignore if given file is not a
-# '.png' file.
+# Accepts a PNG file as an input, optimizes with, and replaces if smaller. Will
+# ignore if given file is not a '.png' file.
 #
 ################################################################################
 
@@ -314,16 +313,15 @@ fi
 
 }
 
-################################################################
+################################################################################
 #
 # __resize <SCALE> </dir/to/src/IMAGE.png> </dir/to/dest/IMAGE.png>
 #
 # Rescale Image
-# Accepts a scale, source and dest PNG files as inputs, rescales
-# to the given scale (0-1.0). Will ignore if given file is not a
-# '.png' file.
+# Accepts a scale, source and dest PNG files as inputs, rescales to the given
+# scale (0-1.0). Will ignore if given file is not a '.png' file.
 #
-################################################################
+################################################################################
 
 __resize () {
 
