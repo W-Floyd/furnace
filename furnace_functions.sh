@@ -751,6 +751,25 @@ fi
 
 ################################################################################
 #
+# __check_command <COMMAND>
+#
+# Check command
+# Wraps a quiet which for use in tests. Returns 0 on success, 1 on failure.
+#
+################################################################################
+
+__check_command () {
+
+if which "${1}" &> /dev/null; then
+    return 0
+else
+    return 1
+fi
+
+}
+
+################################################################################
+#
 # __list_functions <PREFIX>
 #
 # List Functions
@@ -791,7 +810,7 @@ compgen -A function | grep "^__${1}_" | sort | sed "s/^__${1}_//"
 
 __test_function () {
 
-if which "${2}" &> /dev/null && [ "$(type -t "__${1}_${2}")" = 'function' ]; then
+if __check_command "${2}" && [ "$(type -t "__${1}_${2}")" = 'function' ]; then
     return 0
 else
     return 1

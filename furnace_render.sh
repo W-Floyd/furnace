@@ -336,27 +336,6 @@ if ! [ "${__size}" = "$(echo "2^${__calculated_log}" | bc)" ]; then
     __force_warn "Given size is not a power of 2"
 fi
 
-################################################################################
-# Check software deps
-################################################################################
-
-# check inkscape
-if which inkscape &> /dev/null; then
-    __has_inkscape='1'
-
-else
-    __has_inkscape='0'
-fi
-
-# check rsvg-convert
-if which rsvg-convert &> /dev/null; then
-    __has_rsvg_convert='1'
-
-# if that did return an error, we know it doesn't exist
-else
-    __has_rsvg_convert='0'
-fi
-
 __time "Set variables" end
 
 if [ "${__dry}" = '1' ]; then

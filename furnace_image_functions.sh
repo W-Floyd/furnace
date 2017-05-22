@@ -143,7 +143,7 @@ fi
 
 if ! [ "${__gimp_export_check}" = '1' ]; then
 
-    if ! which gimp &> /dev/null; then
+    if ! __check_command gimp; then
         __error "GIMP is not installed"
     fi
 
@@ -192,7 +192,7 @@ fi
 
 if ! [ "${__krita_export_check}" = '1' ]; then
 
-    if ! which krita &> /dev/null; then
+    if ! __check_command krita; then
         __error "Krita is not installed"
     fi
 
