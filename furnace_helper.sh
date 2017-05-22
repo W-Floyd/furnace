@@ -14,8 +14,13 @@ while ! [ "${#}" = '0' ]; do
 
     case "${1}" in
 
-        "--optimizer")
-            __list_functions 'optimize'
+        "--list-prefixes")
+            __list_prefixes
+            exit 0
+            ;;
+
+        "--function")
+            __list_functions "${2}"
             exit 0
             ;;
 

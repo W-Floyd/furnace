@@ -105,8 +105,6 @@ Render Options:
   --force-optimize          Optimize any size of final PNG files.
   --force-max-optimize      Ensure max-optimize is obeyed.
 
-  --optimizer <OPTIMIZER>   Optimize with specified optimizer.
-
   --optional <SIZE>         Render optional items, optionally at specified size
                             only. Use - to ignore the specification.
   --max-optional <SIZE>     Maximum size to render optional size.
@@ -130,6 +128,10 @@ Graphing Options:
   --no-highlight            Do not highlight specified files when graphing.
 
 Other Options:
+  --function-<PREFIX> <ROUTINE>
+                            Choose a routine for the given function (eg. SVG
+                            render, PNG optimizer).
+
   --completed               List completed textures, according to the COMMON
                             field in the catalogue
 
@@ -309,10 +311,15 @@ case "${1}" in
         __re_optimize='1'
         ;;
 
-    "--optimizer")
+    "--name")
         ;;
 
-    "--name")
+    "--function-"*)
+# Gedit is dumb and won't parse quoting correctly in this instance for some
+# reason, so I've piped into cat instead, it gives the same results. Being an
+# option parser, performance isn't that important anyway, and my own sanity when
+# reading the rest of this document is of a higher priority.
+        __set_prefix="$(cat <<< "${1}" | sed 's/^--[^-]*-//')"
         ;;
 
     [0-9]*)
@@ -406,14 +413,6 @@ while ! [ "${#}" = '0' ]; do
             fi
             ;;
 
-        "--optimizer")
-            if __test_function 'optimize' "${1}"; then
-                __function_optimizer="${1}"
-            else
-                __error "Given input is not a valid optimizer"
-            fi
-            ;;
-
         "--name")
             if __check_option "${1}"; then
                 __force_warn "Given name may actually be an option."
@@ -470,6 +469,14 @@ $(tr ',' '\n' <<< "${1}")"
                 __max_optional="${1}"
             else
                 __error "Given input is not a size"
+            fi
+            ;;
+
+        "--function-"*)
+            if __test_function "${__set_prefix}" "${1}"; then
+                export "__function_${__set_prefix}=${1}"
+            else
+                __error "\"${1}\" is not a valid routine for \"${__set_prefix}\""
             fi
             ;;
 

@@ -48,7 +48,7 @@ fi
 #
 ################################################################################
 
-__vector_render_inkscape () {
+__routine__vector_render__inkscape () {
 
 local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
@@ -58,7 +58,7 @@ inkscape \
 
 }
 
-__vector_render_rsvg-convert () {
+__routine__vector_render__rsvg-convert () {
 
 rsvg-convert \
 -z "$(bc -l <<< "${1}/${__vector_scale}" | __strip_zero)" \
@@ -68,7 +68,7 @@ rsvg-convert \
 
 }
 
-__vector_render_convert () {
+__routine__vector_render__convert () {
 
 local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
@@ -221,7 +221,7 @@ krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 
 # with -nc set, it seems to be loaded perfectly by Minecraft,
 # because the color_type is retained
-__optimize_optipng () {
+__routine__optimize__optipng () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 
@@ -239,7 +239,7 @@ fi
 
 # Should be be okay with -noreduce, but is stupid and changes it
 # anyway, so it's checked for color_type correctness
-__optimize_pngcrush () {
+__routine__optimize__pngcrush () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 
@@ -262,7 +262,7 @@ fi
 # Is stupid and won't let us specify a color_type to force, so
 # we attempt to optimize anyway, then check the chunk, because
 # Minecraft is stupid and won't load greyscale images correctly
-__optimize_zopflipng () {
+__routine__optimize__zopflipng () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
 

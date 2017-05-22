@@ -25,11 +25,6 @@ _furnace () {
             return 0
             ;;
 
-        '--optimizer')
-            COMPREPLY=($(compgen -W "$(${helper} --optimizer)" -- "${cur}"))
-            return 0
-            ;;
-
         '--name')
             COMPREPLY=($(compgen -W "$(basename "$(pwd)" | rev | sed -e 's/.*-//' -e 's/.*_//' -e 's/.*\.//' | rev)" -- "${cur}"))
             return 0
@@ -55,11 +50,19 @@ _furnace () {
             return 0
             ;;
 
+        "--function-"*)
+# Again, Gedit is stupid, so I pipe into cat for formatting sake.
+            __prefix="$(cat <<< "${prev}" | sed 's/^--function-//')"
+            COMPREPLY=($(compgen -W "$(${helper} --function "${__prefix}")" -- "${cur}"))
+            return 0
+            ;;
+
     esac
 
     case "${cur}" in
         -*)
-            COMPREPLY=( $( compgen -W "$( _parse_help "${1}" )" -- "${cur}" ) )
+            __prefixes="$(${helper} --list-prefixes | while read -r __tmp_prefix; do echo "--function-${__tmp_prefix}"; done)"
+            COMPREPLY=( $( compgen -W "$( _parse_help "${1}" && echo "${__prefixes}" )" -- "${cur}" ) )
             return 0
             ;;
         [0-9]*)

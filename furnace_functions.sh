@@ -266,7 +266,7 @@ exit 1
 #
 ################################################################################
 
-__hash_md5sum () {
+__routine__hash__md5sum () {
 if read -r -t 0; then
     cat | md5sum "${@}"
 else
@@ -275,7 +275,7 @@ fi
 
 }
 
-__hash_sha1sum () {
+__routine__hash__sha1sum () {
 if read -r -t 0; then
     cat | sha1sum "${@}"
 else
@@ -284,7 +284,7 @@ fi
 
 }
 
-__hash_sha224sum () {
+__routine__hash__sha224sum () {
 if read -r -t 0; then
     cat | sha224sum "${@}"
 else
@@ -293,7 +293,7 @@ fi
 
 }
 
-__hash_sha256sum () {
+__routine__hash__sha256sum () {
 if read -r -t 0; then
     cat | sha256sum "${@}"
 else
@@ -302,7 +302,7 @@ fi
 
 }
 
-__hash_sha384sum () {
+__routine__hash__sha384sum () {
 if read -r -t 0; then
     cat | sha384sum "${@}"
 else
@@ -311,7 +311,7 @@ fi
 
 }
 
-__hash_sha512sum () {
+__routine__hash__sha512sum () {
 if read -r -t 0; then
     cat | sha512sum "${@}"
 else
@@ -751,6 +751,21 @@ fi
 
 ################################################################################
 #
+# __list_prefixes
+#
+# List Prefixes
+# Lists all known prefixes for routines.
+#
+################################################################################
+
+__list_prefixes () {
+
+compgen -A function | grep "^__routine__" | sort | sed "s/^__routine__//" | sed 's/__.*//' | sort | uniq
+
+}
+
+################################################################################
+#
 # __check_command <COMMAND>
 #
 # Check command
@@ -793,7 +808,7 @@ fi
 
 __list_functions () {
 
-compgen -A function | grep "^__${1}_" | sort | sed "s/^__${1}_//"
+compgen -A function | grep "^__routine__${1}__" | sort | sed "s/^__routine__${1}__//"
 
 }
 
@@ -810,7 +825,7 @@ compgen -A function | grep "^__${1}_" | sort | sed "s/^__${1}_//"
 
 __test_function () {
 
-if __check_command "${2}" && [ "$(type -t "__${1}_${2}")" = 'function' ]; then
+if __check_command "${2}" && [ "$(type -t "__routine__${1}__${2}")" = 'function' ]; then
     return 0
 else
     return 1
@@ -1034,7 +1049,7 @@ __debug_toggle off
 
 local __function_name="__function_${__function_prefix}"
 
-local __routine_name="__${__function_prefix}_${!__function_name}"
+local __routine_name="__routine__${__function_prefix}__${!__function_name}"
 
 __debug_toggle on
 
