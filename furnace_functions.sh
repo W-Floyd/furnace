@@ -724,7 +724,7 @@ cat | sed '/^$/d' | awk '!cnts[$0]++'
 #
 # Debug Toggle
 # To be used in functions that do not need debugging (especially
-# __choose_function) be sure to surn it back on when you're done!
+# __choose_function) be sure to turn it back on when you're done!
 #
 ################################################################################
 

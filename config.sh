@@ -32,12 +32,6 @@
 # Defaults to off if missing.
 #__ignore_max_optimize='1'
 
-# What optimizer to use. May be a custom optimizer, so long as a function named
-# __optimize_<OPTIMIZER> exists, and replaces the given file.
-# Defaults to an existing optimizer, selected from a list and by availability.
-# If available, optipng is first on the list, due to compatability.
-#__optimizer='zopflipng'
-
 # Whether or not to render optional images (usually demo images).
 # Defaults to off if missing.
 #__render_optional='0'
