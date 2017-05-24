@@ -5,6 +5,7 @@ _furnace () {
     rundir="$(dirname "$(readlink -f "$(which "${1}")")")"
     helper="${rundir}/furnace_helper.sh"
     sizes=$(seq 5 10 | sed 's/^/2^/' | bc)
+    ignore_list='--function-'
     graph_formats='bmp canon dot gv xdot xdot1.2 xdot1.4 cgimage cmap eps exr fig gd gd2 gif gtk ico imap cmapx imap_np cmapx_np ismap jp2 jpg jpeg jpe json json0 dot_json xdot_json pct pict pdf pic plain plain-ext png pov ps ps2 psd sgi svg svgz tga tif tiff tk vml vmlz vrml wbmp webp xlib x11'
     graphers='dot neato twopi circo fdp sfdp patchwork osage'
     if [ -e './src/xml/list' ]; then
@@ -62,7 +63,14 @@ _furnace () {
     case "${cur}" in
         -*)
             __prefixes="$(${helper} --list-prefixes | while read -r __tmp_prefix; do echo "--function-${__tmp_prefix}"; done)"
-            COMPREPLY=( $( compgen -W "$( _parse_help "${1}" && echo "${__prefixes}" )" -- "${cur}" ) )
+            __candidates="$(_parse_help "${1}" && echo "${__prefixes}")"
+            # TODO Find out why gedit sucks in syntaxing this section
+            # TODO Find out how to grep lines that start with hyphens
+            __var="${__candidates}"
+            while read -r __ignore; do
+                __var="$(sed "s/^${__ignore}$//" <<< "${__var}")"
+            done <<< "${ignore_list}"
+            COMPREPLY=( $( compgen -W "${__var}" -- "${cur}" ) )
             return 0
             ;;
         [0-9]*)
