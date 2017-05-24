@@ -7,22 +7,23 @@ fi
 
 __check_var __run_dir
 
-export __furnace_functions_bin="${__run_dir}/furnace_functions.sh"
-export __furnace_image_functions_bin="${__run_dir}/furnace_image_functions.sh"
+# Source all function files
+if [ -d "${__run_dir}/functions" ]; then
+    while read -r __file; do
+        cp "${__file}" '/tmp/script.sh'
+        echo 'for __function in $(compgen -A function); do
+	export -f ${__function}
+done' >> '/tmp/script.sh'
+        source '/tmp/script.sh' || { echo "Failed to load functions from \"${__file}\"" 1>&2; exit 1; }
+        rm '/tmp/script.sh'
+    done <<< "$(find "${__run_dir}/functions" -type f)"
+fi
+
 export __furnace_render_bin="${__run_dir}/furnace_render.sh"
 export __furnace_completed_bin="${__run_dir}/furnace_completed.sh"
 export __furnace_graph_bin="${__run_dir}/furnace_graph.sh"
-export __standard_conf_dir="${__run_dir}/conf"
 export __catalogue='catalogue.xml'
 export PS4='Line ${LINENO}: '
-
-# get functions from file
-__check_var __furnace_functions_bin
-source "${__furnace_functions_bin}" &> /dev/null || { echo "Failed to load functions \"${__furnace_functions_bin}\""; exit 1; }
-
-# get functions from file
-__check_var __furnace_image_functions_bin
-source "${__furnace_image_functions_bin}" &> /dev/null || __error "Failed to load image functions \"${__furnace_image_functions_bin}\""
 
 ################################################################
 
