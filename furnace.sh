@@ -34,6 +34,8 @@ __use_optional_size='0'
 __max_install_size='1024'
 __short_output='0'
 
+__pack_extension='zip'
+
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
 
@@ -739,12 +741,12 @@ __just_render "${1}"
 if [ "${__dry}" = '0' ]; then
 
 
-if [ -a "${2}.zip" ]; then
-    rm "${2}.zip"
+if [ -a "${2}.${__pack_extension}" ]; then
+    rm "${2}.${__pack_extension}"
 fi
 
-if [ "${__mobile}" = '1' ] && [ -a "${2}_mobile.zip" ]; then
-    rm "${2}_mobile.zip"
+if [ "${__mobile}" = '1' ] && [ -a "${2}_mobile.${__pack_extension}" ]; then
+    rm "${2}_mobile.${__pack_extension}"
 fi
 
 __pushd "${2}_cleaned"
@@ -828,7 +830,7 @@ else
 
 fi
 
-__dest="${HOME}/.minecraft/resourcepacks/${__packfile}.zip"
+__dest="${HOME}/.minecraft/resourcepacks/${__packfile}.${__pack_extension}"
 
 if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; then
 
@@ -838,7 +840,7 @@ if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; th
             rm "${__dest}"
         fi
 
-        cp "${__packfile}.zip" "${__dest}"
+        cp "${__packfile}.${__pack_extension}" "${__dest}"
 
     else
 
