@@ -61,6 +61,9 @@ Options:
   -c  --compress            Actually compress zip files.
   -o  --optimize            Optimize final PNG files.
       --no-optimize         Do not optimize final PNG files.
+  -r  --release             Re-renders, optimizes and compresses zip files.
+                            Equivalent to:
+                            '--force-render --force-optimize --compress'
   --optional <SIZE>         Render optional items, optionally at specified size
                             only. Use - to ignore the specification.
   --graph <ITEM>            Render a graph of the dependency tree. Optional
@@ -104,6 +107,10 @@ Render Options:
   --max-optimize <SIZE>     Max size to optimize.
   --force-optimize          Optimize any size of final PNG files.
   --force-max-optimize      Ensure max-optimize is obeyed.
+
+  -r  --release             Re-renders, optimizes and compresses zip files.
+                            Equivalent to:
+                            '--force-render --force-optimize --compress'
 
   --optional <SIZE>         Render optional items, optionally at specified size
                             only. Use - to ignore the specification.
@@ -309,6 +316,14 @@ case "${1}" in
 
     "--re-optimize")
         __re_optimize='1'
+        ;;
+
+    "r" | "--release")
+        __force_announce "Re-rendering from scratch, this may take a while."
+        __force='1'
+        __should_optimize='1'
+        __ignore_max_optimize='1'
+        __compress='1'
         ;;
 
     "--name")
