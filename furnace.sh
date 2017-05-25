@@ -64,16 +64,10 @@ Options:
   -c  --compress            Actually compress zip files.
   -o  --optimize            Optimize final PNG files.
       --no-optimize         Do not optimize final PNG files.
-  -r  --release             Re-renders, optimizes and compresses zip files.
-                            Equivalent to:
-                            '--force-render --force-optimize --compress'
+  -r  --release             Re-renders, and optimizes all images for zip files.
   -a  --archive             Pack all produced zip files in a single archive.
-                            This is best used without --compress.
-  --optional <SIZE>         Render optional items, optionally at specified size
-                            only. Use - to ignore the specification.
-  --graph <ITEM>            Render a graph of the dependency tree. Optional
-                            input is list of ITEMs to be the subject of the
-                            graph. May be specified multiple times."
+  --optional <SIZE>         Render optional items, optionally at SIZE.
+  --graph <ITEM>            Render a graph of the pack's dependency tree."
 }
 
 __usage () {
@@ -117,7 +111,7 @@ Render Options:
 
   -r  --release             Re-renders, optimizes and compresses zip files.
                             Equivalent to:
-                            '--force-render --force-optimize --compress'
+                            '--force-render --force-optimize'
 
   --optional <SIZE>         Render optional items, optionally at specified size
                             only. Use - to ignore the specification.
@@ -330,7 +324,6 @@ case "${1}" in
         __force='1'
         __should_optimize='1'
         __ignore_max_optimize='1'
-        __compress='1'
         ;;
 
     "-a" | "--archive")
