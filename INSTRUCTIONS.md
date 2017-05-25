@@ -12,7 +12,6 @@ __custom\_function\_bin
 __should_optimize  
 __max_optimize  
 __ignore\_max\_optimize  
-__optimizer  
 __render_optional  
 __max_optional  
 __ignore\_max\_optional  

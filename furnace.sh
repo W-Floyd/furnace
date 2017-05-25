@@ -861,11 +861,6 @@ fi
 
 }
 
-if ! [ -z "${__optimizer}" ] && [ "${__should_optimize}" = '1' ] && [ "${__verbose}" = '1' ]; then
-    __announce "Using optimizer \"${__optimizer}\""
-    echo
-fi
-
 if [ "${__xml_only}" = '1' ]; then
     __just_render 32
 else
