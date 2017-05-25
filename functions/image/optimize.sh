@@ -5,7 +5,7 @@
 ################################################################################
 #
 # In all cases:
-# __optimize_<OPTIMIZER> <IMAGE.png>
+# __routine__optimize__<OPTIMIZER> <IMAGE.png>
 #
 # <OPTIMIZER> Optimize
 # Accepts a PNG file as an input, optimizes with <OPTIMIZER> and
@@ -13,8 +13,12 @@
 #
 ################################################################################
 
-# with -nc set, it seems to be loaded perfectly by Minecraft,
-# because the color_type is retained
+################################################################################
+# Optipng
+# with -nc set, it seems to be loaded perfectly by Minecraft, because the
+# color_type is retained
+################################################################################
+
 __routine__optimize__optipng () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
@@ -31,8 +35,12 @@ else
 fi
 }
 
-# Should be be okay with -noreduce, but is stupid and changes it
-# anyway, so it's checked for color_type correctness
+################################################################################
+# PNGCrush
+# Should be be okay with -noreduce, but is stupid and changes it anyway, so it's
+# checked for color_type correctness
+################################################################################
+
 __routine__optimize__pngcrush () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
@@ -53,9 +61,13 @@ else
 fi
 }
 
+################################################################################
+# Zopflipng
 # Is stupid and won't let us specify a color_type to force, so
 # we attempt to optimize anyway, then check the chunk, because
 # Minecraft is stupid and won't load greyscale images correctly
+################################################################################
+
 __routine__optimize__zopflipng () {
 local __tmpname="/tmp/${RANDOM})"
 local __file="${1}"
