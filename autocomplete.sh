@@ -1,6 +1,5 @@
 _furnace () {
-    local cur prev sizes rundir helper sizes graph_formats matches items \
-    graphers ignore ignore_list prefix candidates tmpvar
+    local cur prev sizes rundir helper sizes graph_formats matches items graphers ignore_list prefix candidates tmpvar
 
     _init_completion || return
 
@@ -8,21 +7,13 @@ _furnace () {
     helper="${rundir}/furnace_helper.sh"
     sizes=$(seq 5 10 | sed 's/^/2^/' | bc)
     ignore_list='-h'
-    graph_formats='bmp canon dot gv xdot xdot1.2 xdot1.4 cgimage cmap eps exr \
-    fig gd gd2 gif gtk ico imap cmapx imap_np cmapx_np ismap jp2 jpg jpeg jpe \
-    json json0 dot_json xdot_json pct pict pdf pic plain plain-ext png pov ps \
-    ps2 psd sgi svg svgz tga tif tiff tk vml vmlz vrml wbmp webp xlib x11'
+    graph_formats='bmp canon dot gv xdot xdot1.2 xdot1.4 cgimage cmap eps exr fig gd gd2 gif gtk ico imap cmapx imap_np cmapx_np ismap jp2 jpg jpeg jpe json json0 dot_json xdot_json pct pict pdf pic plain plain-ext png pov ps ps2 psd sgi svg svgz tga tif tiff tk vml vmlz vrml wbmp webp xlib x11'
     graphers='dot neato twopi circo fdp sfdp patchwork osage'
 
     _get_comp_words_by_ref -n = cur prev
 
     case "${prev}" in
-        '-?' | '-h' | '--help' | "--graph-seed" | "--completed")
-            return 0
-            ;;
-
-        '--max-optimize')
-            COMPREPLY=($(compgen -W "${sizes}" -- "${cur}"))
+        '-?' | '-h' | '--help' | "--completed")
             return 0
             ;;
 
