@@ -919,7 +919,7 @@ fi
 
 if [ "${__should_archive}" = '1' ]; then
 
-__time "Archived packs"
+__force_time "Archived packs" start
 
 __force_announce "Archiving packs" start
 
@@ -947,7 +947,7 @@ __file_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 
 
 __archive "${__file_name}" ${__pack_option}
 
-__time "Archived packs" end
+__force_time "Archived packs" end
 
 fi
 
