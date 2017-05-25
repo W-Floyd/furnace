@@ -5,17 +5,21 @@ if [ -z "${!1}" ]; then
 fi
 }
 
+__source_functions () {
+cp "${1}" '/tmp/script.sh'
+echo 'for __function in $(compgen -A function); do
+    export -f ${__function}
+done' >> '/tmp/script.sh'
+source '/tmp/script.sh' || { echo "Failed to load functions from \"${1}\"" 1>&2; exit 1; }
+rm '/tmp/script.sh'
+}
+
 __check_var __run_dir
 
 # Source all function files
 if [ -d "${__run_dir}/functions" ]; then
     while read -r __file; do
-        cp "${__file}" '/tmp/script.sh'
-        echo 'for __function in $(compgen -A function); do
-	export -f ${__function}
-done' >> '/tmp/script.sh'
-        source '/tmp/script.sh' || { echo "Failed to load functions from \"${__file}\"" 1>&2; exit 1; }
-        rm '/tmp/script.sh'
+        __source_functions "${__file}"
     done <<< "$(find "${__run_dir}/functions" -type f)"
 fi
 
@@ -57,7 +61,7 @@ fi
 
 if ! [ -z "${__custom_function_bin}" ]; then
     if [ -e "${__custom_function_bin}" ]; then
-        source "${__custom_function_bin}" &> /dev/null || "Failed to load custom functions \"${__custom_function_bin}\""
+        __source_functions "${__custom_function_bin}" &> /dev/null || "Failed to load custom functions \"${__custom_function_bin}\""
     else
         __error "Custom functions file \"${__custom_function_bin}\" is missing"
     fi
