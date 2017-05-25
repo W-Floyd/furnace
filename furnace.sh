@@ -169,7 +169,7 @@ __check_input () {
 
 case "${1}" in
 
-    "h" | "?")
+    "-h" | "-?")
         __usage_short
         exit 77
         ;;
@@ -187,38 +187,38 @@ case "${1}" in
         __short_output='1'
         ;;
 
-    "v" | "--verbose")
+    "-v" | "--verbose")
         __verbose='1'
         __quiet='0'
         ;;
 
-    "l" | "--lengthy")
+    "-l" | "--lengthy")
         __verbose='1'
         __very_verbose_pack='1'
         ;;
 
-    "i" | "--install")
+    "-i" | "--install")
         __install='1'
         ;;
 
-    "m" | "--mobile")
+    "-m" | "--mobile")
         __mobile='1'
         ;;
 
-    "t" | "--time")
+    "-t" | "--time")
         __time='1'
         ;;
 
-    "b" | "--benchmark")
+    "-b" | "--benchmark")
         __announce "Benchmarking mode enabled"
         __benchmark='1'
         ;;
 
-    "d" | "--debug")
+    "-d" | "--debug")
         __debug='1'
         ;;
 
-    "f" | "--force-render")
+    "-f" | "--force-render")
         __force='1'
         ;;
 
@@ -238,7 +238,7 @@ case "${1}" in
         __ignore_max_optional='1'
         ;;
 
-    "q" | "--quiet")
+    "-q" | "--quiet")
         __quiet='1'
         __verbose='0'
         ;;
@@ -248,15 +248,15 @@ case "${1}" in
         __quiet='1'
         ;;
 
-    "w" | "--warn")
+    "-w" | "--warn")
         __should_warn='1'
         ;;
 
-    "c" | "--compress")
+    "-c" | "--compress")
         __compress='1'
         ;;
 
-    "x" | "--force-xml")
+    "-x" | "--force-xml")
         __force_warn "Cleaning split xml files"
         __clean_xml='1'
         ;;
@@ -265,7 +265,7 @@ case "${1}" in
         __xml_only='1'
         ;;
 
-    "o" | "--optimize")
+    "-o" | "--optimize")
         __should_optimize='1'
         ;;
 
@@ -325,7 +325,7 @@ case "${1}" in
         __re_optimize='1'
         ;;
 
-    "r" | "--release")
+    "-r" | "--release")
         __force_announce "Re-rendering from scratch, this may take a while."
         __force='1'
         __should_optimize='1'
@@ -333,7 +333,7 @@ case "${1}" in
         __compress='1'
         ;;
 
-    "a" | "--archive")
+    "-a" | "--archive")
         __should_archive='1'
         ;;
 
@@ -399,7 +399,7 @@ elif grep '^-.*' <<< "${1}" &> /dev/null; then
 
         else
 
-            __check_input "${__letter}"
+            __check_input "-${__letter}"
 
         fi
 
