@@ -59,7 +59,7 @@ Options:
   -f  --force-render        Discard pre-rendered data.
   -q  --quiet               Just show progress report.
       --silent              No output at all.
-      --short               Use short output format.
+  -s  --short               Use short output format.
   -w  --warn                Show warnings.
   -c  --compress            Actually compress zip files.
   -o  --optimize            Optimize final PNG files.
@@ -85,7 +85,7 @@ General Options:
   -q  --quiet               Just progress report.
       --silent              No output at all.
       --no-progress         Do not show a progress report.
-      --short               Use short output format.
+  -s  --short               Use short output format.
 
   -i  --install             Install to ~/.minecraft folder.
   -t  --time                Time functions.
@@ -177,7 +177,7 @@ case "${1}" in
         __show_progress='0'
         ;;
 
-    "--short")
+    "-s" | "--short")
         __short_output='1'
         ;;
 
