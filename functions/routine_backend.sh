@@ -316,3 +316,16 @@ __debug_toggle on
 "${__routine_name}" "${@}" <<< "${__pipe}"
 
 }
+
+################################################################################
+#
+# __set_routine <PREFIX> <ROUTINE>
+#
+# Set Routine
+# A shortcut to set routine for a given prefix
+#
+################################################################################
+
+__set_routine () {
+export "__function_${1}=${2}"
+}

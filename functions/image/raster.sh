@@ -53,6 +53,9 @@ EOF
 # it's made silent. Bad idea, I know...
 __gimp_sub "${1}" &> /dev/null
 
+convert "$(__mext "${1}").png" $(__imagemagick_define) "$(__mext "${1}")_.png"
+mv "$(__mext "${1}")_.png" "$(__mext "${1}").png"
+
 }
 
 ################################################################################
@@ -83,5 +86,8 @@ fi
 # My instance of Krita throws some errors no matter what, so
 # it's made silent. Bad idea, I know...
 krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
+
+convert "$(__mext "${1}").png" $(__imagemagick_define) "$(__mext "${1}")_.png"
+mv "$(__mext "${1}")_.png" "$(__mext "${1}").png"
 
 }

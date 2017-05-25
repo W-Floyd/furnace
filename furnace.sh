@@ -45,7 +45,7 @@ source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"$
 
 # Print help
 __usage_short () {
-echo "$(basename "${0}") <OPTIONS> <SIZE>
+echo "$(basename "${0}") <OPTIONS> <SIZES>
 
 Makes the resource pack at the specified size(s) (or using default list of
 sizes). Order of options and size(s) are not important, other than options which
@@ -57,6 +57,7 @@ Options:
   -v  --verbose             Be verbose.
   -i  --install             Install to ~/.minecraft folder.
   -f  --force-render        Discard pre-rendered data.
+      --optional            Render optional items.
   -q  --quiet               Just show progress report.
       --silent              No output at all.
   -s  --short               Use short output format.
@@ -65,13 +66,11 @@ Options:
   -o  --optimize            Optimize final PNG files.
       --no-optimize         Do not optimize final PNG files.
   -r  --release             Re-renders, and optimizes all images for zip files.
-  -a  --archive             Pack all produced zip files in a single archive.
-  --optional <SIZE>         Render optional items, optionally at SIZE.
-  --graph <ITEM>            Render a graph of the pack's dependency tree."
+  -a  --archive             Pack all produced zip files in a single archive."
 }
 
 __usage () {
-echo "$(basename "${0}") <OPTIONS> <SIZE>
+echo "$(basename "${0}") <OPTIONS> <SIZES>
 
 Makes the resource pack at the specified size(s) (or using
 default list of sizes). Order of options and size(s) are not
@@ -105,7 +104,11 @@ Render Options:
       --no-optimize         Do not optimize final PNG files.
       --re-optimize         Re-process and re-optimize files appropriately.
 
-  --max-optimize <SIZE>     Max size to optimize.
+      --png-compression=N   Sets PNG compression level. 30 is good balance
+                            between size and speed (for local use), or when
+                            using optimization.
+
+  --max-optimize=<SIZE>     Max size to optimize.
   --force-optimize          Optimize any size of final PNG files.
   --force-max-optimize      Ensure max-optimize is obeyed.
 
@@ -113,12 +116,12 @@ Render Options:
                             Equivalent to:
                             '--force-render --force-optimize'
 
-  --optional <SIZE>         Render optional items, optionally at specified size
-                            only. Use - to ignore the specification.
-  --max-optional <SIZE>     Maximum size to render optional size.
+  --optional                Render optional items.
+  --optional=<SIZE>         Render optional items at specified size.
+  --max-optional=<SIZE>     Maximum size to render optional size.
   --no-optional             Do not render any optional items.
 
-  --name <NAME>             Name to use when processing a pack.
+  --name=<NAME>             Name to use when processing a pack.
 
 Graphing Options:
   --graph <ITEM>            Render a graph of the dependency tree. Optional
@@ -126,17 +129,15 @@ Graphing Options:
                             ITEMs to be the subject of the graph For a full
                             graph, use '', '.*', or nothing. May be specified
                             multiple times. Supports regex.
-  --graph-format <FORMAT>   Specifies the format to graph to. Defaults to png.
-  --graph-seed <SEED>       Seed to use when graphing. Defaults to a random
+  --graph-format=<FORMAT>   Specifies the format to graph to. Defaults to png.
+  --graph-seed=<SEED>       Seed to use when graphing. Defaults to a random
                             seed when unspecified.
-  --grapher <GRAPHER>       Graphviz tool to use when graphing. Defaults to
-                            neato.
-  --graph-output <NAME>     Name to use when outputting a graph. Default output
+  --graph-output=<NAME>     Name to use when outputting a graph. Default output
                             is 'graph'
   --no-highlight            Do not highlight specified files when graphing.
 
 Other Options:
-  --function-<PREFIX> <ROUTINE>
+  --function=<PREFIX> <ROUTINE>
                             Choose a routine for the given function (eg. SVG
                             render, PNG optimizer).
 
@@ -220,11 +221,18 @@ case "${1}" in
         __render_optional='1'
         ;;
 
+    "--optional="*)
+        __render_optional='1'
+        __use_optional_size='1'
+        __set_int_flag "${1}" __optional_size
+        ;;
+
     "--no-optional")
         __render_optional='0'
         ;;
 
-    "--max-optional")
+    "--max-optional="*)
+        __set_int_flag "${1}" __max_optional
         ;;
 
     "--force-optional")
@@ -275,16 +283,14 @@ case "${1}" in
         __graph_deps='1'
         ;;
 
-    "--graph-format")
+    "--graph-format="*)
         __graph_deps='1'
+        __set_flag "${1}" __graph_format
         ;;
 
     "--graph-output")
         __graph_deps='1'
-        ;;
-
-    "--grapher")
-        __graph_deps='1'
+        __set_flag "${1}" __graph_output
         ;;
 
     "--graph-seed")
@@ -303,7 +309,8 @@ case "${1}" in
         __no_optimize='1'
         ;;
 
-    "--max-optimize")
+    "--max-optimize="*)
+        __set_int_flag "${1}" __max_optimize
         ;;
 
     "--force-max-optimize")
@@ -330,15 +337,20 @@ case "${1}" in
         __should_archive='1'
         ;;
 
-    "--name")
+    "--name="*)
+        __set_flag "${1}" __name
         ;;
 
-    "--function-"*)
+    "--png-compression="*)
+        __set_int_flag "${1}" __png_compression
+        ;;
+
+    "--function="*)
 # Gedit is dumb and won't parse quoting correctly in this instance for some
 # reason, so I've piped into cat instead, it gives the same results. Being an
 # option parser, performance isn't that important anyway, and my own sanity when
 # reading the rest of this document is of a higher priority.
-        __set_prefix="$(cat <<< "${1}" | sed 's/^--[^-]*-//')"
+        __set_flag "${1}" __set_prefix
         ;;
 
     [0-9]*)
@@ -419,31 +431,37 @@ fi
 }
 
 ################################################################################
+#
+# __set_flag <RAW_OPTION> <VARIABLE>
+#
+# Set Flag
+# Sets a flag from RAW_OPTION in VARIABLE.
+#
+################################################################################
+
+__set_flag () {
+export "${2}"="$(sed 's/[^=]*=//' <<< "${1}")"
+}
+
+__set_int_flag () {
+__set_flag $@
+if ! __int_check "${!2}"; then
+    __error "Given option is not a size"
+fi
+}
+
+
+################################################################################
 
 # then let's look at them in sequence.
 while ! [ "${#}" = '0' ]; do
 
     case "${__last_option}" in
 
-        "--max-optimize")
-            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
-                __max_optimize="${1}"
-            else
-                __error "Given input is not a size"
-            fi
-            ;;
-
-        "--name")
-            if __check_option "${1}"; then
-                __force_warn "Given name may actually be an option."
-            fi
-            __name="${1}"
-            ;;
-
         "--graph")
             if __check_option "${1}"; then
                 __process_option "${1}"
-            elif [[  "${1}" == [0-9]* ]]; then
+            elif __int_check "${1}"; then
                 __force_warn "Size is not important when graphing, and will be ignored"
             else
                 if [ -z "${__graph_files}" ]; then
@@ -455,46 +473,13 @@ $(tr ',' '\n' <<< "${1}")"
             fi
             ;;
 
-        "--graph-format")
-            __graph_format="${1}"
-            ;;
-
-        "--graph-output")
-            __graph_output="${1}"
-            ;;
-
-        "--grapher")
-            __grapher="${1}"
-            ;;
-
         "--graph-seed")
             __graph_seed="${1}"
             ;;
 
-        "--optional")
-            if ! [ "${1}" = '-' ]; then
-                if [ "${1}" -eq "${1}" ] 2>/dev/null; then
-                    __use_optional_size='1'
-                    __optional_size="${1}"
-                elif __check_option "${1}"; then
-                    __process_option "${1}"
-                else
-                    __error "Given input is not a size"
-                fi
-            fi
-            ;;
-
-        "--max-optional")
-            if [ "${1}" -eq "${1}" ] 2>/dev/null; then
-                __max_optional="${1}"
-            else
-                __error "Given input is not a size"
-            fi
-            ;;
-
-        "--function-"*)
+        "--function="*)
             if __test_function "${__set_prefix}" "${1}"; then
-                export "__function_${__set_prefix}=${1}"
+                __set_routine "${__set_prefix}" "${1}"
             else
                 __error "\"${1}\" is not a valid routine for \"${__set_prefix}\""
             fi
@@ -623,7 +608,7 @@ if [ -z "${__max_optional}" ]; then
         if [ "${__should_warn_size}" = '1' ]; then
             __force_warn "Default maximum optional size is \"${__default_max_optional}\",
 some sizes will not have optional images rendered. Use --force-optional to
-override this, or set a new maximum with --max-optional <SIZE>"
+override this, or set a new maximum with --max-optional=<SIZE>"
         fi
     fi
 fi
@@ -930,11 +915,11 @@ ${__size}"
 
 done
 
-__pack_option="$(sort <<< "${__pack_list}" | uniq | tr '\n' ' ' | sed 's/^.\(.*\).$/\1/')"
+__archive_option="$(sort <<< "${__pack_list}" | uniq | tr '\n' ' ' | sed 's/^.\(.*\).$/\1/')"
 
-__file_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 's/.$//')"
+__archive_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 's/.$//')"
 
-__archive "${__file_name}" ${__pack_option}
+__archive "${__archive_name}" ${__archive_option}
 
 __force_time "Archived packs" end
 

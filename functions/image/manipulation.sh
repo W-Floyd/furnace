@@ -16,7 +16,7 @@ __fade () {
 if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
 
     local __tmptrans=$(echo '1/'"${3}" | bc)
-    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" ${__imagemagick_define} "${2}"
+    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" $(__imagemagick_define) "${2}"
 
 else
 
@@ -46,7 +46,10 @@ fi
 
 local __imgseq=$(for __tile in $(seq 1 "$(sed 's/x/\*/' <<< "${2}" | bc)"); do echo -n "${1} "; done)
 
-montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
+# TODO - Find why Imagemagick throws warnings here about fonts.
+# Example:
+# montage: unable to read font `(null)' @ error/annotate.c/RenderFreetype/1388.
+montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
 
 if ! [ -e "${3}" ]; then
     __force_warn "File \"${3}\" was not produced when tiling"
@@ -89,7 +92,7 @@ __num_sub
 
 local __imgseq="$(for __num in $(seq 1 "${__option_num}"); do echo -n "${!__num} "; done)"
 
-montage -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
+montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
 
 if ! [ -e "${__output}" ]; then
     __force_warn "File \"${__output}\" was not produced when custom tiling"
@@ -119,7 +122,7 @@ fi
 ################################################################################
 
 __crop () {
-convert "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
+convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
 }
 
 ################################################################################
@@ -169,7 +172,7 @@ case "${2}" in
 		;;
 esac
 
-mogrify -rotate "${__angle}" "${1}"
+mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
 
 }
 
@@ -187,7 +190,7 @@ mogrify -rotate "${__angle}" "${1}"
 
 __rotate_exact () {
 
-convert -background none ${__imagemagick_define} -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
+convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
 
 }
 
@@ -204,6 +207,6 @@ convert -background none ${__imagemagick_define} -distort SRT "$(bc <<< "${3}*36
 __shift () {
 __tile "${1}" 1x2 "${1}"_
 mv "${1}"_ "${1}"
-convert "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(echo "$(identify -format "%w" "${1}")*${2}" | bc)")" "${1}"_
+convert $(__imagemagick_define) "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(echo "$(identify -format "%w" "${1}")*${2}" | bc)")" "${1}"_
 mv "${1}"_ "${1}"
 }

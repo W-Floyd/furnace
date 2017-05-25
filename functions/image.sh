@@ -2,7 +2,13 @@
 # Image Functions
 ################################################################################
 
-export __imagemagick_define='-define png:color-type=6'
+__imagemagick_define () {
+if [ -z "${__png_compression}" ]; then
+    __png_compression='30'
+fi
+
+cat <<< "-define png:color-type=6 -quality ${__png_compression}"
+}
 
 ################################################################################
 #
@@ -49,7 +55,7 @@ fi
 __resize () {
 
 if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
-    convert "${2}" ${__imagemagick_define} -scale "$(bc -l <<< "${1}*100" | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
+    convert "${2}" $(__imagemagick_define) -scale "$(bc -l <<< "${1}*100" | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
 else
     __force_warn "File ${2} is not a PNG image and cannot be resized"
 fi

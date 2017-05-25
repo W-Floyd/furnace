@@ -26,7 +26,7 @@ __clip_src_over ${@}
 ################################################################################
 
 __multiply () {
-composite ${__imagemagick_define} -compose Multiply "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose Multiply "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -39,7 +39,7 @@ composite ${__imagemagick_define} -compose Multiply "${2}" "${1}" "${3}"
 ################################################################################
 
 __screen () {
-composite ${__imagemagick_define} -compose Screen "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose Screen "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -52,7 +52,7 @@ composite ${__imagemagick_define} -compose Screen "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_over () {
-composite ${__imagemagick_define} -compose src-over "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose src-over "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -65,7 +65,7 @@ composite ${__imagemagick_define} -compose src-over "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_over () {
-composite ${__imagemagick_define} -compose dst-over "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose dst-over "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -78,7 +78,7 @@ composite ${__imagemagick_define} -compose dst-over "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_in () {
-composite ${__imagemagick_define} -compose src-in "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose src-in "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -91,7 +91,7 @@ composite ${__imagemagick_define} -compose src-in "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_in () {
-composite ${__imagemagick_define} -compose dst-in "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose dst-in "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -104,7 +104,7 @@ composite ${__imagemagick_define} -compose dst-in "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_out () {
-composite ${__imagemagick_define} -compose src-out "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose src-out "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -117,7 +117,7 @@ composite ${__imagemagick_define} -compose src-out "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_out () {
-composite ${__imagemagick_define} -compose dst-out "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose dst-out "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -130,7 +130,7 @@ composite ${__imagemagick_define} -compose dst-out "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_src_atop () {
-composite ${__imagemagick_define} -compose src-atop "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose src-atop "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -143,7 +143,7 @@ composite ${__imagemagick_define} -compose src-atop "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_dst_atop () {
-composite ${__imagemagick_define} -compose dst-atop "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose dst-atop "${2}" "${1}" "${3}"
 }
 
 ################################################################################
@@ -156,5 +156,5 @@ composite ${__imagemagick_define} -compose dst-atop "${2}" "${1}" "${3}"
 ################################################################################
 
 __clip_xor () {
-composite ${__imagemagick_define} -compose xor "${2}" "${1}" "${3}"
+composite $(__imagemagick_define) -compose xor "${2}" "${1}" "${3}"
 }

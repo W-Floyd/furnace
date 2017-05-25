@@ -37,7 +37,7 @@ __routine__vector_render__convert () {
 local __dpi="$(echo "(${__vector_ppi}*${1})/${__vector_scale}" | bc -l | sed 's/0*$//')"
 
 convert \
-${__imagemagick_define} \
+$(__imagemagick_define) \
 -background none \
 -density "${__dpi}" \
 "${2}" \
@@ -79,7 +79,7 @@ if ! [ -e "$(__mext "${2}").png" ]; then
     return 1
 else
 
-    convert "$(__mext "${2}").png" ${__imagemagick_define} "$(__mext "${2}")_.png"
+    convert "$(__mext "${2}").png" $(__imagemagick_define) "$(__mext "${2}")_.png"
     mv "$(__mext "${2}")_.png" "$(__mext "${2}").png"
 
 fi

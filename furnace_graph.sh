@@ -135,7 +135,7 @@ if ! [ -z "${__dep_list}" ]; then
 
     cp "${__graph}" "./$(basename "${__graph}")"
 
-    "${5}" -Ln5 "-Gstart=${6}" "-T${1}" "./$(basename "${__graph}")" -O
+    __graph "${1}" "${6}" "./$(basename "${__graph}")"
 
     rm "./$(basename "${__graph}")"
 
