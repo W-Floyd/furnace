@@ -75,7 +75,7 @@ fi
 __run_routine "${__prefix}" "${1}" "${2}"
 
 if ! [ -e "$(__mext "${2}").png" ]; then
-    __force_warn "File \""$(__mext "${2}").png"\" was not rendered"
+    __force_warn "File \"$(__mext "${2}").png\" was not rendered"
     return 1
 else
 

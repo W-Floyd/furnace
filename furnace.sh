@@ -33,6 +33,7 @@ __show_progress='1'
 __use_optional_size='0'
 __max_install_size='1024'
 __short_output='0'
+__should_archive='0'
 
 __pack_extension='zip'
 
@@ -66,6 +67,8 @@ Options:
   -r  --release             Re-renders, optimizes and compresses zip files.
                             Equivalent to:
                             '--force-render --force-optimize --compress'
+  -a  --archive             Pack all produced zip files in a single archive.
+                            This is best used without --compress.
   --optional <SIZE>         Render optional items, optionally at specified size
                             only. Use - to ignore the specification.
   --graph <ITEM>            Render a graph of the dependency tree. Optional
@@ -97,6 +100,8 @@ General Options:
   -l  --lengthy             Very verbose debugging mode.
   -w  --warn                Show warnings.
   -c  --compress            Actually compress zip files.
+  -a  --archive             Pack all produced zip files in a single archive.
+                            This is best used without --compress.
 
 Render Options:
   -f  --force-render        Discard pre-rendered data.
@@ -326,6 +331,10 @@ case "${1}" in
         __should_optimize='1'
         __ignore_max_optimize='1'
         __compress='1'
+        ;;
+
+    "a" | "--archive")
+        __should_archive='1'
         ;;
 
     "--name")
@@ -755,13 +764,9 @@ if [ "${__compress}" = '1' ]; then
 
     __force_announce "Compressing resource pack"
 
-    zip -q -9 -r "../${2}" ./
-
-else
-
-    zip -qZ store -r "../${2}" ./
-
 fi
+
+__zip "${2}"
 
 __popd
 
@@ -770,13 +775,11 @@ if [ "${__mobile}" = '1' ]; then
 
     if [ "${__compress}" = '1' ]; then
 
-        zip -q -9 -r "../${2}_mobile" ./
-
-    else
-
-        zip -qZ store -r "../${2}_mobile" ./
+        __force_announce "Compressing mobile resource pack"
 
     fi
+
+    __zip "${2}_mobile"
 
     __popd
 fi
@@ -901,7 +904,7 @@ else
         fi
 
         if [ "${__loop_status}" = '1' ]; then
-            exit
+            __error "Render interrupted"
         fi
 
     done
@@ -911,6 +914,41 @@ if [ "${__xml_only}" = '0' ]; then
     __force_time "Rendered all" end
 else
     __force_time "Processed XML" end
+    exit
+fi
+
+if [ "${__should_archive}" = '1' ]; then
+
+__time "Archived packs"
+
+__force_announce "Archiving packs" start
+
+__pack_list=''
+__size_list=''
+
+for __size in ${__sizes}; do
+
+    __packfile="$("${__furnace_render_bin}" --name-only "${__size}").${__pack_extension}"
+
+    if ! [ -e "${__packfile}" ]; then
+        __force_warn "Size ${__size} has no pack file present, this isn't normal"
+    else
+        __pack_list+="
+${__packfile}"
+        __size_list+="
+${__size}"
+    fi
+
+done
+
+__pack_option="$(sort <<< "${__pack_list}" | uniq | tr '\n' ' ' | sed 's/^.\(.*\).$/\1/')"
+
+__file_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 's/.$//')"
+
+__archive "${__file_name}" ${__pack_option}
+
+__time "Archived packs" end
+
 fi
 
 exit
