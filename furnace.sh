@@ -365,8 +365,9 @@ ${1}"
         ;;
 
     *)
-        __custom_error "Unknown option \"${1}\""
-        __usage_short
+        __custom_error "Unknown option \"${1}\"
+Please use '-h' for help."
+
         exit 77
         ;;
 
