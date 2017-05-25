@@ -682,7 +682,7 @@ if [ "${__quiet}" = '1' ]; then
         __options="${__options} --quiet"
 fi
 
-if [ "${__no_optimize}" = '1' ] || [ "${__ignore_max_optimize}" = '0' -a "${1}" -gt "${__max_optimize}" ]; then
+if [ "${__no_optimize}" = '1' ] || ( [ "${__ignore_max_optimize}" = '0' ] && [ "${1}" -gt "${__max_optimize}" ] ); then
     __options="${__options} --no-optimize"
 fi
 
@@ -750,11 +750,11 @@ __just_render "${1}"
 if [ "${__dry}" = '0' ]; then
 
 
-if [ -a "${2}.${__pack_extension}" ]; then
+if [ -e "${2}.${__pack_extension}" ]; then
     rm "${2}.${__pack_extension}"
 fi
 
-if [ "${__mobile}" = '1' ] && [ -a "${2}_mobile.${__pack_extension}" ]; then
+if [ "${__mobile}" = '1' ] && [ -e "${2}_mobile.${__pack_extension}" ]; then
     rm "${2}_mobile.${__pack_extension}"
 fi
 
