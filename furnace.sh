@@ -400,7 +400,7 @@ elif grep '^-.*' <<< "${1}" &> /dev/null; then
 
         if [[ "${__letter}" == [0-9] ]]; then
 
-            __force_warn "Sizes are not to be specified in this way"
+            __error "Sizes are not to be specified in this way"
 
         else
 
