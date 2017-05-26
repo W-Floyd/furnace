@@ -39,6 +39,8 @@ __pack_extension='zip'
 
 export __run_dir="$(dirname "$(readlink -f "${0}")")"
 export __furnace_setup_bin="${__run_dir}/furnace_setup.sh"
+export __working_dir="$(pwd)"
+export __src_dir="${__working_dir}/src/"
 
 # get set up
 source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }

@@ -20,7 +20,7 @@ __check_var __run_dir
 if [ -d "${__run_dir}/functions" ]; then
     while read -r __file; do
         __source_functions "${__file}"
-    done <<< "$(find "${__run_dir}/functions" -type f)"
+    done <<< "$(find "${__run_dir}/functions" -type f; find "${__run_dir}/functions" -type l)"
 fi
 
 export __furnace_render_bin="${__run_dir}/furnace_render.sh"

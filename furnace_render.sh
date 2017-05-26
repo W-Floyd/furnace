@@ -84,13 +84,6 @@ __stop_debugging () {
 }
 
 ################################################################################
-# Set variables from config
-################################################################################
-
-# Master folder
-__working_dir="$(pwd)"
-
-################################################################################
 # Read options
 __force_time "Read options" start
 ################################################################################
@@ -578,7 +571,7 @@ __pushd ./src/xml/
 
 touch "${__list_file}"
 
-find . -type f > "${__list_file}"
+( find . -type l; find . -type f )  > "${__list_file}"
 
 # Go back to the regular directory
 __popd
@@ -758,7 +751,7 @@ touch "${__old_split_xml_list}"
 __pushd ./src/xml
 
 # List all files into new list
-find . -type f > "${__new_xml_list}"
+( find . -type l; find . -type f ) > "${__new_xml_list}"
 
 # Get back to main directory
 __popd
@@ -769,7 +762,7 @@ if [ -d "./${__pack}/xml" ]; then
     __pushd "./${__pack}/xml"
 
     # List all files into old list
-    find . -type f > "${__old_xml_list}"
+    ( find . -type l; find . -type f ) > "${__old_xml_list}"
 
     # Get back to main directory
     __popd
@@ -862,7 +855,7 @@ else
 
     fi
 
-     cp "${__shared_xml_list}" "${__unchanged_xml}"
+     cp --dereference "${__shared_xml_list}" "${__unchanged_xml}"
 
 fi
 
@@ -901,7 +894,7 @@ touch "${__old_split_source_list}"
 __pushd ./src
 
 # List all files into new list
-find . -not -path "./xml/*" -type f > "${__new_source_list}"
+( find . -not -path "./xml/*" -type l; find . -not -path "./xml/*" -type f ) > "${__new_source_list}"
 
 # Get back to main directory
 __popd
@@ -910,7 +903,7 @@ __popd
 __pushd "./${__pack}"
 
 # List all files into old list
-find . -not -path "./xml/*" -type f > "${__old_source_list}"
+( find . -not -path "./xml/*" -type l; find . -not -path "./xml/*" -type f ) > "${__old_source_list}"
 
 # Get back to main directory
 __popd
@@ -961,7 +954,7 @@ __popd
 __pushd "./${__pack}"
 
 # Hash source files into designated file, excluding xml files
-find . -type f | grep -Fxf "${__shared_source_list}" | while read -r __file; do
+( find . -type l; find . -type f ) | grep -Fxf "${__shared_source_list}" | while read -r __file; do
     __hash "${__file}"
 done > "${__source_hash_old}"
 
@@ -1004,7 +997,7 @@ else
 
     fi
 
-     cp "${__shared_source_list}" "${__unchanged_source}"
+     cp --dereference "${__shared_source_list}" "${__unchanged_source}"
 
 fi
 
@@ -1157,7 +1150,7 @@ grep -Fxf "${__changed_both}" "${__new_xml_list}"
 } >> "${__list_file_proc}" &
 
 # List all deps
-find . -type f -exec cat {} + | sort | uniq > "${__all_deps}" &
+( find . -type l -exec cat {} +; find . -type f -exec cat {} + ) | sort | uniq > "${__all_deps}" &
 
 # Get back to main directory
 __popd
@@ -1205,7 +1198,7 @@ mv "${__list_file_proc}_" "${__list_file_proc}"
 
 # Make a backup of the process list for debugging
 if [ "${__debug}" = '1' ]; then
-    cp "${__list_file_proc}" "${__list_file_proc}_original"
+    cp --dereference "${__list_file_proc}" "${__list_file_proc}_original"
 fi
 
 # As long as the process list is not empty,
@@ -1266,7 +1259,7 @@ fi
 
 while read -r __xml_name; do
 
-    cp "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null &
+    cp --dereference "${__working_dir}/${__pack}/${__xml_name}" "${__working_dir}/${__pack_new}/${__xml_name}" &> /dev/null &
 
     echo "./${__xml_name}"
 
@@ -1276,7 +1269,7 @@ sort "${__render_list}" | uniq > "${__render_list}_backup"
 
 rm "${__render_list}"
 
-cp "${__render_list}_backup" "${__render_list}"
+cp --dereference "${__render_list}_backup" "${__render_list}"
 
 if [ -s "${__render_list}" ]; then
     mapfile -t __dir_array <<< "$(sed "s#^#${__working_dir}/${__pack_new}/#" < "${__render_list}")"
@@ -1314,7 +1307,7 @@ __announce "Setting up files for processing."
 ################################################################################
 
 # copy src files into new pack folder
-cp -r "./src/"* "${__pack_new}" &
+cp --dereference -r "./src/"* "${__pack_new}" &
 
 # remove old pack
 rm -r "${__pack}" &
@@ -1493,7 +1486,7 @@ Won't create \".${__config//.\/xml/}\""
                 fi
 
 # copy the config script out so we can use it
-                cp "${__config_script}" ./
+                cp --dereference "${__config_script}" ./
 
 # execute the script, given the determined size and options set in the config
                 {
@@ -1596,7 +1589,7 @@ if [ -d "${__pack_cleaned}" ]; then
 fi
 
 # copy the pack to a new folder to be cleaned
-cp -r "${__pack}" "${__pack_cleaned}"
+cp --dereference -r "${__pack}" "${__pack_cleaned}"
 
 # get into the cleaned folder
 __pushd "${__pack_cleaned}"
@@ -1684,10 +1677,10 @@ if [ "${__mobile}" = '1' ]; then
     fi
 
 # copy the cleaned folder to the end pack folder
-    cp -r "${__pack_cleaned}" "${__pack_end}"
+    cp --dereference -r "${__pack_cleaned}" "${__pack_end}"
 
 # copy the script to the end pack folder
-    cp "${__furnace_make_mobile_bin}" "${__pack_end}/$(basename "${__furnace_make_mobile_bin}")"
+    cp --dereference "${__furnace_make_mobile_bin}" "${__pack_end}/$(basename "${__furnace_make_mobile_bin}")"
 
 # get into the end pack folder
     __pushd "${__pack_end}"
@@ -1717,23 +1710,23 @@ fi
 fi
 
 # copy the catalogue into the src xml folder
-cp "${__cleaned_catalogue}" "./src/xml/${__catalogue}"
+cp --dereference "${__cleaned_catalogue}" "./src/xml/${__catalogue}"
 
-cp "${__dep_list_tsort}" "./src/xml/${__tsort_file}"
+cp --dereference "${__dep_list_tsort}" "./src/xml/${__tsort_file}"
 
-cp -r "${__dep_list_folder}" "./src/xml/"
+cp --dereference -r "${__dep_list_folder}" "./src/xml/"
 
-cp "${__cleanup_all}" "./src/xml/${__cleanup_file}"
+cp --dereference "${__cleanup_all}" "./src/xml/${__cleanup_file}"
 
-cp "${__optimize_list}" "./src/xml/${__optimize_file}"
+cp --dereference "${__optimize_list}" "./src/xml/${__optimize_file}"
 
-cp "${__list_file}" "./src/xml/${__list_name}"
+cp --dereference "${__list_file}" "./src/xml/${__list_name}"
 
 if [ "${__xml_only}" = '0' ]; then
 
 if [ "${__should_optimize}" = '1' ]; then
 
-    cp "${__optimize_list}" "./${__pack}/.${__optimize_file}"
+    cp --dereference "${__optimize_list}" "./${__pack}/.${__optimize_file}"
 
 else
 

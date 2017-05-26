@@ -115,9 +115,9 @@ __debug_toggle on
 
 __hash_folder () {
 if [ -z "${2}" ]; then
-    local __listing="$(find . -type f)"
+    local __listing="$(find . -type l; find . -type f)"
 else
-    local __listing="$(find . -not -path "./${2}/*" -type f)"
+    local __listing="$(find . -not -path "./${2}/*" -type f; find . -not -path "./${2}/*" -type l)"
 fi
 
 if ! [ -z "${__listing}" ]; then
