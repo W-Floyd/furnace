@@ -601,14 +601,14 @@ __time "Read base dependencies" start
 # For every xml file,
 while read -r __xml; do
 
-    echo "${__xml} ${__xml}" >> "${__dep_list_tsort}"
+    echo "${__xml} ${__xml}"
 
     __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | grep -v '^$' | while read -r __line; do
-        echo "${__xml} ${__line}" >> "${__dep_list_tsort}"
+        echo "${__xml} ${__line}"
     done
 
 # Finish loop
-done < "${__list_file}"
+done < "${__list_file}" >> "${__dep_list_tsort}"
 
 __time "Read base dependencies" end
 
