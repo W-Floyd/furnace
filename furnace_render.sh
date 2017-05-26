@@ -512,8 +512,7 @@ __xml_current="${__tmp_dir}/xml_current"
 # For every ITEM in catalogue,
 __get_range "${__cleaned_catalogue}" ITEM | while read -r __range ; do
 
-# TODO
-# Optimize xml functions more
+# TODO - Optimize XML functions more
 
 # Actually read the range into a variable. This now contains an ITEM.
     __tmp_read="$(__read_range "${__cleaned_catalogue}" "${__range}")"
