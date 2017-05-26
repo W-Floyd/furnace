@@ -90,7 +90,7 @@ __debug_toggle on
 # ... | __hash_piped
 #
 # Hash Piped
-# Hash piped intput, so that testing different programs can be done easily.
+# Hash piped input, so that testing different programs can be done easily.
 #
 ################################################################################
 
