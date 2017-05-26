@@ -62,3 +62,31 @@ fi
 
 }
 
+################################################################################
+#
+# __image_conform <IMAGE.png>
+#
+# Image Conform
+# Checks an image to ensure Minecraft conformance, reencoding if required.
+#
+################################################################################
+
+__routine__image_conform__convert () {
+
+if ! __minecraft_verify "${1}"; then
+    convert "${1}" $(__imagemagick_define) "$(__mext "${1}")_.$(__oext "${1}")"
+mv "$(__mext "${1}")_.$(__oext "${1}")" "${1}"
+fi
+
+}
+
+__image_conform () {
+
+local __prefix='image_conform'
+
+__choose_function -e -d 'image conformace' -p 'convert' "${__prefix}"
+
+__run_routine "${__prefix}" "${1}"
+
+}
+

@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-__gimp_export () {
+__routine__gimp_export__gimp () {
 
 if ! [ "$(__oext "${1}")" = 'xcf' ]; then
     __error "File \"${1}\" is not a GIMP file"
@@ -53,8 +53,17 @@ EOF
 # it's made silent. Bad idea, I know...
 __gimp_sub "${1}" &> /dev/null
 
-convert "$(__mext "${1}").png" $(__imagemagick_define) "$(__mext "${1}")_.png"
-mv "$(__mext "${1}")_.png" "$(__mext "${1}").png"
+__image_conform "$(__mext "${1}").png"
+
+}
+
+__gimp_export () {
+
+local __prefix='gimp_export'
+
+__choose_function -e -d 'Gimp exporting' -p 'gimp' "${__prefix}"
+
+__run_routine "${__prefix}" "${1}"
 
 }
 
@@ -67,7 +76,7 @@ mv "$(__mext "${1}")_.png" "$(__mext "${1}").png"
 #
 ################################################################################
 
-__krita_export () {
+__routine__krita_export__krita () {
 
 if ! [ "$(__oext "${1}")" = 'kra' ]; then
     __error "File \"${1}\" is not a Krita file"
@@ -85,9 +94,19 @@ fi
 
 # My instance of Krita throws some errors no matter what, so
 # it's made silent. Bad idea, I know...
+# TODO - Find out why Krita is throwing warnings.
 krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 
-convert "$(__mext "${1}").png" $(__imagemagick_define) "$(__mext "${1}")_.png"
-mv "$(__mext "${1}")_.png" "$(__mext "${1}").png"
+__image_conform "$(__mext "${1}").png"
+
+}
+
+__krita_export () {
+
+local __prefix='krita_export'
+
+__choose_function -e -d 'Krita exporting' -p 'krita' "${__prefix}"
+
+__run_routine "${__prefix}" "${1}"
 
 }

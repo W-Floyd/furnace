@@ -12,7 +12,8 @@
 #
 ################################################################################
 
-__fade () {
+__routine__image_fade__convert () {
+
 if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
 
     local __tmptrans=$(echo '1/'"${3}" | bc)
@@ -26,6 +27,16 @@ fi
 
 }
 
+__fade () {
+
+local __prefix='image_fade'
+
+__choose_function -e -d 'image fading' -p 'convert' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
+}
+
 ################################################################################
 #
 # __tile <FILE> <GRID> <OUTPUT> <DIVIDER>
@@ -36,7 +47,7 @@ fi
 #
 ################################################################################
 
-__tile () {
+__routine__image_tile__montage () {
 
 if ! [ -z "${4}" ]; then
 	local __spacer="${4}"
@@ -57,6 +68,16 @@ fi
 
 }
 
+__tile () {
+
+local __prefix='image_tile'
+
+__choose_function -e -d 'image tiling' -p 'montage' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
+}
+
 ################################################################################
 #
 # __custom_tile <FILE1> <FILE2> ... <GRID> <SPACER> <OUTPUT>
@@ -71,7 +92,7 @@ fi
 #
 ################################################################################
 
-__custom_tile () {
+__routine__image_custom_tile__montage () {
 
 if [ "${#}" -lt '4' ]; then
     __error "Not enough options specified for __custom_tile"
@@ -100,6 +121,16 @@ fi
 
 }
 
+__custom_tile () {
+
+local __prefix='image_custom_tile'
+
+__choose_function -e -d 'custom image tiling' -p 'montage' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
+}
+
 ################################################################################
 #
 # __crop <INPUT> <RESOLUTION> <X-CORD> <Y-CORD> <OUTPUT>
@@ -121,8 +152,20 @@ fi
 #
 ################################################################################
 
-__crop () {
+__routine__image_crop__convert () {
+
 convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
+
+}
+
+__crop () {
+
+local __prefix='image_crop'
+
+__choose_function -e -d 'image cropping' -p 'convert' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
 }
 
 ################################################################################
@@ -141,7 +184,8 @@ convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(
 #
 ################################################################################
 
-__rotate () {
+__routine__image_rotate__mogrify () {
+
 case "${2}" in
 	"0")
 		local __angle="0"
@@ -176,6 +220,16 @@ mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
 
 }
 
+__rotate () {
+
+local __prefix='image_rotate'
+
+__choose_function -e -d 'image rotation' -p 'mogrify' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
+}
+
 ################################################################################
 #
 # __rotate_exact <INPUT.png> <OUTPUT.png> <AMOUNT>
@@ -188,9 +242,19 @@ mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
 # 1.0 = 360 degrees
 ################################################################################
 
-__rotate_exact () {
+__routine__image_rotate_exact__convert () {
 
 convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
+
+}
+
+__rotate_exact () {
+
+local __prefix='image_rotate_exact'
+
+__choose_function -e -d 'exact image rotation' -p 'convert' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
 
 }
 
@@ -204,9 +268,21 @@ convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*36
 #
 ################################################################################
 
-__shift () {
+__routine__image_shift__convert () {
+
 __tile "${1}" 1x2 "${1}"_
 mv "${1}"_ "${1}"
 convert $(__imagemagick_define) "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(echo "$(identify -format "%w" "${1}")*${2}" | bc)")" "${1}"_
 mv "${1}"_ "${1}"
+
+}
+
+__shift () {
+
+local __prefix='image_shift'
+
+__choose_function -e -d 'image shifting' -p 'convert' "${__prefix}"
+
+__run_routine "${__prefix}" ${@}
+
 }
