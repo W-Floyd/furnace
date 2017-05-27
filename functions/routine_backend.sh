@@ -348,7 +348,11 @@ local __description="${2}"
 local __prefered="${3}"
 shift 3
 
+__debug_toggle off
+
 __choose_function -e -d "${__description}" -p "${__prefered}" "${__prefix}"
+
+__debug_toggle on
 
 __run_routine "${__prefix}" "${@}"
 
