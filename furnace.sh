@@ -203,7 +203,7 @@ case "${1}" in
         ;;
 
     "-t" | "--time")
-        __time='1'
+        export __time='1'
         ;;
 
     "-b" | "--benchmark")

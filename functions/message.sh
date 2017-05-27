@@ -227,3 +227,22 @@ if [ "${__verbose}" = '1' ]; then
     __force_time "${1}" "${2}"
 fi
 }
+
+################################################################################
+#
+# __tmp_time
+#
+# Temporary Time
+# Temporary timer that automatically toggles. Useful for optimization.
+#
+################################################################################
+
+__tmp_time () {
+if [ -z "${__tmp_time_var}" ] || [ "${__tmp_time_var}" = 'end' ]; then
+    export __tmp_time_var='start'
+elif [ "${__tmp_time_var}" = 'start' ]; then
+    export __tmp_time_var='end'
+fi
+
+__force_time "temporary timer" "${__tmp_time_var}"
+}

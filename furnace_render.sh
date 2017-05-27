@@ -34,18 +34,6 @@ if [ -z "${__run_dir}" ]; then
     __error "Running directory has not been set for some reason"
 fi
 
-# temporary timer for quick timing automatically toggles
-__time_var='temporary timer'
-__tmp_time () {
-if [ -z "${__tmp_time_var}" ] || [ "${__tmp_time_var}" = 'end' ]; then
-    __tmp_time_var='start'
-elif [ "${__tmp_time_var}" = 'start' ]; then
-    __tmp_time_var='end'
-fi
-
-__time "${__time_var}" "${__tmp_time_var}"
-}
-
 # print help
 __usage () {
 echo "$(basename "${0}") <OPTIONS> <SIZE>
