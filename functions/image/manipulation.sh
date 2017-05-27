@@ -38,8 +38,7 @@ __short_routine 'image_fade' 'image fading' 'convert' "${@}"
 # __tile <FILE> <GRID> <OUTPUT> <DIVIDER>
 #
 # Tile
-# Tiles image at the specified grid size, with an optional
-# divider width
+# Tiles image at the specified grid size, with an optional divider width.
 #
 ################################################################################
 
@@ -48,7 +47,7 @@ __routine__image_tile__montage () {
 if ! [ -z "${4}" ]; then
 	local __spacer="${4}"
 else
-	local __spacer=0
+	local __spacer='0'
 fi
 
 local __imgseq=$(for __tile in $(seq 1 "$(sed 's/x/\*/' <<< "${2}" | bc)"); do echo -n "${1} "; done)
@@ -66,7 +65,7 @@ fi
 
 __tile () {
 
-__short_routine 'image_tile' 'image tiling' 'montage' "${@}"
+__short_routine 'image_tile' 'image tiling' 'montage' "${@}" <<< ''
 
 }
 
