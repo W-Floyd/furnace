@@ -126,6 +126,7 @@ fi
 # Choose Function
 # Chooses a function that exists, given the prefix of the function.
 # NOTE - It is important to declare the PREFIX *LAST*
+# See __short_routine for an easy shortcut that will do everything you need.
 #
 # Optional flags include:
 #   -e                  Error out if missing
@@ -328,4 +329,27 @@ __debug_toggle on
 
 __set_routine () {
 export "__function_${1}=${2}"
+}
+
+################################################################################
+#
+# __short_routine <PREFIX> <DESCRIPTION> <PREFERED> <ALL_OTHER_OPTIONS>
+#
+# Short Routine
+# A shortcut to choosing and running a routine, assumes that the operation is
+# required, and will error out if it fails.
+#
+################################################################################
+
+__short_routine () {
+
+local __prefix="${1}"
+local __description="${2}"
+local __prefered="${3}"
+shift 3
+
+__choose_function -e -d "${__description}" -p "${__prefered}" "${__prefix}"
+
+__run_routine "${__prefix}" "${@}"
+
 }

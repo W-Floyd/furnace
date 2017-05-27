@@ -16,11 +16,7 @@
 
 __graph () {
 
-local __prefix='graph'
-
-__choose_function -e -d 'dependency graphing' -p 'sfdp neato' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'graph' 'dependency graphing' 'sfdp neato' "${@}"
 
 }
 
@@ -57,7 +53,7 @@ __routine__graph__dot () {
 
 local __grapher='dot'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -69,7 +65,7 @@ __routine__graph__neato () {
 
 local __grapher='neato'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -81,7 +77,7 @@ __routine__graph__twopi () {
 
 local __grapher='twopi'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -93,7 +89,7 @@ __routine__graph__circo () {
 
 local __grapher='circo'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -105,7 +101,7 @@ __routine__graph__fdp () {
 
 local __grapher='fdp'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -117,7 +113,7 @@ __routine__graph__sfdp () {
 
 local __grapher='sfdp'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -129,7 +125,7 @@ __routine__graph__patchwork () {
 
 local __grapher='patchwork'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }
 
@@ -141,6 +137,6 @@ __routine__graph__osage () {
 
 local __grapher='osage'
 
-__graph_common "${__grapher}" $@
+__graph_common "${__grapher}" "${@}"
 
 }

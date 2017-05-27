@@ -81,7 +81,7 @@ cat | pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>"
 __get_values () {
 local __file="${1}"
 shift
-for __input in "$@"; do
+for __input in "${@}"; do
     pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" "${__file}"
     shift
 done
@@ -89,7 +89,7 @@ done
 
 __get_values_piped () {
 local __pipe="$(cat)"
-for __input in "$@"; do
+for __input in "${@}"; do
     pcregrep -M -o1 "<${1}>((\n|.)*)</${1}>" <<< "${__pipe}"
     shift
 done

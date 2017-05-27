@@ -16,11 +16,7 @@
 
 __archive () {
 
-local __prefix='archive'
-
-__choose_function -d 'archiving' -p 'zip ect gzip zopfli' "${__prefix}"
-
-__run_routine "${__prefix}" $@
+__short_routine 'archive' 'archiving' 'zip ect gzip zopfli' "${@}"
 
 if ! [ -e "${1}.${__archive_extension}" ]; then
     __force_warn "File \"${1}.${__archive_extension}\" was not produced when archiving"
@@ -45,7 +41,7 @@ fi
 
 shift
 
-zip -q9 "${__dest}" $@
+zip -q9 "${__dest}" "${@}"
 
 }
 
@@ -63,13 +59,13 @@ __archive_extension="${__ext_1}.${__ext_2}"
 local __dest_1="${1}.${__ext_1}"
 local __dest_2="${1}.${__archive_extension}"
 
-if [ -e "${__dest}" ]; then
-    rm "${__dest}"
+if [ -e "${__dest_2}" ]; then
+    rm "${__dest_2}"
 fi
 
 shift
 
-tar -cf "${__dest_1}" $@
+__tar "${__dest_1}" "${@}"
 
 gzip -9 "${__dest_1}"
 
@@ -89,13 +85,13 @@ __archive_extension="${__ext_1}.${__ext_2}"
 local __dest_1="${1}.${__ext_1}"
 local __dest_2="${1}.${__archive_extension}"
 
-if [ -e "${__dest}" ]; then
-    rm "${__dest}"
+if [ -e "${__dest_2}" ]; then
+    rm "${__dest_2}"
 fi
 
 shift
 
-tar -cf "${__dest_1}" $@
+__tar "${__dest_1}" "${@}"
 
 zopfli "${__dest_1}"
 
@@ -117,17 +113,68 @@ __archive_extension="${__ext_1}.${__ext_2}"
 local __dest_1="${1}.${__ext_1}"
 local __dest_2="${1}.${__archive_extension}"
 
+if [ -e "${__dest_2}" ]; then
+    rm "${__dest_2}"
+fi
+
+shift
+
+__tar "${__dest_1}" "${@}"
+
+ect -quiet -gzip "${__dest_1}"
+
+rm "${__dest_1}"
+
+}
+
+################################################################################
+# tar
+################################################################################
+
+__routine__archive__tar () {
+
+if ! [ -z "${__archive_extension}" ]; then
+
+    local __archive_extension_1='tar'
+
+else
+
+    __archive_extension='tar'
+    local __archive_extension_1="${__archive_extension}"
+
+fi
+
+local __dest="${1}.${__archive_extension_1}"
+
 if [ -e "${__dest}" ]; then
     rm "${__dest}"
 fi
 
 shift
 
-tar -cf "${__dest_1}" $@
+__tar "${__dest}" "${@}"
 
-ect -quiet -gzip "${__dest_1}"
+}
 
-rm "${__dest_1}"
+################################################################################
+#
+# __tar <OUTPUT> <FILE(s)>
+#
+# Tar
+# Collects named files and stores them in a file named according to <OUTPUT>
+# Note that <OUTPUT> should not include a file extension.
+#
+################################################################################
+
+__tar () {
+
+__short_routine 'tar' 'tarballing' 'tar' "${@}"
+
+}
+
+__routine__tar__tar () {
+
+tar -cf "${@}"
 
 }
 
@@ -145,11 +192,7 @@ rm "${__dest_1}"
 
 __zip () {
 
-local __prefix='zip'
-
-__choose_function -e -d 'zipping' -p 'zip' "${__prefix}"
-
-__run_routine "${__prefix}" "${1}"
+__short_routine 'zip' 'zipping' 'zip' "${1}"
 
 if ! [ -e "../${1}.zip" ]; then
     __force_warn "File \"${1}.zip\" was not produced when zipping"

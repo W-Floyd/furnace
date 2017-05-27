@@ -29,11 +29,7 @@ fi
 
 __fade () {
 
-local __prefix='image_fade'
-
-__choose_function -e -d 'image fading' -p 'convert' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_fade' 'image fading' 'convert' "${@}"
 
 }
 
@@ -70,11 +66,7 @@ fi
 
 __tile () {
 
-local __prefix='image_tile'
-
-__choose_function -e -d 'image tiling' -p 'montage' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_tile' 'image tiling' 'montage' "${@}"
 
 }
 
@@ -123,11 +115,7 @@ fi
 
 __custom_tile () {
 
-local __prefix='image_custom_tile'
-
-__choose_function -e -d 'custom image tiling' -p 'montage' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_custom_tile' 'custom image tiling' 'montage' "${@}"
 
 }
 
@@ -160,11 +148,7 @@ convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(
 
 __crop () {
 
-local __prefix='image_crop'
-
-__choose_function -e -d 'image cropping' -p 'convert' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_crop' 'image cropping' 'convert' "${@}"
 
 }
 
@@ -222,11 +206,7 @@ mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
 
 __rotate () {
 
-local __prefix='image_rotate'
-
-__choose_function -e -d 'image rotation' -p 'mogrify' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_rotate' 'image rotation' 'mogrify' "${@}"
 
 }
 
@@ -250,11 +230,7 @@ convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*36
 
 __rotate_exact () {
 
-local __prefix='image_rotate_exact'
-
-__choose_function -e -d 'exact image rotation' -p 'convert' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_rotate_exact' 'exact image rotation' 'convert' "${@}"
 
 }
 
@@ -279,10 +255,6 @@ mv "${1}"_ "${1}"
 
 __shift () {
 
-local __prefix='image_shift'
-
-__choose_function -e -d 'image shifting' -p 'convert' "${__prefix}"
-
-__run_routine "${__prefix}" ${@}
+__short_routine 'image_shift' 'image shifting' 'convert' "${@}"
 
 }

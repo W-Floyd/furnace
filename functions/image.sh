@@ -82,11 +82,7 @@ fi
 
 __image_conform () {
 
-local __prefix='image_conform'
-
-__choose_function -e -d 'image conformace' -p 'convert' "${__prefix}"
-
-__run_routine "${__prefix}" "${1}"
+__short_routine 'image_conform' 'image conformace' 'convert' "${1}"
 
 }
 

@@ -15,21 +15,7 @@
 #
 ################################################################################
 
-__routine__gimp_export__gimp () {
-
-if ! [ "$(__oext "${1}")" = 'xcf' ]; then
-    __error "File \"${1}\" is not a GIMP file"
-fi
-
-if ! [ "${__gimp_export_check}" = '1' ]; then
-
-    if ! __check_command gimp; then
-        __error "GIMP is not installed"
-    fi
-
-    __gimp_export_check='1'
-
-fi
+__routine__image_gimp_export__gimp () {
 
 __gimp_sub () {
 gimp -i --batch-interpreter=python-fu-eval -b - << EOF
@@ -59,11 +45,11 @@ __image_conform "$(__mext "${1}").png"
 
 __gimp_export () {
 
-local __prefix='gimp_export'
+if ! [ "$(__oext "${1}")" = 'xcf' ]; then
+    __error "File \"${1}\" is not a GIMP file"
+fi
 
-__choose_function -e -d 'Gimp exporting' -p 'gimp' "${__prefix}"
-
-__run_routine "${__prefix}" "${1}"
+__short_routine 'image_gimp_export' 'Gimp exporting' 'gimp' "${1}"
 
 }
 
@@ -76,21 +62,7 @@ __run_routine "${__prefix}" "${1}"
 #
 ################################################################################
 
-__routine__krita_export__krita () {
-
-if ! [ "$(__oext "${1}")" = 'kra' ]; then
-    __error "File \"${1}\" is not a Krita file"
-fi
-
-if ! [ "${__krita_export_check}" = '1' ]; then
-
-    if ! __check_command krita; then
-        __error "Krita is not installed"
-    fi
-
-    __krita_export_check='1'
-
-fi
+__routine__image_krita_export__krita () {
 
 # My instance of Krita throws some errors no matter what, so
 # it's made silent. Bad idea, I know...
@@ -103,10 +75,10 @@ __image_conform "$(__mext "${1}").png"
 
 __krita_export () {
 
-local __prefix='krita_export'
+if ! [ "$(__oext "${1}")" = 'kra' ]; then
+    __error "File \"${1}\" is not a Krita file"
+fi
 
-__choose_function -e -d 'Krita exporting' -p 'krita' "${__prefix}"
-
-__run_routine "${__prefix}" "${1}"
+__short_routine 'image_krita_export' 'Krita exporting' 'krita' "${1}"
 
 }

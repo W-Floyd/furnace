@@ -56,9 +56,9 @@ $(__imagemagick_define) \
 
 __vector_render () {
 
-local __prefix='vector_render'
-
-__choose_function -e -d 'vector rendering' -p 'rsvg-convert inkscape convert' "${__prefix}"
+if ! [ "$(__oext "${2}")" = 'svg' ]; then
+    __error "File \"${2}\" is not an svg file"
+fi
 
 if [ -z "${__vector_ppi}" ]; then
     export __vector_ppi='96'
@@ -68,11 +68,7 @@ if [ -z "${__vector_scale}" ]; then
     export __vector_scale='128'
 fi
 
-if ! [ "$(__oext "${2}")" = 'svg' ]; then
-    __error "File \"${2}\" is not an svg file"
-fi
-
-__run_routine "${__prefix}" "${1}" "${2}"
+__short_routine 'vector_render' 'vector rendering' 'rsvg-convert inkscape convert'  "${1}" "${2}"
 
 if ! [ -e "$(__mext "${2}").png" ]; then
     __force_warn "File \"$(__mext "${2}").png\" was not rendered"
