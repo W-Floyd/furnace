@@ -584,6 +584,7 @@ __time "Inherited and created dependencies" start
 if [ -e "${__dep_list_tsort}" ]; then
     rm "${__dep_list_tsort}"
 fi
+
 touch "${__dep_list_tsort}"
 
 if [ -d "${__dep_list_folder}" ]; then
@@ -603,9 +604,7 @@ while read -r __xml; do
 
     echo "${__xml} ${__xml}"
 
-    __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | grep -v '^$' | while read -r __line; do
-        echo "${__xml} ${__line}"
-    done
+    __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | sed '/^$/d' | sed "s#^#${__xml} #"
 
 # Finish loop
 done < "${__list_file}" >> "${__dep_list_tsort}"
@@ -672,9 +671,11 @@ __time "Setting deps from file" start
 
 while read -r __xml; do
 
-    __set_value "${__xml}" DEPENDS < "${__dep_list_folder}/${__xml}"
+    __set_value "${__xml}" DEPENDS < "${__dep_list_folder}/${__xml}" &
 
 done < "${__list_file}"
+
+wait
 
 __time "Setting deps from file" end
 
@@ -683,18 +684,18 @@ __time "Getting cleanup files" start
 while read -r __xml; do
 
 # get the cleanup files, and list it to a file
-    __get_value "${__xml}" CLEANUP >> "${__cleanup_all}"
+    __get_value "${__xml}" CLEANUP
 
 # if the file is not to be kept,
     if [ "$(__get_value "${__xml}" KEEP)" = "NO" ]; then
 
 # add it to the cleanup file list
-        echo "${__xml}" >> "${__cleanup_all}"
+        echo "${__xml}"
 
 # end the if statement
     fi
 
-done < "${__list_file}"
+done < "${__list_file}" >> "${__cleanup_all}"
 
 sort "${__cleanup_all}" | uniq > "${__cleanup_all}_"
 
@@ -1058,7 +1059,7 @@ touch "${__rendered_list}"
 # Combine and sort all changed source and changed xml files (also new)
 __changed_both="${__tmp_dir}/changed_all"
 touch "${__changed_both}"
-sort "${__changed_source}" "${__changed_xml}" "${__new_split_source_list}" "${__new_split_xml_list}" | uniq | grep -v '^$' > "${__changed_both}"
+sort "${__changed_source}" "${__changed_xml}" "${__new_split_source_list}" "${__new_split_xml_list}" | uniq | sed '/^$/d' > "${__changed_both}"
 
 # Combine and sort all unchanged source and unchanged xml files
 __unchanged_both="${__tmp_dir}/unchanged_both"
