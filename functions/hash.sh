@@ -72,6 +72,7 @@ fi
 #
 # Hash
 # Hash file, so that testing different programs can be done easily.
+# Assumes it has already had it's routine chosen (in setup most likely)
 #
 ################################################################################
 
