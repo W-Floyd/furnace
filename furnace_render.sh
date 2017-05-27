@@ -649,8 +649,6 @@ while read -r __xml; do
 # Set the location for the dep list
         __dep_list="${__dep_list_folder}/${__xml}"
 
-        touch "${__dep_list}"
-
         __get_values "${__xml}" SCRIPT CLEANUP DEPENDS | sort | uniq | sed '/^$/d' | tee -a "${__dep_list}" | while read -r __suspect_dep; do
 
             if [ -e "${__suspect_dep}" ] && ! [ "${__dep_list_folder}/${__suspect_dep}" = "${__dep_list}" ]; then
@@ -661,13 +659,15 @@ while read -r __xml; do
 
         done | sort | uniq | sed '/^$/d' >> "${__dep_list}"
 
+        touch "${__dep_list}"
+
     fi
 
 done < "${__dep_list_tsort}"
 
 __time "Read and inherited dep files" end
 
-__time "Setting deps from file" start
+__time "Set deps from file" start
 
 while read -r __xml; do
 
@@ -677,9 +677,9 @@ done < "${__list_file}"
 
 wait
 
-__time "Setting deps from file" end
+__time "Set deps from file" end
 
-__time "Getting cleanup files" start
+__time "Got cleanup files" start
 
 while read -r __xml; do
 
@@ -701,7 +701,7 @@ sort "${__cleanup_all}" | uniq > "${__cleanup_all}_"
 
 mv "${__cleanup_all}_" "${__cleanup_all}"
 
-__time "Getting cleanup files" end
+__time "Got cleanup files" end
 
 # Go back to the regular directory
 __popd
