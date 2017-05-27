@@ -217,8 +217,12 @@ cat | sed '/^$/d' | awk '!cnts[$0]++'
 ################################################################################
 
 __debug_toggle () {
-set +x
-if [ "${__very_verbose}" = '1' ] ; then
+if [[ "${-}" == *x* ]]; then
+    export __debug_toggle_flag='1'
+    set +x
+fi
+
+if [ "${__very_verbose}" = '1' ] || [ "${__debug_toggle_flag}" = '1' ]; then
     if [ "${1}" = 'on' ]; then
         set -x
     elif ! [ "${1}" = 'off' ]; then
