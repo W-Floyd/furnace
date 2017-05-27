@@ -1330,9 +1330,9 @@ if [ "${__render_optional}" = '0' ]; then
     while read -r __item; do
         __config="./xml/${__item//.\//}"
         if [ "$(__get_value "${__config}" OPTIONAL)" = 'NO' ]; then
-            echo "${__item}" >> "${__render_list}_"
+            echo "${__item}"
         fi
-    done < "${__render_list}"
+    done < "${__render_list}" >> "${__render_list}_"
     mv "${__render_list}_" "${__render_list}"
 fi
 
