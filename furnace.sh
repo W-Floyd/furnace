@@ -515,7 +515,7 @@ fi
 
 # set pack name if not set already
 if [ -z "${__name}" ]; then
-    __name="$(basename "${__working_dir}")"
+    export __name="$(basename "${__working_dir}")"
     __force_warn "Pack name not defined, defaulting to ${__name}"
 fi
 
