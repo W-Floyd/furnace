@@ -590,9 +590,9 @@ __time "Read base dependencies" start
 # For every xml file,
 while read -r __xml; do
 
-    echo "${__xml} ${__xml}"
+    echo "$(sed 's/ /%WHITESPACE%/g' <<< "${__xml}") $(sed 's/ /%WHITESPACE%/g' <<< "${__xml}")"
 
-    __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | sed '/^$/d' | sed "s#^#${__xml} #"
+    __get_values "${__xml}" DEPENDS SCRIPT | sort | uniq | sed '/^$/d' | sed 's/ /%WHITESPACE%/g' | sed "s#^#$(sed 's/ /%WHITESPACE%/g' <<< "${__xml}") #"
 
 # Finish loop
 done < "${__list_file}" >> "${__dep_list_tsort}"
@@ -601,7 +601,7 @@ __time "Read base dependencies" end
 
 __time "tsort-ed" start
 
-tsort "${__dep_list_tsort}" | tac > "${__dep_list_tsort}_"
+tsort < "${__dep_list_tsort}" | sed 's/%WHITESPACE%/ /g' | tac > "${__dep_list_tsort}_"
 
 mv "${__dep_list_tsort}_" "${__dep_list_tsort}"
 
@@ -1332,7 +1332,13 @@ __time "Rendered ${__size}px" start
 
 __pushd './src/xml/'
 
-__process_count="$(while read -r __item; do if ! [ -z "$(__get_value "${__item}" SCRIPT)" ]; then echo "${__item}"; fi; done < "${__render_list}" | wc -l)"
+__process_count='0'
+
+while read -r __item; do
+    if ! [ -z "$(__get_value "${__item}" SCRIPT)" ] || ( [ "$(__get_value "${__item}" IMAGE)" = 'YES' ] && [ "$(__get_value "${__item}" KEEP)" = 'YES' ] && [ "${__should_optimize}" = '1' ] && ( [ "$(__get_value "${__item}" OPTIONAL)" = 'NO' ] || [ "${__render_optional}" = '1' ] ) ); then
+        __process_count=$((__process_count+1))
+    fi
+done < "${__render_list}"
 
 __popd
 
@@ -1374,6 +1380,8 @@ if [ -s "${__render_list}" ]; then
 else
     __clean_benchmark='0'
 fi
+
+# TODO - Unify rendering logic between rendering and only optimizing.
 
 # while the render list has lines to process,
 while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
@@ -1417,10 +1425,10 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 # get the name of the config script, and replace any macro locations
         __config_script="$(__get_value "${__config}" SCRIPT)"
 
+        __render_num=$((__render_num+1))
+
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
-
-            __render_num=$((__render_num+1))
 
             __failed='0'
 
@@ -1503,12 +1511,47 @@ Won't create \".${__config//.\/xml/}\""
         else
 
             if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
-                __will_optimize='1'
-            fi
 
-            if [ "${__will_optimize}" = '1' ]; then
 
-                __optimize "./${__orig_config_name}"
+
+                if [ "${__short_output}" = '0' ]; then
+
+                    __leader="Optimizing "
+
+                else
+
+                    __leader=''
+
+                fi
+
+                if [ "${__render_num}" = '1' ] && [ "${__show_progress}" = '1' ]; then
+                    echo
+                fi
+
+                if [ "${__show_progress}" = '1' ]; then
+# Clears last line
+                    tput cuu 1 && tput el
+                fi
+
+# announce that we are processing the given config
+                if [ "${__quiet}" = '0' ]; then
+                    if [ "${__short_output}" = '0' ]; then
+                        __file_part="\".${__config//.\/xml/}\""
+                    else
+                        __file_part="$(basename ".${__config//.\/xml/}")"
+                    fi
+
+                    __format_text "\e[36m${__size}\e[39m" "${__leader}${__file_part}" ""
+                fi
+
+
+                __optimize "./${__orig_config_name}" &
+
+                if [ "${__show_progress}" = '1' ]; then
+                    __format_text "\e[36m${__size}\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
+                fi
+
+                wait
 
             fi
 
@@ -1539,7 +1582,7 @@ if [ "${__benchmark}" = '1' ] && [ "${__clean_benchmark}" = '1' ]; then
 
     echo 'file, time' > "${__benchmark_file}_"
 
-    sort -r -n -k 2 "${__benchmark_file}" >> "${__benchmark_file}_"
+    sort "${__benchmark_file}" >> "${__benchmark_file}_"
 
     mv "${__benchmark_file}_" "${__benchmark_file}"
 
@@ -1622,8 +1665,10 @@ done < "${__cleanup_all}"
 wait
 
 # remove xml and conf from cleaned pack
-rm -r ./xml
-rm -r ./conf
+rm -r './xml'
+if [ -d './conf' ]; then
+    rm -r ./conf
+fi
 
 # remove all empty directories
 __empdir

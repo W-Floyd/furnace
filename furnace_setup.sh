@@ -7,7 +7,8 @@ fi
 
 __source_functions () {
 cp "${1}" '/tmp/script.sh'
-echo 'for __function in $(compgen -A function); do
+echo '
+for __function in $(compgen -A function); do
     export -f ${__function}
 done' >> '/tmp/script.sh'
 source '/tmp/script.sh' || { echo "Failed to load functions from \"${1}\"" 1>&2; exit 1; }
@@ -37,14 +38,13 @@ else
     if [ "$(head -n 1 'config.sh')" = '#furnaceconfig#' ]; then
         cp 'config.sh' '/tmp/config.sh'
         __tmpvar="$(
-        echo \
-'echo "something to use a pipe" | rev > /dev/null
+        echo 'echo "something to use a pipe" | rev > /dev/null
 compgen -A variable > /tmp/tmpvars'
 
         cat '/tmp/config.sh'
 
-        echo \
-'compgen -A variable > /tmp/tmpvars2
+        echo '
+compgen -A variable > /tmp/tmpvars2
 for __variable in $(grep -Fxvf /tmp/tmpvars /tmp/tmpvars2); do
     export "${__variable}"
 done'
