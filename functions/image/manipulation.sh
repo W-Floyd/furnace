@@ -16,7 +16,7 @@ __routine__image_fade__convert () {
 
 if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
 
-    local __tmptrans=$(echo '1/'"${3}" | bc)
+    local __tmptrans=$(echo "1/${3}" | bc -l | __strip_zero)
     convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" $(__imagemagick_define) "${2}"
 
 else
