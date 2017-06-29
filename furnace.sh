@@ -390,7 +390,7 @@ if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
 
     __check_input "${1}"
 
-elif  grep '^--.*' <<< "${1}" &> /dev/null; then
+elif grep '^--.*' <<< "${1}" &> /dev/null; then
 
     __check_input "${1}"
 
@@ -451,7 +451,6 @@ if ! __int_check "${!2}"; then
     __error "Given option is not a size"
 fi
 }
-
 
 ################################################################################
 
