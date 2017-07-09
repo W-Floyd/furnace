@@ -73,7 +73,8 @@ __stop_debugging () {
 
 ################################################################################
 # Read options
-__force_time "Read options" start
+unset -f __restore_array
+__force_timer start "Read options"
 ################################################################################
 
 # If there are are options,
@@ -254,9 +255,9 @@ while ! [ "${#}" = '0' ]; do
 done
 fi
 
-__time "Read options" end
+__timer end "Read options"
 
-__time "Set variables" start
+__timer start "Set variables"
 
 ################################################################################
 # Fill the blanks that the config didn't fill
@@ -317,7 +318,7 @@ if ! [ "${__size}" = "$(echo "2^${__calculated_log}" | bc)" ]; then
     __force_warn "Given size is not a power of 2"
 fi
 
-__time "Set variables" end
+__timer end "Set variables"
 
 if [ "${__dry}" = '1' ]; then
     exit
@@ -327,7 +328,7 @@ fi
 # If not only doing xml
 if [ "${__xml_only}" = '0' ]; then
 
-__time "Set up folders" start
+__timer start "Set up folders"
 
 ################################################################################
 # Announce size
@@ -387,7 +388,7 @@ else
     mkdir -p "${__pack}/xml"
 fi
 
-__time "Set up folders" end
+__timer end "Set up folders"
 
 # End conditional if only doing xml processing
 fi
@@ -396,7 +397,7 @@ fi
 # Split XML
 ################################################################################
 
-__time "Split XML" start
+__timer start "Split XML"
 
 __tsort_file='tsort'
 
@@ -419,11 +420,11 @@ touch "${__optimize_list}"
 
 __cleaned_catalogue="${__tmp_dir}/${__catalogue}"
 
-__time "Cleaned pack" start
+__timer start "Cleaned pack"
 
 __clean_pack < "${__catalogue}" > "${__cleaned_catalogue}"
 
-__time "Cleaned pack" end
+__timer end "Cleaned pack"
 
 # if the xml folder does not exist,
 if ! [ -d ./src/xml/ ]; then
@@ -525,7 +526,7 @@ fi
 # Move xml into src now, so it can be used later
 mv "${__xml_current}" './src/xml/'
 
-__time "Split XML" end
+__timer end "Split XML"
 
 ################################################################################
 # Check for files to __optimize
@@ -533,7 +534,7 @@ __announce "Checking for files to optimize."
 
 touch "${__optimize_list}"
 
-__time "Found files to optimize" start
+__timer start "Found files to optimize"
 
 __pushd ./src/xml/
 
@@ -544,7 +545,7 @@ grep -rlw '<IMAGE>YES</IMAGE>' | grep -F "$(grep -rlw '<KEEP>YES</KEEP>')" | sed
 
 __popd
 
-__time "Found files to optimize" end
+__timer end "Found files to optimize"
 
 ################################################################################
 # Inherit deps and cleanup
@@ -567,7 +568,7 @@ __popd
 # If we're told not to re-use xml, then
 if [ "${__re_use_xml}" = '0' ]; then
 
-__time "Inherited and created dependencies" start
+__timer start "Inherited and created dependencies"
 
 if [ -e "${__dep_list_tsort}" ]; then
     rm "${__dep_list_tsort}"
@@ -585,7 +586,7 @@ mkdir -p "${__dep_list_folder}"
 # Get into the xml directory
 __pushd ./src/xml/
 
-__time "Read base dependencies" start
+__timer start "Read base dependencies"
 
 # For every xml file,
 while read -r __xml; do
@@ -597,17 +598,17 @@ while read -r __xml; do
 # Finish loop
 done < "${__list_file}" >> "${__dep_list_tsort}"
 
-__time "Read base dependencies" end
+__timer end "Read base dependencies"
 
-__time "tsort-ed" start
+__timer start "tsort-ed"
 
 tsort < "${__dep_list_tsort}" | sed 's/%WHITESPACE%/ /g' | tac > "${__dep_list_tsort}_"
 
 mv "${__dep_list_tsort}_" "${__dep_list_tsort}"
 
-__time "tsort-ed" end
+__timer end "tsort-ed"
 
-__time "Made directories" start
+__timer start "Made directories"
 
 while read -r __xml; do
 
@@ -626,9 +627,9 @@ done < "${__dep_list_tsort}" | sort | uniq | while read -r __dir; do
 
 done
 
-__time "Made directories" end
+__timer end "Made directories"
 
-__time "Read and inherited dep files" start
+__timer start "Read and inherited dep files"
 
 while read -r __xml; do
 
@@ -653,9 +654,9 @@ while read -r __xml; do
 
 done < "${__dep_list_tsort}"
 
-__time "Read and inherited dep files" end
+__timer end "Read and inherited dep files"
 
-__time "Set deps from file" start
+__timer start "Set deps from file"
 
 while read -r __xml; do
 
@@ -665,9 +666,9 @@ done < "${__list_file}"
 
 wait
 
-__time "Set deps from file" end
+__timer end "Set deps from file"
 
-__time "Got cleanup files" start
+__timer start "Got cleanup files"
 
 while read -r __xml; do
 
@@ -689,12 +690,12 @@ sort "${__cleanup_all}" | uniq > "${__cleanup_all}_"
 
 mv "${__cleanup_all}_" "${__cleanup_all}"
 
-__time "Got cleanup files" end
+__timer end "Got cleanup files"
 
 # Go back to the regular directory
 __popd
 
-__time "Inherited and created dependencies" end
+__timer end "Inherited and created dependencies"
 
 # Else, if we're supposed to re-use xml files
 else
@@ -714,7 +715,7 @@ if [ "${__xml_only}" = '0' ]; then
 __announce "Listing new and matching XML entries."
 ################################################################################
 
-__time "Listed new and matching XML entries" start
+__timer start "Listed new and matching XML entries"
 
 # This is where all new xml files are listed
 __new_xml_list="${__tmp_dir}/xml_list_new"
@@ -763,14 +764,14 @@ grep -Fxvf "${__old_xml_list}" "${__new_xml_list}" > "${__new_split_xml_list}"
 grep -Fxvf "${__new_xml_list}" "${__old_xml_list}" > "${__old_split_xml_list}"
 grep -Fxf "${__old_xml_list}" "${__new_xml_list}" > "${__shared_xml_list}"
 
-__time "Listed new and matching XML entries" end
+__timer end "Listed new and matching XML entries"
 
 ################################################################################
 # Check changes in XML files
 __announce "Checking changes in XML files."
 ################################################################################
 
-__time "Checked changes in XML files" start
+__timer start "Checked changes in XML files"
 
 # Where all new xml files are hashed to
 __new_hashes="${__tmp_dir}/new_hashes_xml"
@@ -810,7 +811,7 @@ if [ -d "./${__pack}/xml" ]; then
 
 fi
 
-__time "Checked hash changes" start
+__timer start "Checked hash changes"
 
 if ! [ "$(__hash_piped < "${__new_hashes}")" = "$(__hash_piped < "${__old_hashes}")" ]; then
 
@@ -848,16 +849,16 @@ else
 
 fi
 
-__time "Checked hash changes" end
+__timer end "Checked hash changes"
 
-__time "Checked changes in XML files" end
+__timer end "Checked changes in XML files"
 
 ################################################################################
 # List new and matching source files
 __announce "Listing new and matching source files."
 ################################################################################
 
-__time "Listed new and matching source files" start
+__timer start "Listed new and matching source files"
 
 # This is where all new source files are listed
 __new_source_list="${__tmp_dir}/source_list_new"
@@ -902,14 +903,14 @@ grep -Fxvf "${__old_source_list}" "${__new_source_list}" > "${__new_split_source
 grep -Fxvf "${__new_source_list}" "${__old_source_list}" > "${__old_split_source_list}"
 grep -Fxf "${__old_source_list}" "${__new_source_list}" > "${__shared_source_list}"
 
-__time "Listed new and matching source files" end
+__timer end "Listed new and matching source files"
 
 ################################################################################
 # Check changes in source files
 __announce "Checking changes in source files."
 ################################################################################
 
-__time "Checked for changes in source files" start
+__timer start "Checked for changes in source files"
 
 # Where new source files are hashed to
 __source_hash_new="${__tmp_dir}/new_hashes_source"
@@ -990,7 +991,7 @@ else
 
 fi
 
-__time "Checked for changes in source files" end
+__timer end "Checked for changes in source files"
 
 ################################################################################
 # Before we go on, let's recap. These are the files we want
@@ -1026,7 +1027,7 @@ __time "Checked for changes in source files" end
 __announce "Checking for items to re/process."
 ################################################################################
 
-__time "Checked for items to re/process" start
+__timer start "Checked for items to re/process"
 
 # Where we'll start putting new work in, will eventually be
 # renamed to regular
@@ -1238,7 +1239,7 @@ grep -Fxvf "${__render_list}" "${__list_file}" | sort | uniq | while read -r __x
 # Finish loop
 done
 
-__time "Copied existing files" start
+__timer start "Copied existing files"
 
 if [ -s "${__copy_list}" ]; then
 # This makes a bunch of directories as needed for copying
@@ -1267,9 +1268,9 @@ fi
 
 wait
 
-__time "Copied existing files" end
+__timer end "Copied existing files"
 
-__time "Checked for items to re/process" end
+__timer end "Checked for items to re/process"
 
 if [ "${__list_changed}" = '1' ]; then
 
@@ -1328,7 +1329,7 @@ __popd
 
 __break_loop='0'
 
-__time "Rendered ${__size}px" start
+__timer start "Rendered ${__size}px"
 
 __pushd './src/xml/'
 
@@ -1425,10 +1426,10 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 # get the name of the config script, and replace any macro locations
         __config_script="$(__get_value "${__config}" SCRIPT)"
 
-        __render_num=$((__render_num+1))
-
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
+
+            __render_num=$((__render_num+1))
 
             __failed='0'
 
@@ -1512,7 +1513,7 @@ Won't create \".${__config//.\/xml/}\""
 
             if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
 
-
+                __render_num=$((__render_num+1))
 
                 if [ "${__short_output}" = '0' ]; then
 
@@ -1601,14 +1602,14 @@ __popd
 
 __announce "Done rendering."
 
-__time "Rendered ${__size}px" end
+__timer end "Rendered ${__size}px"
 
 ################################################################################
 # Make cleaned folder
 __announce "Making cleaned folder."
 ################################################################################
 
-__time "Made cleaned folder" start
+__timer start "Made cleaned folder"
 
 sed -i '/^$/d' "${__cleanup_all}"
 
@@ -1676,7 +1677,7 @@ __empdir
 # get back to the right directory
 __popd
 
-__time "Made cleaned folder" end
+__timer end "Made cleaned folder"
 
 ################################################################################
 # Make mobile pack if asked to
@@ -1699,7 +1700,7 @@ if [ "${__mobile}" = '1' ]; then
 
     __announce "Making mobile pack."
 
-    __time "Made mobile pack" start
+    __timer start "Made mobile pack"
 
 # if the end pack folder exists,
     if [ -d "${__pack_end}" ]; then
@@ -1731,7 +1732,7 @@ if [ "${__mobile}" = '1' ]; then
 # get back into the main directory
     __popd
 
-    __time "Made mobile pack" end
+    __timer end "Made mobile pack"
 
 fi
 
@@ -1781,5 +1782,7 @@ if [ "${__debug}" = '0' ]; then
 fi
 
 echo "${__break_loop}" > "./src/xml/loopstatus"
+
+__print_timer -s
 
 exit

@@ -78,11 +78,11 @@ fi
 
 __hash () {
 
-__debug_toggle off
+#__debug_toggle off
 
 "${__function_hash}" "${@}"
 
-__debug_toggle on
+#__debug_toggle on
 
 }
 
@@ -97,11 +97,11 @@ __debug_toggle on
 
 __hash_piped () {
 
-__debug_toggle off
+#__debug_toggle off
 
 cat | "${__function_hash}" "${@}"
 
-__debug_toggle on
+#__debug_toggle on
 
 }
 

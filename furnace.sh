@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 __sizes=''
 __verbose='0'
 __very_verbose_pack='0'
@@ -154,8 +156,8 @@ Other Options:
 
 ################################################################################
 
-__force_time "Rendered all" start
-__force_time "Processed XML" start
+__force_timer start "Rendered all"
+__force_timer start "Processed XML"
 
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
@@ -168,12 +170,17 @@ case "${1}" in
 
     "-h" | "-?")
         __usage_short
-        exit 77
+        exit
         ;;
 
     "--help")
         __usage
-        exit 77
+        exit
+        ;;
+
+    "--helo" | "--hello")
+        echo -e ';) Hi there, beautiful \e[31m❤\e[39m'
+        exit
         ;;
 
     "--no-progress")
@@ -356,6 +363,9 @@ case "${1}" in
         ;;
 
     [0-9]*)
+        if ! __int_check "${1}"; then
+            __error "${1} is not an integer"
+        fi
         if [ "${__use_custom_size}" = '0' ]; then
             __warn "Overriding render sizes"
             __use_custom_size='1'
@@ -374,8 +384,7 @@ ${1}"
     *)
         __custom_error "Unknown option \"${1}\"
 Please use '-h' for help."
-
-        exit 77
+        exit
         ;;
 
 esac
@@ -414,10 +423,6 @@ elif grep '^-.*' <<< "${1}" &> /dev/null; then
 
 else
     __check_input "${1}"
-fi
-
-if [ "${?}" = '77' ]; then
-    exit
 fi
 
 }
@@ -574,7 +579,7 @@ fi
 
 __final_size="$(tr ' ' '\n' <<< "${__sizes}" | tail -n1)"
 
-__sizes="$(echo "${__sizes}" | tr ' ' '\n' | sort -n | uniq)"
+__sizes="$(tr ' ' '\n' <<< "${__sizes}" | sort -n | uniq)"
 
 if [ -z "${__max_optimize}" ]; then
     __default_max_optimize='512'
@@ -789,7 +794,7 @@ fi
 
 if [ "${__time}" = '1' ]; then
 
-    __force_time "Rendered size ${__size}" start
+    __force_timer start "Rendered size ${__size}"
 
     if [ "${__silent}" = '1' ]; then
         __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
@@ -797,9 +802,9 @@ if [ "${__time}" = '1' ]; then
         __render_and_pack "${__size}" "${__packfile}"
     fi
 
-    __force_time "Rendered size ${__size}" end
+    __force_timer end "Rendered size ${__size}"
 
-    if [ "${__silent}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
+    if [ "${__silent}" = '0' ] && [ "${__verbose}" = '0' ]; then
         echo
     fi
 
@@ -885,16 +890,14 @@ else
     done
 fi
 
-if [ "${__xml_only}" = '0' ]; then
-    __force_time "Rendered all" end
-else
-    __force_time "Processed XML" end
+if [ "${__xml_only}" = '1' ]; then
+    __force_timer end "Processed XML"
     exit
 fi
 
 if [ "${__should_archive}" = '1' ]; then
 
-__force_time "Archived packs" start
+__force_timer start "Archived packs"
 
 __force_announce "Archiving packs" start
 
@@ -922,8 +925,12 @@ __archive_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | s
 
 __archive "${__archive_name}" ${__archive_option}
 
-__force_time "Archived packs" end
+__force_timer end "Archived packs"
 
 fi
+
+__force_timer end "Rendered all"
+
+__print_timer -f -s
 
 exit

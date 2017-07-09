@@ -159,7 +159,7 @@ fi
 
 __choose_function () {
 
-__debug_toggle off
+#__debug_toggle off
 
 local __should_error='0'
 local __should_force='0'
@@ -212,7 +212,7 @@ ${1}"
 # http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
 # Means no more eval sodomy :3
 	                    if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ] && __test_function "${__function_prefix}" "${!__function_name}"; then
-	                        __debug_toggle off on
+	                        #__debug_toggle off on
                             return 0
                         fi
 
@@ -231,7 +231,7 @@ ${1}"
 
 else
 
-    __debug_toggle on
+    #__debug_toggle on
 
     __error "No options passed"
 
@@ -260,7 +260,7 @@ if ! __test_routine "${__function_prefix}"; then
     local __message="No valid routine for ${__description} found"
 
     if [ "${__should_error}" = '1' ]; then
-        __debug_toggle on
+        #__debug_toggle on
         __error "${__message}"
     else
         __force_warn "${__message}"
@@ -268,7 +268,7 @@ if ! __test_routine "${__function_prefix}"; then
 
 fi
 
-__debug_toggle on
+#__debug_toggle on
 
 }
 
@@ -291,7 +291,7 @@ __debug_toggle on
 
 __run_routine () {
 
-__debug_toggle off
+#__debug_toggle off
 
 if read -r -t 0; then
     local __pipe="$(cat)"
@@ -302,17 +302,17 @@ fi
 local __function_prefix="${1}"
 shift
 
-__debug_toggle on
+#__debug_toggle on
 
 __choose_function "${__function_prefix}"
 
-__debug_toggle off
+#__debug_toggle off
 
 local __function_name="__function_${__function_prefix}"
 
 local __routine_name="__routine__${__function_prefix}__${!__function_name}"
 
-__debug_toggle on
+#__debug_toggle on
 
 "${__routine_name}" "${@}" <<< "${__pipe}"
 
@@ -348,11 +348,11 @@ local __description="${2}"
 local __prefered="${3}"
 shift 3
 
-__debug_toggle off
+#__debug_toggle off
 
 __choose_function -e -d "${__description}" -p "${__prefered}" "${__prefix}"
 
-__debug_toggle on
+#__debug_toggle on
 
 __run_routine "${__prefix}" "${@}"
 
