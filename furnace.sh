@@ -128,7 +128,7 @@ Render Options:
   --name=<NAME>             Name to use when processing a pack.
 
 Graphing Options:
-  --graph <ITEM>            Render a graph of the dependency tree. Optional
+  --graph=<ITEM>            Render a graph of the dependency tree. Optional
                             input is a comma and/or new-line separated list of
                             ITEMs to be the subject of the graph For a full
                             graph, use '', '.*', or nothing. May be specified
@@ -292,6 +292,17 @@ case "${1}" in
         __graph_deps='1'
         ;;
 
+    "--graph="*)
+        __graph_deps='1'
+        local __graph_tmp_files="$(sed 's/[^=]*=//' <<< "${1}" | tr ',' '\n')"
+        if [ -z "${__graph_files}" ]; then
+            __graph_files="${__graph_tmp_files}"
+        else
+            __graph_files="${__graph_files}
+${__graph_tmp_files}"
+        fi
+        ;;
+
     "--graph-format="*)
         __graph_deps='1'
         __set_flag "${1}" __graph_format
@@ -302,8 +313,9 @@ case "${1}" in
         __set_flag "${1}" __graph_output
         ;;
 
-    "--graph-seed")
+    "--graph-seed="*)
         __graph_deps='1'
+        __set_flag "${1}" __graph_seed=
         ;;
 
     "--no-highlight")
@@ -355,10 +367,6 @@ case "${1}" in
         ;;
 
     "--function="*)
-# Gedit is dumb and won't parse quoting correctly in this instance for some
-# reason, so I've piped into cat instead, it gives the same results. Being an
-# option parser, performance isn't that important anyway, and my own sanity when
-# reading the rest of this document is of a higher priority.
         __set_flag "${1}" __set_prefix
         ;;
 
@@ -463,25 +471,6 @@ fi
 while ! [ "${#}" = '0' ]; do
 
     case "${__last_option}" in
-
-        "--graph")
-            if __check_option "${1}"; then
-                __process_option "${1}"
-            elif __int_check "${1}"; then
-                __force_warn "Size is not important when graphing, and will be ignored"
-            else
-                if [ -z "${__graph_files}" ]; then
-                    __graph_files="$(tr ',' '\n' <<< "${1}")"
-                else
-                    __graph_files="${__graph_files}
-$(tr ',' '\n' <<< "${1}")"
-                fi
-            fi
-            ;;
-
-        "--graph-seed")
-            __graph_seed="${1}"
-            ;;
 
         "--function="*)
             if __test_function "${__set_prefix}" "${1}"; then
