@@ -49,11 +49,9 @@ source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"$
 
 # Print help
 __usage_short () {
-echo "$(basename "${0}") <OPTIONS> <SIZES>
+__help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
 
-Makes the resource pack at the specified size(s) (or using default list of
-sizes). Order of options and size(s) are not important, other than options which
-take secondary inputs.
+Makes the resource pack at the specified size(s) (or using default list of sizes). Order of options and size(s) are not important, other than options which take secondary inputs.
 
 Options:
   -h  -?                    Short help (this message).
@@ -69,16 +67,14 @@ Options:
   -c  --compress            Actually compress zip files.
   -o  --optimize            Optimize final PNG files.
       --no-optimize         Do not optimize final PNG files.
-  -r  --release             Re-renders, and optimizes all images for zip files.
+  -r  --release             Re-renders, and optimizes all final images.
   -a  --archive             Pack all produced zip files in a single archive."
 }
 
 __usage () {
-echo "$(basename "${0}") <OPTIONS> <SIZES>
+__help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
 
-Makes the resource pack at the specified size(s) (or using
-default list of sizes). Order of options and size(s) are not
-important, other than options which take secondary inputs.
+Makes the resource pack at the specified size(s) (or using default list of sizes). Order of options and size(s) are not important, other than options which take secondary inputs.
 
 General Options:
   -h  -?                    Short help.
@@ -97,8 +93,7 @@ General Options:
   -l  --lengthy             Very verbose debugging mode.
   -w  --warn                Show warnings.
   -c  --compress            Actually compress zip files.
-  -a  --archive             Pack all produced zip files in a single archive.
-                            This is best used without --compress.
+  -a  --archive             Pack all produced zip files in a single archive. This is best used without --compress.
 
 Render Options:
   -f  --force-render        Discard pre-rendered data.
@@ -108,16 +103,13 @@ Render Options:
       --no-optimize         Do not optimize final PNG files.
       --re-optimize         Re-process and re-optimize files appropriately.
 
-      --png-compression=N   Sets PNG compression level. 30 is good balance
-                            between size and speed (for local use), or when
-                            using optimization.
+      --png-compression=N   Sets PNG compression level. 30 is good balance between size and speed (for local use), or when using optimization.
 
   --max-optimize=<SIZE>     Max size to optimize.
   --force-optimize          Optimize any size of final PNG files.
   --force-max-optimize      Ensure max-optimize is obeyed.
 
-  -r  --release             Re-renders, optimizes and compresses zip files.
-                            Equivalent to:
+  -r  --release             Re-renders, optimizes and compresses zip files. Equivalent to:
                             '--force-render --force-optimize'
 
   --optional                Render optional items.
@@ -128,25 +120,17 @@ Render Options:
   --name=<NAME>             Name to use when processing a pack.
 
 Graphing Options:
-  --graph=<ITEM>            Render a graph of the dependency tree. Optional
-                            input is a comma and/or new-line separated list of
-                            ITEMs to be the subject of the graph For a full
-                            graph, use '', '.*', or nothing. May be specified
-                            multiple times. Supports regex.
+  --graph=<ITEM>            Render a graph of the dependency tree. Optional input is a comma and/or new-line separated list of ITEMs to be the subject of the graph For a full graph, use '', '.*', or nothing. May be specified multiple times. Supports regex.
   --graph-format=<FORMAT>   Specifies the format to graph to. Defaults to png.
-  --graph-seed=<SEED>       Seed to use when graphing. Defaults to a random
-                            seed when unspecified.
-  --graph-output=<NAME>     Name to use when outputting a graph. Default output
-                            is 'graph'
+  --graph-seed=<SEED>       Seed to use when graphing. Defaults to a random seed when unspecified.
+  --graph-output=<NAME>     Name to use when outputting a graph. Default output is 'graph'.
   --no-highlight            Do not highlight specified files when graphing.
 
 Other Options:
   --function=<PREFIX> <ROUTINE>
-                            Choose a routine for the given function (eg. SVG
-                            render, PNG optimizer).
+@                            Choose a routine for the given function (eg. SVG render, PNG optimizer).
 
-  --completed               List completed textures, according to the COMMON
-                            field in the catalogue
+  --completed               List completed textures, according to the COMMON field in the catalogue
 
   --changed                 List ITEMS changed since last render
 
