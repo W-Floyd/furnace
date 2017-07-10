@@ -337,7 +337,7 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_change
         __get_timer "${__item}" || continue
     done | (
     if [ "${__sort}" = '1' ]; then
-        sort -rg
+        sort -grk 3
     else
         cat
     fi
