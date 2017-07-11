@@ -84,16 +84,20 @@ cat | __hash | sed -e 's/ .*//' -e 's/^/X/'
 ################################################################################
 
 __tmp_timer () {
-if [ -z "${__tmp_time_var}" ] || [ "${__tmp_time_var}" = 'end' ]; then
-    export __tmp_time_var='start'
-elif [ "${__tmp_time_var}" = 'start' ]; then
-    export __tmp_time_var='end'
+if [ -z "${__tmp_timer_var}" ] || [ "${__tmp_timer_var}" = 'end' ]; then
+    export __tmp_timer_var='start'
+    if [ -z "${__tmp_timer_iteration}" ]; then
+        export __tmp_timer_iteration='1'
+    else
+        __tmp_timer_iteration=$((__tmp_timer_iteration+1))
+    fi
+elif [ "${__tmp_timer_var}" = 'start' ]; then
+    export __tmp_timer_var='end'
 fi
-__force_timer "${__tmp_time_var}" "temporary timer"
-if [ -z "${__tmp_time_var}" ] || [ "${__tmp_time_var}" = 'end' ]; then
-    __get_timer "temporary timer"
-    __timer reset "temporary timer"
-fi
+
+local message="Temporary Timer ${__tmp_timer_iteration}"
+
+__force_timer "${__tmp_timer_var}" "${message}"
 }
 
 ################################################################################
