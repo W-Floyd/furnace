@@ -173,7 +173,7 @@ popd 1> /dev/null
 __log2 () {
 local x=0
 for (( y=$1-1 ; $y > 0; y >>= 1 )) ; do
-    let x=$x+1
+    ((x++))
 done
 echo $x
 }

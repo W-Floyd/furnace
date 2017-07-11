@@ -1140,7 +1140,10 @@ grep -Fxf "${__changed_both}" "${__new_xml_list}"
 } >> "${__list_file_proc}" &
 
 # List all deps
-( find . -type l -exec cat {} +; find . -type f -exec cat {} + ) | sort | uniq > "${__all_deps}" &
+{
+find . -type l -exec cat {} +
+find . -type f -exec cat {} +
+} | sort | uniq > "${__all_deps}" &
 
 # Get back to main directory
 __popd
@@ -1337,7 +1340,7 @@ __process_count='0'
 
 while read -r __item; do
     if ! [ -z "$(__get_value "${__item}" SCRIPT)" ] || ( [ "$(__get_value "${__item}" IMAGE)" = 'YES' ] && [ "$(__get_value "${__item}" KEEP)" = 'YES' ] && [ "${__should_optimize}" = '1' ] && ( [ "$(__get_value "${__item}" OPTIONAL)" = 'NO' ] || [ "${__render_optional}" = '1' ] ) ); then
-        __process_count=$((__process_count+1))
+        ((__process_count++))
     fi
 done < "${__render_list}"
 
@@ -1429,7 +1432,7 @@ while [ -s "${__render_list}" ] && [ "${__break_loop}" = '0' ]; do
 # if there is a config script to use, then
         if ! [ -z "${__config_script}" ]; then
 
-            __render_num=$((__render_num+1))
+            ((__render_num++))
 
             __failed='0'
 
@@ -1513,7 +1516,7 @@ Won't create \".${__config//.\/xml/}\""
 
             if [ "${__should_optimize}" = '1' ] && [ "$(__get_value "${__config}" KEEP)" = "YES" ] && [ "$(__get_value "${__config}" IMAGE)" = 'YES' ]; then
 
-                __render_num=$((__render_num+1))
+                ((__render_num++))
 
                 if [ "${__short_output}" = '0' ]; then
 
