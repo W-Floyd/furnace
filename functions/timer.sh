@@ -115,7 +115,7 @@ if [ -z "${__timer[${1}]}" ]; then
     return 1
 fi
 
-__format_text "\e[32mTIME\e[39m" "$(sed 's/^\./0\./' <<< "${__timer[${1}]}") seconds - ${__timer_description[${1}]}" ""
+__format_text "$(__colorize -f 'TIME' green bold)" "$(sed 's/^\./0\./' <<< "${__timer[${1}]}") seconds - ${__timer_description[${1}]}" ""
 }
 
 ################################################################################
@@ -186,7 +186,7 @@ if ! [ "${__name_only}" = '1' ] && [ "${__time}" = '1' ] && ! [ "${__list_change
     )"
     if ! [ -z "${__end}" ]; then
         if [ "${__final}" = '1' ] && [ "${__verbose}" = '1' ]; then
-            __format_text "\e[32mTIME\e[39m" "General Timing" ""
+            __format_text "$(__colorize -f 'TIME' green bold)" "General Timing" ""
         fi
         echo -e "${__end}"
         if [ "${__final}" = '0' ]; then

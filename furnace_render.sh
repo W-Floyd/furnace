@@ -292,6 +292,8 @@ else
 # end mobile if statement
 fi
 
+__size_coloured="$(__colorize -f "${__size}" cyan bold)"
+
 ################################################################################
 # Print pack name
 ################################################################################
@@ -1284,7 +1286,7 @@ if [ "${__list_changed}" = '1' ]; then
     else
         __force_announce "Changes to \"${__size}\":"
         tac <<< "${__changed}" | while read -r __change; do
-            __format_text "\e[36m${__size}\e[39m" "File \"${__change}\" has changed." ""
+            __format_text  "$(__colorize -f "${__size}" cyan bold)" "File \"${__change}\" has changed." ""
         done
     fi
 
@@ -1483,7 +1485,7 @@ Won't create \".${__config//.\/xml/}\""
                         __file_part="$(basename ".${__config//.\/xml/}")"
                     fi
 
-                    __format_text "\e[36m${__size}\e[39m" "${__leader}${__file_part}" ""
+                    __format_text "${__size_coloured}" "${__leader}${__file_part}" ""
                 fi
 
 # copy the config script out so we can use it
@@ -1501,7 +1503,7 @@ Won't create \".${__config//.\/xml/}\""
                 } &
 
                 if [ "${__show_progress}" = '1' ]; then
-                    __format_text "\e[36m${__size}\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
+                    __format_text "${__size_coloured}" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
                 fi
 
                 wait
@@ -1545,14 +1547,14 @@ Won't create \".${__config//.\/xml/}\""
                         __file_part="$(basename ".${__config//.\/xml/}")"
                     fi
 
-                    __format_text "\e[36m${__size}\e[39m" "${__leader}${__file_part}" ""
+                    __format_text "${__size_coloured}" "${__leader}${__file_part}" ""
                 fi
 
 
                 __optimize "./${__orig_config_name}" &
 
                 if [ "${__show_progress}" = '1' ]; then
-                    __format_text "\e[36m${__size}\e[39m" "$(echo "100*${__render_num}/${__process_count}" | bc)% done - ${__render_num}/${__process_count}" ""
+                    __format_text "${__size_coloured}" "$(bc <<< "100*${__render_num}/${__process_count}")% done - ${__render_num}/${__process_count}" ""
                 fi
 
                 wait

@@ -16,6 +16,138 @@ cat | perl -pe 's/\e\[?.*?[\@-~]//g'
 
 ################################################################################
 #
+# __colorize -f <TEXT> <COLOR1> <COLOR2>
+#
+# Colorize
+# Colours an input with specified colour, and escapes the colour once done. Uses
+# same colours as __color.
+#
+################################################################################
+
+__colorize () {
+if [ "${1}" = '-f' ]; then
+    shift
+    local force='1'
+fi
+local message="${1}"
+shift
+if [ "${force}" = '1' ]; then
+    __color -f "${@}"
+else
+    __color "${@}"
+fi
+printf -- "${message}"
+if [ "${force}" = '1' ]; then
+    __color -f normal
+else
+    __color normal
+fi
+}
+
+################################################################################
+#
+# __color [-f] <COLOR1> [ <COLOR2> ... ]
+#
+# Color
+# Determines if the context supports colouring output, and outputs accordingly.
+# If '-f' is on, it will colour no matter what.
+#
+# Valid colours are:
+# bold
+# underline
+# standout
+# normal
+# black
+# red
+# green
+# yellow
+# blue
+# magenta
+# cyan
+# white
+#
+# Adapted from:
+# https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
+#
+################################################################################
+
+__color_print () {
+case "${1}" in
+    bold)
+        tput bold
+        ;;
+    underline)
+        tput smul
+        ;;
+    standout)
+        tput smso
+        ;;
+    normal)
+        tput sgr0
+        ;;
+    black)
+        tput setaf 0
+        ;;
+    red)
+        tput setaf 1
+        ;;
+    green)
+        tput setaf 2
+        ;;
+    yellow)
+        tput setaf 3
+        ;;
+    blue)
+        tput setaf 4
+        ;;
+    magenta)
+        tput setaf 5
+        ;;
+    cyan)
+        tput setaf 6
+        ;;
+    white)
+        tput setaf 7
+        ;;
+    [0-9]*)
+        if [ "${1}" -eq "${1}" ]; then
+            tput setaf "${1}"
+        else
+            __error 'Invalid colour.'
+        fi
+        ;;
+    *)
+        __error 'Invalid colour.'
+esac
+}
+
+__color_process () {
+until [ "${#}" = '0' ]; do
+    __color_print "${1}"
+    shift
+done
+}
+
+__color () {
+if [ "${1}" = '-f' ]; then
+    shift
+    __color_process "${@}"
+else
+# check if stdout is a terminal...
+    if [ -t 1 ]; then
+
+        # see if it supports colors...
+        local ncolors=$(tput colors)
+
+        if [ -n "${ncolors}" ] && [ "${ncolors}" -ge 8 ]; then
+            __color_print "${1}"
+        fi
+    fi
+fi
+}
+
+################################################################################
+#
 # __print_pad
 #
 # Prints the given number of spaces.
@@ -74,7 +206,7 @@ fi
 ################################################################################
 
 __bypass_announce () {
-__format_text "\e[32mINFO\e[39m" "${1}" ""
+__format_text "$(__colorize -f 'INFO' green bold)" "${1}" ""
 }
 
 ################################################################################
@@ -118,7 +250,7 @@ fi
 
 __force_warn () {
 if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __format_text "\e[93mWARN\e[39m" "${1}" ", continuing anyway." 1>&2
+    __format_text "$(__colorize -f 'WARN' yellow bold)" "${1}" ", continuing anyway." 1>&2
 fi
 }
 
@@ -150,7 +282,7 @@ fi
 ################################################################################
 
 __custom_error () {
-__format_text "\e[31mERRO\e[39m" "${1}" "${2}" 1>&2
+__format_text "$(__colorize -f 'ERRO' red bold)" "${1}" "${2}" 1>&2
 }
 
 ################################################################################

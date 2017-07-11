@@ -163,7 +163,7 @@ case "${1}" in
         ;;
 
     "--helo" | "--hello")
-        echo -e ';) Hi there, beautiful \e[31m❤\e[39m'
+        echo -e ";) Hi there, beautiful $(__colorize -f '❤' red bold)"
         exit
         ;;
 
