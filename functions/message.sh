@@ -171,12 +171,13 @@ done
 ################################################################################
 
 __format_text () {
-echo -ne "${1}"
 local __desired_size='7'
+{
+printf -- "${1}"
 local __leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
 local __clipped_size=$((__desired_size-__leader_size-3))
 local __front_pad="$(__print_pad "${__clipped_size}") - "
-echo -ne "${__front_pad}"
+printf -- "${__front_pad}"
 local __pad=''
 
 if [ "$(wc -l <<< "${2}")" -gt '1' ]; then
@@ -193,6 +194,9 @@ if [ "$(wc -l <<< "${2}")" -gt '1' ]; then
 else
     echo -e "${2}${3}"
 fi
+} | while IFS='' read -r __line; do
+    __fold -c "${__line}" "${__desired_size}"
+done
 
 }
 
@@ -301,7 +305,7 @@ exit 1
 
 ################################################################################
 #
-# __fold <LINE> <PAD_NUM>
+# __fold -c <LINE> <PAD_NUM>
 #
 # Fold
 # Folds the line, with second option being the number of spaces to pad other
@@ -310,8 +314,16 @@ exit 1
 ################################################################################
 
 __fold () {
+    if [ "${1}" = '-c' ]; then
+        shift
+        local strip_colour='1'
+    else
+        local strip_colour='0'
+    fi
     local max_length=78
-    if ! [ "${#1}" -gt "${max_length}" ]; then
+    local input="${1}"
+    local stripped_input="$(__strip_ansi <<< "${input}")"
+    if ! [ "${#stripped_input}" -gt "${max_length}" ]; then
         printf -- "${1}\n"
     else
         if ! shopt -q -p extglob; then
@@ -330,7 +342,6 @@ __fold () {
 
 	    local cur_line=''
 	    local i=0
-        local input="${1}"
 	    local leading_space="${input//[^ ]*}"
         while IFS= read -d ' ' -r __word; do
             if [ "${i}" = '0' ]; then
@@ -339,7 +350,14 @@ __fold () {
                 tmp_cur_line="${cur_line} ${__word}"
             fi
 
-            if ! [ "${#tmp_cur_line}" -gt "${max_length}" ]; then
+            if [ "${strip_colour}" = '1' ]; then
+                local tmp_length="$(__strip_ansi <<< "${tmp_cur_line}")"
+                local tmp_length="${#tmp_length}"
+            else
+                local tmp_length="${#tmp_cur_line}"
+            fi
+
+            if ! [ "${tmp_length}" -gt "${max_length}" ]; then
                 if [ "${i}" = '0' ]; then
                     cur_line="${__word}"
                 else

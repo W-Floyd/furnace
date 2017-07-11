@@ -163,7 +163,7 @@ case "${1}" in
         ;;
 
     "--helo" | "--hello")
-        echo -e ";) Hi there, beautiful $(__colorize -f '❤' red bold)"
+        echo ";) Hi there, beautiful $(__colorize -f '❤' red bold)"
         exit
         ;;
 
