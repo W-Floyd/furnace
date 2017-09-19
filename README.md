@@ -1,6 +1,8 @@
 ![Logo](https://github.com/W-Floyd/furnace/raw/master/logo.png)
 # Furnace
 ## A Minecraft resource pack builder
+## In the process of planning for a complete rewrite, waiting until I have more time.
+### Not supported, sorry :/
 ### Changes occur often, here be dragons.
 
 ## Installation
