@@ -29,7 +29,7 @@ import (
 // cacheExportCmd represents the cacheExport command
 var cacheExportCmd = &cobra.Command{
 	Use:   "cache-export",
-	Short: "Export the contents of the render cache for import in another furnace instance.",
+	Short: "Export the contents of the render cache for import in another furnace instance",
 	Long:  `Export the contents of the render cache for import in another furnace instance.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

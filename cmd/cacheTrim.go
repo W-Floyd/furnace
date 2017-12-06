@@ -27,13 +27,17 @@ import (
 )
 
 // TODO - Make these meaningful
-var trimAge, trimSize string
+var maxTrimAge, maxTrimSize string
 
 // cacheTrimCmd represents the cacheTrim command
 var cacheTrimCmd = &cobra.Command{
 	Use:   "cache-trim",
 	Short: "Trim the render cache",
-	Long:  `Trim the render cache with customizable requirements`,
+	Long: `Trim the render cache with customizable requirements.
+	
+This should not ordinarily be required unless the cache size (and possibly age) limit has been lifted.
+If you find yourself running this regularly, please change the default cache size in your config.
+TODO - Add and implement such an option.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("cacheTrim called")
 	},
@@ -51,6 +55,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	cacheTrimCmd.Flags().BoolP("delete", "d", false, "Delete the entire cache")
-	cacheTrimCmd.PersistentFlags().StringVar(&trimAge, "age", "", "Maximum age")
-	cacheTrimCmd.PersistentFlags().StringVar(&trimSize, "size", "1GiB", "Maximum size")
+	cacheTrimCmd.PersistentFlags().StringVar(&maxTrimAge, "max-age", "", "Maximum age")
+	cacheTrimCmd.PersistentFlags().StringVar(&maxTrimSize, "max-size", "", "Maximum size")
 }

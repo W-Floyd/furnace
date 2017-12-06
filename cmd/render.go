@@ -29,13 +29,8 @@ import (
 // renderCmd represents the render command
 var renderCmd = &cobra.Command{
 	Use:   "render",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Renders and zips a Minecraft-ready pack",
+	Long:  `Renders and zips a Minecraft-ready pack.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("render called")
 	},
@@ -52,5 +47,6 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// renderCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	renderCmd.Flags().Bool("no-slave", false, "Do not run an internal slave instance")
+	renderCmd.Flags().Bool("no-cache", false, "Do not run an internal cacher instance")
 }

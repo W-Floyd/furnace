@@ -57,12 +57,14 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.furnace.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.furnace.yaml)")
+	rootCmd.PersistentFlags().Bool("no-warn", false, "Suppress non-critical warnings")
+	rootCmd.PersistentFlags().Bool("no-color", false, "Do not colour output")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Quiet output")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().Bool("no-warn", false, "Suppress non-critical warnings")
-	rootCmd.Flags().Bool("no-color", false, "Do not colour output")
 }
 
 // initConfig reads in config file and ENV variables if set.
