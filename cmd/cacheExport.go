@@ -29,8 +29,8 @@ import (
 // cacheExportCmd represents the cacheExport command
 var cacheExportCmd = &cobra.Command{
 	Use:   "cache-export",
-	Short: "Export the contents of the render cache for import in another furnace instance",
-	Long:  `Export the contents of the render cache for import in another furnace instance.`,
+	Short: "Export the relevant contents of the render cache",
+	Long:  `Export the pack relevant contents of the render cache for import in another furnace instance.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("cacheExport called")
@@ -48,5 +48,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// cacheExportCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	cacheExportCmd.Flags().BoolP("all", "a", false, "Export all cached data")
 }
