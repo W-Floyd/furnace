@@ -14,14 +14,14 @@
 #
 ################################################################################
 
-__archive () {
+__archive() {
 
-__short_routine 'archive' 'archiving' 'zip ect gzip zopfli' "${@}"
+    __short_routine 'archive' 'archiving' 'zip ect gzip zopfli' "${@}"
 
-if ! [ -e "${1}.${__archive_extension}" ]; then
-    __force_warn "File \"${1}.${__archive_extension}\" was not produced when archiving"
-    return 1
-fi
+    if ! [ -e "${1}.${__archive_extension}" ]; then
+        __force_warn "File \"${1}.${__archive_extension}\" was not produced when archiving"
+        return 1
+    fi
 
 }
 
@@ -29,19 +29,19 @@ fi
 # Zip
 ################################################################################
 
-__routine__archive__zip () {
+__routine__archive__zip() {
 
-__archive_extension='zip'
+    __archive_extension='zip'
 
-local __dest="${1}.${__archive_extension}"
+    local __dest="${1}.${__archive_extension}"
 
-if [ -e "${__dest}" ]; then
-    rm "${__dest}"
-fi
+    if [ -e "${__dest}" ]; then
+        rm "${__dest}"
+    fi
 
-shift
+    shift
 
-zip -q9 "${__dest}" "${@}"
+    zip -q9 "${__dest}" "${@}"
 
 }
 
@@ -49,25 +49,25 @@ zip -q9 "${__dest}" "${@}"
 # Gzip
 ################################################################################
 
-__routine__archive__gzip () {
+__routine__archive__gzip() {
 
-local __ext_1='tar'
-local __ext_2='gz'
+    local __ext_1='tar'
+    local __ext_2='gz'
 
-__archive_extension="${__ext_1}.${__ext_2}"
+    __archive_extension="${__ext_1}.${__ext_2}"
 
-local __dest_1="${1}.${__ext_1}"
-local __dest_2="${1}.${__archive_extension}"
+    local __dest_1="${1}.${__ext_1}"
+    local __dest_2="${1}.${__archive_extension}"
 
-if [ -e "${__dest_2}" ]; then
-    rm "${__dest_2}"
-fi
+    if [ -e "${__dest_2}" ]; then
+        rm "${__dest_2}"
+    fi
 
-shift
+    shift
 
-__tar "${__dest_1}" "${@}"
+    __tar "${__dest_1}" "${@}"
 
-gzip -9 "${__dest_1}"
+    gzip -9 "${__dest_1}"
 
 }
 
@@ -75,27 +75,27 @@ gzip -9 "${__dest_1}"
 # Zopfli
 ################################################################################
 
-__routine__archive__zopfli () {
+__routine__archive__zopfli() {
 
-local __ext_1='tar'
-local __ext_2='gz'
+    local __ext_1='tar'
+    local __ext_2='gz'
 
-__archive_extension="${__ext_1}.${__ext_2}"
+    __archive_extension="${__ext_1}.${__ext_2}"
 
-local __dest_1="${1}.${__ext_1}"
-local __dest_2="${1}.${__archive_extension}"
+    local __dest_1="${1}.${__ext_1}"
+    local __dest_2="${1}.${__archive_extension}"
 
-if [ -e "${__dest_2}" ]; then
-    rm "${__dest_2}"
-fi
+    if [ -e "${__dest_2}" ]; then
+        rm "${__dest_2}"
+    fi
 
-shift
+    shift
 
-__tar "${__dest_1}" "${@}"
+    __tar "${__dest_1}" "${@}"
 
-zopfli "${__dest_1}"
+    zopfli "${__dest_1}"
 
-rm "${__dest_1}"
+    rm "${__dest_1}"
 
 }
 
@@ -103,27 +103,27 @@ rm "${__dest_1}"
 # ECT
 ################################################################################
 
-__routine__archive__ect () {
+__routine__archive__ect() {
 
-local __ext_1='tar'
-local __ext_2='gz'
+    local __ext_1='tar'
+    local __ext_2='gz'
 
-__archive_extension="${__ext_1}.${__ext_2}"
+    __archive_extension="${__ext_1}.${__ext_2}"
 
-local __dest_1="${1}.${__ext_1}"
-local __dest_2="${1}.${__archive_extension}"
+    local __dest_1="${1}.${__ext_1}"
+    local __dest_2="${1}.${__archive_extension}"
 
-if [ -e "${__dest_2}" ]; then
-    rm "${__dest_2}"
-fi
+    if [ -e "${__dest_2}" ]; then
+        rm "${__dest_2}"
+    fi
 
-shift
+    shift
 
-__tar "${__dest_1}" "${@}"
+    __tar "${__dest_1}" "${@}"
 
-ect -quiet -gzip "${__dest_1}"
+    ect -quiet -gzip "${__dest_1}"
 
-rm "${__dest_1}"
+    rm "${__dest_1}"
 
 }
 
@@ -131,28 +131,28 @@ rm "${__dest_1}"
 # tar
 ################################################################################
 
-__routine__archive__tar () {
+__routine__archive__tar() {
 
-if ! [ -z "${__archive_extension}" ]; then
+    if ! [ -z "${__archive_extension}" ]; then
 
-    local __archive_extension_1='tar'
+        local __archive_extension_1='tar'
 
-else
+    else
 
-    __archive_extension='tar'
-    local __archive_extension_1="${__archive_extension}"
+        __archive_extension='tar'
+        local __archive_extension_1="${__archive_extension}"
 
-fi
+    fi
 
-local __dest="${1}.${__archive_extension_1}"
+    local __dest="${1}.${__archive_extension_1}"
 
-if [ -e "${__dest}" ]; then
-    rm "${__dest}"
-fi
+    if [ -e "${__dest}" ]; then
+        rm "${__dest}"
+    fi
 
-shift
+    shift
 
-__tar "${__dest}" "${@}"
+    __tar "${__dest}" "${@}"
 
 }
 
@@ -166,15 +166,15 @@ __tar "${__dest}" "${@}"
 #
 ################################################################################
 
-__tar () {
+__tar() {
 
-__short_routine 'tar' 'tarballing' 'tar' "${@}"
+    __short_routine 'tar' 'tarballing' 'tar' "${@}"
 
 }
 
-__routine__tar__tar () {
+__routine__tar__tar() {
 
-tar -cf "${@}"
+    tar -cf "${@}"
 
 }
 
@@ -190,14 +190,14 @@ tar -cf "${@}"
 #
 ################################################################################
 
-__zip () {
+__zip() {
 
-__short_routine 'zip' 'zipping' 'zip' "${1}"
+    __short_routine 'zip' 'zipping' 'zip' "${1}"
 
-if ! [ -e "../${1}.zip" ]; then
-    __force_warn "File \"${1}.zip\" was not produced when zipping"
-    return 1
-fi
+    if ! [ -e "../${1}.zip" ]; then
+        __force_warn "File \"${1}.zip\" was not produced when zipping"
+        return 1
+    fi
 
 }
 
@@ -205,16 +205,16 @@ fi
 # Zip
 ################################################################################
 
-__routine__zip__zip () {
+__routine__zip__zip() {
 
-if [ "${__compress}" = '1' ]; then
+    if [ "${__compress}" = '1' ]; then
 
-    zip -q -9 -r "../${1}.zip" ./
+        zip -q -9 -r "../${1}.zip" ./
 
-else
+    else
 
-    zip -qZ store -r "../${1}.zip" ./
+        zip -qZ store -r "../${1}.zip" ./
 
-fi
+    fi
 
 }

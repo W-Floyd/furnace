@@ -32,14 +32,13 @@ fi
 
 __dep_list=''
 
-__options=\
-'    overlap=scalexy;
+__options='    overlap=scalexy;
     center=true
     splines=true;
     sep="0.3";'
 
 echo \
-"digraph pack {
+    "digraph pack {
 ${__options}" > "${__graph}"
 
 __list="$(cat './src/xml/list')"
@@ -95,19 +94,23 @@ if ! [ -z "${__dep_list}" ]; then
 
     echo "${__dep_list}" > "${__graph_tmp_dir}/dep_list"
 
-    __tmp_func () {
+    __tmp_func() {
 
-    __deps="$({ __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS; __get_value "${__graph_tmp_dir}/readrangetmp" SCRIPT; __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP; } | sed '/^$/d')"
+        __deps="$({
+            __get_value "${__graph_tmp_dir}/readrangetmp" DEPENDS
+            __get_value "${__graph_tmp_dir}/readrangetmp" SCRIPT
+            __get_value "${__graph_tmp_dir}/readrangetmp" CLEANUP
+        } | sed '/^$/d')"
 
-    if ! [ -z "${__deps}" ]; then
+        if ! [ -z "${__deps}" ]; then
 
-        while read -r __dep; do
-            if ! [ "${__dep}" = "${__name}" ]; then
-                echo "    \"${__dep}\" -> \"${__name}\";"
-            fi
-        done <<< "${__deps}" | sort | uniq >> "${__graph}"
+            while read -r __dep; do
+                if ! [ "${__dep}" = "${__name}" ]; then
+                    echo "    \"${__dep}\" -> \"${__name}\";"
+                fi
+            done <<< "${__deps}" | sort | uniq >> "${__graph}"
 
-    fi
+        fi
 
     }
 

@@ -14,14 +14,14 @@ for __range in $(__get_range "${__catalogue}" ITEM); do
 
     if [ "$(__get_value "/tmp/readrangetmp" KEEP)" = 'YES' ]; then
 
-	    __common="$(__get_value "/tmp/readrangetmp" COMMON)"
+        __common="$(__get_value "/tmp/readrangetmp" COMMON)"
 
-	    if ! [ -z "${__common}" ]; then
-	        echo "${__common}" >> "/tmp/commontmp"
-	    else
-	        __get_value "/tmp/readrangetmp" NAME >> "/tmp/nametmp"
-	        __un_named="$(bc <<< "${__un_named}+1")"
-	    fi
+        if ! [ -z "${__common}" ]; then
+            echo "${__common}" >> "/tmp/commontmp"
+        else
+            __get_value "/tmp/readrangetmp" NAME >> "/tmp/nametmp"
+            __un_named="$(bc <<< "${__un_named}+1")"
+        fi
     fi
 
 done

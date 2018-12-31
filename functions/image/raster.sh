@@ -15,10 +15,10 @@
 #
 ################################################################################
 
-__routine__image_gimp_export__gimp () {
+__routine__image_gimp_export__gimp() {
 
-__gimp_sub () {
-gimp -i --batch-interpreter=python-fu-eval -b - << EOF
+    __gimp_sub() {
+        gimp -i --batch-interpreter=python-fu-eval -b - << EOF
 import gimpfu
 
 def convert(filename):
@@ -33,23 +33,23 @@ convert('${1}')
 
 pdb.gimp_quit(1)
 EOF
+    }
+
+    # My instance of GIMP throws some errors no matter what, so
+    # it's made silent. Bad idea, I know...
+    __gimp_sub "${1}" &> /dev/null
+
+    __image_conform "$(__mext "${1}").png"
+
 }
 
-# My instance of GIMP throws some errors no matter what, so
-# it's made silent. Bad idea, I know...
-__gimp_sub "${1}" &> /dev/null
+__gimp_export() {
 
-__image_conform "$(__mext "${1}").png"
+    if ! [ "$(__oext "${1}")" = 'xcf' ]; then
+        __error "File \"${1}\" is not a GIMP file"
+    fi
 
-}
-
-__gimp_export () {
-
-if ! [ "$(__oext "${1}")" = 'xcf' ]; then
-    __error "File \"${1}\" is not a GIMP file"
-fi
-
-__short_routine 'image_gimp_export' 'Gimp exporting' 'gimp' "${1}"
+    __short_routine 'image_gimp_export' 'Gimp exporting' 'gimp' "${1}"
 
 }
 
@@ -62,23 +62,23 @@ __short_routine 'image_gimp_export' 'Gimp exporting' 'gimp' "${1}"
 #
 ################################################################################
 
-__routine__image_krita_export__krita () {
+__routine__image_krita_export__krita() {
 
-# My instance of Krita throws some errors no matter what, so
-# it's made silent. Bad idea, I know...
-# TODO - Find out why Krita is throwing warnings.
-krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
+    # My instance of Krita throws some errors no matter what, so
+    # it's made silent. Bad idea, I know...
+    # TODO - Find out why Krita is throwing warnings.
+    krita --export --export-filename "$(__mext "${1}").png" "${1}" &> /dev/null
 
-__image_conform "$(__mext "${1}").png"
+    __image_conform "$(__mext "${1}").png"
 
 }
 
-__krita_export () {
+__krita_export() {
 
-if ! [ "$(__oext "${1}")" = 'kra' ]; then
-    __error "File \"${1}\" is not a Krita file"
-fi
+    if ! [ "$(__oext "${1}")" = 'kra' ]; then
+        __error "File \"${1}\" is not a Krita file"
+    fi
 
-__short_routine 'image_krita_export' 'Krita exporting' 'krita' "${1}"
+    __short_routine 'image_krita_export' 'Krita exporting' 'krita' "${1}"
 
 }

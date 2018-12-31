@@ -1,4 +1,4 @@
-_furnace () {
+_furnace() {
     local cur prev sizes rundir helper sizes graph_formats matches items graphers ignore_list prefix candidates tmpvar
 
     _init_completion || return
@@ -63,7 +63,10 @@ _furnace () {
             ;;
 
         "--name="*)
-            candidates="$(basename "$(pwd)" | rev | sed -e 's/.*-//' -e 's/.*_//' -e 's/.*\.//' | rev; basename "$(pwd)")"
+            candidates="$(
+                basename "$(pwd)" | rev | sed -e 's/.*-//' -e 's/.*_//' -e 's/.*\.//' | rev
+                basename "$(pwd)"
+            )"
             COMPREPLY=($(compgen -W "${candidates}" -- "${cur#*=}"))
             return 0
             ;;
@@ -79,7 +82,7 @@ _furnace () {
 
         -*)
             tmpvar="$(_parse_help "${1}" | grep -vxF -- "${ignore_list}")"
-            COMPREPLY=( $( compgen -W "${tmpvar}" -- "${cur}" ) )
+            COMPREPLY=($(compgen -W "${tmpvar}" -- "${cur}"))
             if [ "$(wc -l <<< "${COMPREPLY}")" = '1' ]; then
                 if grep -qE '=$' <<< "${COMPREPLY}"; then
                     compopt -o nospace
@@ -95,7 +98,6 @@ _furnace () {
     esac
 
 } &&
-
-complete -F _furnace furnace
+    complete -F _furnace furnace
 
 # ex: ts=4 sw=4 et filetype=sh

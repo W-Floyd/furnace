@@ -10,8 +10,8 @@
 #
 ################################################################################
 
-__strip_ansi () {
-cat | perl -pe 's/\e\[?.*?[\@-~]//g'
+__strip_ansi() {
+    cat | perl -pe 's/\e\[?.*?[\@-~]//g'
 }
 
 ################################################################################
@@ -24,24 +24,24 @@ cat | perl -pe 's/\e\[?.*?[\@-~]//g'
 #
 ################################################################################
 
-__colorize () {
-if [ "${1}" = '-f' ]; then
+__colorize() {
+    if [ "${1}" = '-f' ]; then
+        shift
+        local force='1'
+    fi
+    local message="${1}"
     shift
-    local force='1'
-fi
-local message="${1}"
-shift
-if [ "${force}" = '1' ]; then
-    __color -f "${@}"
-else
-    __color "${@}"
-fi
-printf -- "${message}"
-if [ "${force}" = '1' ]; then
-    __color -f normal
-else
-    __color normal
-fi
+    if [ "${force}" = '1' ]; then
+        __color -f "${@}"
+    else
+        __color "${@}"
+    fi
+    printf -- "${message}"
+    if [ "${force}" = '1' ]; then
+        __color -f normal
+    else
+        __color normal
+    fi
 }
 
 ################################################################################
@@ -71,79 +71,80 @@ fi
 #
 ################################################################################
 
-__color_print () {
-case "${1}" in
-    bold)
-        tput bold
-        ;;
-    underline)
-        tput smul
-        ;;
-    standout)
-        tput smso
-        ;;
-    normal)
-        tput sgr0
-        ;;
-    black)
-        tput setaf 0
-        ;;
-    red)
-        tput setaf 1
-        ;;
-    green)
-        tput setaf 2
-        ;;
-    yellow)
-        tput setaf 3
-        ;;
-    blue)
-        tput setaf 4
-        ;;
-    magenta)
-        tput setaf 5
-        ;;
-    cyan)
-        tput setaf 6
-        ;;
-    white)
-        tput setaf 7
-        ;;
-    [0-9]*)
-        if [ "${1}" -eq "${1}" ]; then
-            tput setaf "${1}"
-        else
+__color_print() {
+    case "${1}" in
+        bold)
+            tput bold
+            ;;
+        underline)
+            tput smul
+            ;;
+        standout)
+            tput smso
+            ;;
+        normal)
+            tput sgr0
+            ;;
+        black)
+            tput setaf 0
+            ;;
+        red)
+            tput setaf 1
+            ;;
+        green)
+            tput setaf 2
+            ;;
+        yellow)
+            tput setaf 3
+            ;;
+        blue)
+            tput setaf 4
+            ;;
+        magenta)
+            tput setaf 5
+            ;;
+        cyan)
+            tput setaf 6
+            ;;
+        white)
+            tput setaf 7
+            ;;
+        [0-9]*)
+            if [ "${1}" -eq "${1}" ]; then
+                tput setaf "${1}"
+            else
+                __error 'Invalid colour.'
+            fi
+            ;;
+        *)
             __error 'Invalid colour.'
-        fi
-        ;;
-    *)
-        __error 'Invalid colour.'
-esac
+            ;;
+    esac
 }
 
-__color_process () {
-until [ "${#}" = '0' ]; do
-    __color_print "${1}"
-    shift
-done
+__color_process() {
+    until [ "${#}" = '0' ]; do
+        __color_print "${1}"
+        shift
+    done
 }
 
-__color () {
-if [ "${1}" = '-f' ]; then
-    shift
-    __color_process "${@}"
-else
-# check if stdout is a terminal...
-    if [ -t 1 ]; then
+__color() {
+    if [ "${1}" = '-f' ]; then
+        shift
+        __color_process "${@}"
+    else
+        # check if stdout is a terminal...
+        if [ -t 1 ]; then
 
-        # see if it supports colors...
-        local ncolors=$(tput colors)
+            # see if it supports colors...
+            local ncolors=$(tput colors)
 
-        if [ -n "${ncolors}" ] && [ "${ncolors}" -ge 8 ]; then
-            __color_print "${1}"
+            if [ -n "${ncolors}" ] && [ "${ncolors}" -ge 8 ]; then
+                __color_print "${1}"
+            fi
         fi
     fi
-fi
 }
 
 ################################################################################
@@ -154,12 +155,12 @@ fi
 #
 ################################################################################
 
-__print_pad () {
-local i='0'
-until [ "${i}" = "${1}" ]; do
-    echo -n ' '
-    i=$((i+1))
-done
+__print_pad() {
+    local i='0'
+    until [ "${i}" = "${1}" ]; do
+        echo -n ' '
+        i=$((i + 1))
+    done
 }
 
 ################################################################################
@@ -170,33 +171,33 @@ done
 #
 ################################################################################
 
-__format_text () {
-local __desired_size='7'
-{
-printf -- "${1}"
-local __leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
-local __clipped_size=$((__desired_size-__leader_size-3))
-local __front_pad="$(__print_pad "${__clipped_size}") - "
-printf -- "${__front_pad}"
-local __pad=''
+__format_text() {
+    local __desired_size='7'
+    {
+        printf -- "${1}"
+        local __leader_size="$(echo -ne "${1}" | __strip_ansi | wc -m)"
+        local __clipped_size=$((__desired_size - __leader_size - 3))
+        local __front_pad="$(__print_pad "${__clipped_size}") - "
+        printf -- "${__front_pad}"
+        local __pad=''
 
-if [ "$(wc -l <<< "${2}")" -gt '1' ]; then
-    head -n -1 <<< "${2}" | while read -r __line; do
-        if [ -z "${__pad}" ]; then
-            echo -e "${__pad}${__line}"
+        if [ "$(wc -l <<< "${2}")" -gt '1' ]; then
+            head -n -1 <<< "${2}" | while read -r __line; do
+                if [ -z "${__pad}" ]; then
+                    echo -e "${__pad}${__line}"
+                    local __pad="$(__print_pad "${__desired_size}")"
+                else
+                    echo -e "${__pad}${__line}"
+                fi
+            done
             local __pad="$(__print_pad "${__desired_size}")"
+            echo -e "${__pad}$(tail -n 1 <<< "${2}")${3}"
         else
-            echo -e "${__pad}${__line}"
+            echo -e "${2}${3}"
         fi
+    } | while IFS='' read -r __line; do
+        __fold -c "${__line}" "${__desired_size}"
     done
-    local __pad="$(__print_pad "${__desired_size}")"
-    echo -e "${__pad}$(tail -n 1 <<< "${2}")${3}"
-else
-    echo -e "${2}${3}"
-fi
-} | while IFS='' read -r __line; do
-    __fold -c "${__line}" "${__desired_size}"
-done
 
 }
 
@@ -209,8 +210,8 @@ done
 #
 ################################################################################
 
-__bypass_announce () {
-__format_text "$(__colorize -f 'INFO' green bold)" "${1}" ""
+__bypass_announce() {
+    __format_text "$(__colorize -f 'INFO' green bold)" "${1}" ""
 }
 
 ################################################################################
@@ -222,10 +223,10 @@ __format_text "$(__colorize -f 'INFO' green bold)" "${1}" ""
 #
 ################################################################################
 
-__force_announce () {
-if [ "${__quiet}" = '0' ]; then
-    __bypass_announce "${1}"
-fi
+__force_announce() {
+    if [ "${__quiet}" = '0' ]; then
+        __bypass_announce "${1}"
+    fi
 }
 
 ################################################################################
@@ -237,10 +238,10 @@ fi
 #
 ################################################################################
 
-__announce () {
-if [ "${__time}" = '0' ] && [ "${__verbose}" = '1' ] && ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __force_announce "${1}"
-fi
+__announce() {
+    if [ "${__time}" = '0' ] && [ "${__verbose}" = '1' ] && ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
+        __force_announce "${1}"
+    fi
 }
 
 ################################################################################
@@ -252,10 +253,10 @@ fi
 #
 ################################################################################
 
-__force_warn () {
-if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __format_text "$(__colorize -f 'WARN' yellow bold)" "${1}" ", continuing anyway." 1>&2
-fi
+__force_warn() {
+    if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
+        __format_text "$(__colorize -f 'WARN' yellow bold)" "${1}" ", continuing anyway." 1>&2
+    fi
 }
 
 ################################################################################
@@ -268,12 +269,12 @@ fi
 #
 ################################################################################
 
-__warn () {
-if [ "${__very_verbose}" = '1' ] || [ "${__should_warn}" = '1' ]; then
-if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
-    __force_warn "${@}"
-fi
-fi
+__warn() {
+    if [ "${__very_verbose}" = '1' ] || [ "${__should_warn}" = '1' ]; then
+        if ! [ "${__name_only}" = '1' ] && ! [ "${__list_changed}" = '1' ]; then
+            __force_warn "${@}"
+        fi
+    fi
 }
 
 ################################################################################
@@ -285,8 +286,8 @@ fi
 #
 ################################################################################
 
-__custom_error () {
-__format_text "$(__colorize -f 'ERRO' red bold)" "${1}" "${2}" 1>&2
+__custom_error() {
+    __format_text "$(__colorize -f 'ERRO' red bold)" "${1}" "${2}" 1>&2
 }
 
 ################################################################################
@@ -298,9 +299,9 @@ __format_text "$(__colorize -f 'ERRO' red bold)" "${1}" "${2}" 1>&2
 #
 ################################################################################
 
-__error () {
-__custom_error "${1}" ", exiting."
-exit 1
+__error() {
+    __custom_error "${1}" ", exiting."
+    exit 1
 }
 
 ################################################################################
@@ -313,7 +314,7 @@ exit 1
 #
 ################################################################################
 
-__fold () {
+__fold() {
     if [ "${1}" = '-c' ]; then
         shift
         local strip_colour='1'
@@ -340,9 +341,9 @@ __fold () {
             local pad="$(__print_pad "${2}")"
         fi
 
-	    local cur_line=''
-	    local i=0
-	    local leading_space="${input//[^ ]*}"
+        local cur_line=''
+        local i=0
+        local leading_space="${input//[^ ]*/}"
         while IFS= read -d ' ' -r __word; do
             if [ "${i}" = '0' ]; then
                 tmp_cur_line="${__word}"
@@ -367,7 +368,7 @@ __fold () {
                 printf -- "${cur_line}\n"
                 cur_line="${pad}${__word}"
             fi
-            i=$((i+1))
+            i=$((i + 1))
         done <<< "${input} "
         printf -- "${cur_line}\n"
         if [ "${start_glob}" = '0' ]; then
@@ -386,23 +387,23 @@ __fold () {
 # then no padding, like a text line. If neither, guess.
 #
 ################################################################################
-__help_fold () {
-while IFS= read -r __line; do
-    case "${__line}" in
-        @*)
-            __fold "${__line#@}" 28
-            ;;
-        %*)
-            __fold "${__line#%}"
-            ;;
-        *)
-            if grep -qE '^ *-' <<< "${__line}"; then
-                __fold "${__line}" 28
-            else
-                __fold "${__line}"
-            fi
-            ;;
-    esac
+__help_fold() {
+    while IFS= read -r __line; do
+        case "${__line}" in
+            @*)
+                __fold "${__line#@}" 28
+                ;;
+            %*)
+                __fold "${__line#%}"
+                ;;
+            *)
+                if grep -qE '^ *-' <<< "${__line}"; then
+                    __fold "${__line}" 28
+                else
+                    __fold "${__line}"
+                fi
+                ;;
+        esac
 
-done
+    done
 }

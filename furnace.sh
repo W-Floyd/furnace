@@ -45,11 +45,14 @@ export __working_dir="$(pwd)"
 export __src_dir="${__working_dir}/src/"
 
 # get set up
-source "${__furnace_setup_bin}" 1> /dev/null || { echo "Failed to load setup \"${__furnace_setup_bin}\""; exit 1; }
+source "${__furnace_setup_bin}" 1> /dev/null || {
+    echo "Failed to load setup \"${__furnace_setup_bin}\""
+    exit 1
+}
 
 # Print help
-__usage_short () {
-__help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
+__usage_short() {
+    __help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
 
 Makes the resource pack at the specified size(s) (or using default list of sizes). Order of options and size(s) are not important, other than options which take secondary inputs.
 
@@ -71,8 +74,8 @@ Options:
   -a  --archive             Pack all produced zip files in a single archive."
 }
 
-__usage () {
-__help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
+__usage() {
+    __help_fold <<< "$(basename "${0}") <OPTIONS> <SIZES>
 
 Makes the resource pack at the specified size(s) (or using default list of sizes). Order of options and size(s) are not important, other than options which take secondary inputs.
 
@@ -146,335 +149,335 @@ __force_timer start "Processed XML"
 # If there are are options,
 if ! [ "${#}" = 0 ]; then
 
-################################################################################
+    ################################################################################
 
-__check_input () {
+    __check_input() {
 
-case "${1}" in
+        case "${1}" in
 
-    "-h" | "-?")
-        __usage_short
-        exit
-        ;;
+            "-h" | "-?")
+                __usage_short
+                exit
+                ;;
 
-    "--help")
-        __usage
-        exit
-        ;;
+            "--help")
+                __usage
+                exit
+                ;;
 
-    "--helo" | "--hello")
-        echo ";) Hi there, beautiful $(__colorize -f '❤' red bold)"
-        exit
-        ;;
+            "--helo" | "--hello")
+                echo ";) Hi there, beautiful $(__colorize -f '❤' red bold)"
+                exit
+                ;;
 
-    "--no-progress")
-        __show_progress='0'
-        ;;
+            "--no-progress")
+                __show_progress='0'
+                ;;
 
-    "-s" | "--short")
-        __short_output='1'
-        ;;
+            "-s" | "--short")
+                __short_output='1'
+                ;;
 
-    "-v" | "--verbose")
-        __verbose='1'
-        __quiet='0'
-        ;;
+            "-v" | "--verbose")
+                __verbose='1'
+                __quiet='0'
+                ;;
 
-    "-l" | "--lengthy")
-        __verbose='1'
-        __very_verbose_pack='1'
-        ;;
+            "-l" | "--lengthy")
+                __verbose='1'
+                __very_verbose_pack='1'
+                ;;
 
-    "-i" | "--install")
-        __install='1'
-        ;;
+            "-i" | "--install")
+                __install='1'
+                ;;
 
-    "-m" | "--mobile")
-        __mobile='1'
-        ;;
+            "-m" | "--mobile")
+                __mobile='1'
+                ;;
 
-    "-t" | "--time")
-        export __time='1'
-        ;;
+            "-t" | "--time")
+                export __time='1'
+                ;;
 
-    "-b" | "--benchmark")
-        __announce "Benchmarking mode enabled"
-        __benchmark='1'
-        ;;
+            "-b" | "--benchmark")
+                __announce "Benchmarking mode enabled"
+                __benchmark='1'
+                ;;
 
-    "-d" | "--debug")
-        __debug='1'
-        ;;
+            "-d" | "--debug")
+                __debug='1'
+                ;;
 
-    "-f" | "--force-render")
-        __force='1'
-        ;;
+            "-f" | "--force-render")
+                __force='1'
+                ;;
 
-    "--optional")
-        __render_optional='1'
-        ;;
+            "--optional")
+                __render_optional='1'
+                ;;
 
-    "--optional="*)
-        __render_optional='1'
-        __use_optional_size='1'
-        __set_int_flag "${1}" __optional_size
-        ;;
+            "--optional="*)
+                __render_optional='1'
+                __use_optional_size='1'
+                __set_int_flag "${1}" __optional_size
+                ;;
 
-    "--no-optional")
-        __render_optional='0'
-        ;;
+            "--no-optional")
+                __render_optional='0'
+                ;;
 
-    "--max-optional="*)
-        __set_int_flag "${1}" __max_optional
-        ;;
+            "--max-optional="*)
+                __set_int_flag "${1}" __max_optional
+                ;;
 
-    "--force-optional")
-        __render_optional='1'
-        __ignore_max_optional='1'
-        ;;
+            "--force-optional")
+                __render_optional='1'
+                __ignore_max_optional='1'
+                ;;
 
-    "-q" | "--quiet")
-        __quiet='1'
-        __verbose='0'
-        ;;
+            "-q" | "--quiet")
+                __quiet='1'
+                __verbose='0'
+                ;;
 
-    "--silent")
-        __silent='1'
-        __quiet='1'
-        ;;
+            "--silent")
+                __silent='1'
+                __quiet='1'
+                ;;
 
-    "-w" | "--warn")
-        __should_warn='1'
-        ;;
+            "-w" | "--warn")
+                __should_warn='1'
+                ;;
 
-    "-c" | "--compress")
-        __compress='1'
-        ;;
+            "-c" | "--compress")
+                __compress='1'
+                ;;
 
-    "-x" | "--force-xml")
-        __force_warn "Cleaning split xml files"
-        __clean_xml='1'
-        ;;
+            "-x" | "--force-xml")
+                __force_warn "Cleaning split xml files"
+                __clean_xml='1'
+                ;;
 
-    "--xml-only")
-        __xml_only='1'
-        ;;
+            "--xml-only")
+                __xml_only='1'
+                ;;
 
-    "-o" | "--optimize")
-        __should_optimize='1'
-        ;;
+            "-o" | "--optimize")
+                __should_optimize='1'
+                ;;
 
-    "--dry")
-        __dry='1'
-        ;;
+            "--dry")
+                __dry='1'
+                ;;
 
-    "--completed")
-        __list_completed='1'
-        ;;
+            "--completed")
+                __list_completed='1'
+                ;;
 
-    "--graph")
-        __graph_deps='1'
-        ;;
+            "--graph")
+                __graph_deps='1'
+                ;;
 
-    "--graph="*)
-        __graph_deps='1'
-        local __graph_tmp_files="$(sed 's/[^=]*=//' <<< "${1}" | tr ',' '\n')"
-        if [ -z "${__graph_files}" ]; then
-            __graph_files="${__graph_tmp_files}"
-        else
-            __graph_files="${__graph_files}
+            "--graph="*)
+                __graph_deps='1'
+                local __graph_tmp_files="$(sed 's/[^=]*=//' <<< "${1}" | tr ',' '\n')"
+                if [ -z "${__graph_files}" ]; then
+                    __graph_files="${__graph_tmp_files}"
+                else
+                    __graph_files="${__graph_files}
 ${__graph_tmp_files}"
-        fi
-        ;;
+                fi
+                ;;
 
-    "--graph-format="*)
-        __graph_deps='1'
-        __set_flag "${1}" __graph_format
-        ;;
+            "--graph-format="*)
+                __graph_deps='1'
+                __set_flag "${1}" __graph_format
+                ;;
 
-    "--graph-output")
-        __graph_deps='1'
-        __set_flag "${1}" __graph_output
-        ;;
+            "--graph-output")
+                __graph_deps='1'
+                __set_flag "${1}" __graph_output
+                ;;
 
-    "--graph-seed="*)
-        __graph_deps='1'
-        __set_flag "${1}" __graph_seed=
-        ;;
+            "--graph-seed="*)
+                __graph_deps='1'
+                __set_flag "${1}" __graph_seed=
+                ;;
 
-    "--no-highlight")
-        __no_highlight='1'
-        ;;
+            "--no-highlight")
+                __no_highlight='1'
+                ;;
 
-    "--changed")
-        __list_changed='1'
-        ;;
+            "--changed")
+                __list_changed='1'
+                ;;
 
-    "--no-optimize")
-        __no_optimize='1'
-        ;;
+            "--no-optimize")
+                __no_optimize='1'
+                ;;
 
-    "--max-optimize="*)
-        __set_int_flag "${1}" __max_optimize
-        ;;
+            "--max-optimize="*)
+                __set_int_flag "${1}" __max_optimize
+                ;;
 
-    "--force-max-optimize")
-        __ignore_max_optimize='0'
-        ;;
+            "--force-max-optimize")
+                __ignore_max_optimize='0'
+                ;;
 
-    "--force-optimize")
-        __should_optimize='1'
-        __ignore_max_optimize='1'
-        ;;
+            "--force-optimize")
+                __should_optimize='1'
+                __ignore_max_optimize='1'
+                ;;
 
-    "--re-optimize")
-        __re_optimize='1'
-        ;;
+            "--re-optimize")
+                __re_optimize='1'
+                ;;
 
-    "-r" | "--release")
-        __force_announce "Re-rendering from scratch, this may take a while."
-        __force='1'
-        __should_optimize='1'
-        __ignore_max_optimize='1'
-        ;;
+            "-r" | "--release")
+                __force_announce "Re-rendering from scratch, this may take a while."
+                __force='1'
+                __should_optimize='1'
+                __ignore_max_optimize='1'
+                ;;
 
-    "-a" | "--archive")
-        __should_archive='1'
-        ;;
+            "-a" | "--archive")
+                __should_archive='1'
+                ;;
 
-    "--name="*)
-        __set_flag "${1}" __name
-        ;;
+            "--name="*)
+                __set_flag "${1}" __name
+                ;;
 
-    "--png-compression="*)
-        __set_int_flag "${1}" __png_compression
-        ;;
+            "--png-compression="*)
+                __set_int_flag "${1}" __png_compression
+                ;;
 
-    "--function="*)
-        __set_flag "${1}" __set_prefix
-        ;;
+            "--function="*)
+                __set_flag "${1}" __set_prefix
+                ;;
 
-    [0-9]*)
-        if ! __int_check "${1}"; then
-            __error "${1} is not an integer"
-        fi
-        if [ "${__use_custom_size}" = '0' ]; then
-            __warn "Overriding render sizes"
-            __use_custom_size='1'
-            __sizes=''
-        fi
+            [0-9]*)
+                if ! __int_check "${1}"; then
+                    __error "${1} is not an integer"
+                fi
+                if [ "${__use_custom_size}" = '0' ]; then
+                    __warn "Overriding render sizes"
+                    __use_custom_size='1'
+                    __sizes=''
+                fi
 
-        if [ "${1}" -gt '0' ]; then
-            __sizes="${__sizes}
+                if [ "${1}" -gt '0' ]; then
+                    __sizes="${__sizes}
 ${1}"
-        else
-            __force_warn "Specified size \"${1}\" is less than 1, cannot render"
-            __use_custom_size='1'
-        fi
-        ;;
+                else
+                    __force_warn "Specified size \"${1}\" is less than 1, cannot render"
+                    __use_custom_size='1'
+                fi
+                ;;
 
-    *)
-        __custom_error "Unknown option \"${1}\"
+            *)
+                __custom_error "Unknown option \"${1}\"
 Please use '-h' for help."
-        exit
-        ;;
+                exit
+                ;;
 
-esac
+        esac
 
-}
+    }
 
-################################################################################
+    ################################################################################
 
-__process_option () {
+    __process_option() {
 
-if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
+        if [ "${1}" = '-' ] || [ "${1}" = '--' ]; then
 
-    __check_input "${1}"
+            __check_input "${1}"
 
-elif grep '^--.*' <<< "${1}" &> /dev/null; then
+        elif grep '^--.*' <<< "${1}" &> /dev/null; then
 
-    __check_input "${1}"
+            __check_input "${1}"
 
-elif grep '^-.*' <<< "${1}" &> /dev/null; then
+        elif grep '^-.*' <<< "${1}" &> /dev/null; then
 
-    __letters="$(cut -c 2- <<< "${1}" | sed 's/./& /g')"
+            __letters="$(cut -c 2- <<< "${1}" | sed 's/./& /g')"
 
-    for __letter in ${__letters}; do
+            for __letter in ${__letters}; do
 
-        if [[ "${__letter}" == [0-9] ]]; then
+                if [[ "${__letter}" == [0-9] ]]; then
 
-            __error "Sizes are not to be specified in this way"
+                    __error "Sizes are not to be specified in this way"
+
+                else
+
+                    __check_input "-${__letter}"
+
+                fi
+
+            done
 
         else
-
-            __check_input "-${__letter}"
-
+            __check_input "${1}"
         fi
+
+    }
+
+    ################################################################################
+
+    __check_option() {
+        if grep -q '^-.*' <<< "${1}"; then
+            return 0
+        else
+            return 1
+        fi
+    }
+
+    ################################################################################
+    #
+    # __set_flag <RAW_OPTION> <VARIABLE>
+    #
+    # Set Flag
+    # Sets a flag from RAW_OPTION in VARIABLE.
+    #
+    ################################################################################
+
+    __set_flag() {
+        export "${2}"="$(sed 's/[^=]*=//' <<< "${1}")"
+    }
+
+    __set_int_flag() {
+        __set_flag $@
+        if ! __int_check "${!2}"; then
+            __error "Given option is not a size"
+        fi
+    }
+
+    ################################################################################
+
+    # then let's look at them in sequence.
+    while ! [ "${#}" = '0' ]; do
+
+        case "${__last_option}" in
+
+            "--function="*)
+                if __test_function "${__set_prefix}" "${1}"; then
+                    __set_routine "${__set_prefix}" "${1}"
+                else
+                    __error "\"${1}\" is not a valid routine for \"${__set_prefix}\""
+                fi
+                ;;
+
+            *)
+                __process_option "${1}"
+                ;;
+
+        esac
+
+        __last_option="${1}"
+
+        shift
 
     done
-
-else
-    __check_input "${1}"
-fi
-
-}
-
-################################################################################
-
-__check_option () {
-if grep -q '^-.*' <<< "${1}"; then
-    return 0
-else
-    return 1
-fi
-}
-
-################################################################################
-#
-# __set_flag <RAW_OPTION> <VARIABLE>
-#
-# Set Flag
-# Sets a flag from RAW_OPTION in VARIABLE.
-#
-################################################################################
-
-__set_flag () {
-export "${2}"="$(sed 's/[^=]*=//' <<< "${1}")"
-}
-
-__set_int_flag () {
-__set_flag $@
-if ! __int_check "${!2}"; then
-    __error "Given option is not a size"
-fi
-}
-
-################################################################################
-
-# then let's look at them in sequence.
-while ! [ "${#}" = '0' ]; do
-
-    case "${__last_option}" in
-
-        "--function="*)
-            if __test_function "${__set_prefix}" "${1}"; then
-                __set_routine "${__set_prefix}" "${1}"
-            else
-                __error "\"${1}\" is not a valid routine for \"${__set_prefix}\""
-            fi
-            ;;
-
-        *)
-            __process_option "${1}"
-            ;;
-
-    esac
-
-    __last_option="${1}"
-
-    shift
-
-done
 
 fi
 
@@ -538,7 +541,7 @@ fi
 ################################################################################
 
 if [ "${__use_custom_size}" = '0' ] && [ -z "${__sizes}" ]; then
-__sizes="32
+    __sizes="32
 64
 128
 256
@@ -557,7 +560,7 @@ __sizes="$(tr ' ' '\n' <<< "${__sizes}" | sort -n | uniq)"
 if [ -z "${__max_optimize}" ]; then
     __default_max_optimize='512'
     __max_optimize="${__default_max_optimize}"
-    if [ "${__should_optimize}" = '1' ] ; then
+    if [ "${__should_optimize}" = '1' ]; then
         __should_warn_size='0'
         while read -r __test_size; do
             if ! [ "${__test_size}" -lt "${__default_max_optimize}" ]; then
@@ -576,7 +579,7 @@ fi
 if [ -z "${__max_optional}" ]; then
     __default_max_optional='2048'
     __max_optional="${__default_max_optional}"
-    if [ "${__render_optional}" = '1' ] ; then
+    if [ "${__render_optional}" = '1' ]; then
         __should_warn_size='0'
         while read -r __test_size; do
             if ! [ "${__test_size}" -lt "${__default_max_optional}" ]; then
@@ -592,230 +595,229 @@ override this, or set a new maximum with --max-optional=<SIZE>"
     fi
 fi
 
-__just_render () {
+__just_render() {
 
-__options="${1}"
+    __options="${1}"
 
-if [ "${__mobile}" = '1' ]; then
-    __options="${__options} -m"
-fi
+    if [ "${__mobile}" = '1' ]; then
+        __options="${__options} -m"
+    fi
 
-if [ "${__time}" = '1' ]; then
-    __options="${__options} -t"
-fi
+    if [ "${__time}" = '1' ]; then
+        __options="${__options} -t"
+    fi
 
-if [ "${__benchmark}" = '1' ]; then
-    __options="${__options} -b"
-fi
+    if [ "${__benchmark}" = '1' ]; then
+        __options="${__options} -b"
+    fi
 
-if [ "${__debug}" = '1' ]; then
-    __options="${__options} -d"
-fi
+    if [ "${__debug}" = '1' ]; then
+        __options="${__options} -d"
+    fi
 
-if [ "${__force}" = '1' ]; then
-    __options="${__options} -f"
-fi
+    if [ "${__force}" = '1' ]; then
+        __options="${__options} -f"
+    fi
 
-if [ "${__should_warn}" = '1' ]; then
-    __options="${__options} -w"
-fi
+    if [ "${__should_warn}" = '1' ]; then
+        __options="${__options} -w"
+    fi
 
-if [ "${__should_optimize}" = '1' ]; then
-    __options="${__options} -o"
-fi
+    if [ "${__should_optimize}" = '1' ]; then
+        __options="${__options} -o"
+    fi
 
-if [ "${__show_progress}" = '1' ]; then
-    __options="${__options} --progress"
-fi
+    if [ "${__show_progress}" = '1' ]; then
+        __options="${__options} --progress"
+    fi
 
-if [ "${__list_changed}" = '1' ]; then
-    __options="${__options} --list-changed"
-fi
+    if [ "${__list_changed}" = '1' ]; then
+        __options="${__options} --list-changed"
+    fi
 
-if [ "${__xml_only}" = '1' ]; then
-    __options="${__options} --xml-only"
-fi
+    if [ "${__xml_only}" = '1' ]; then
+        __options="${__options} --xml-only"
+    fi
 
-if [ "${__quiet}" = '1' ]; then
+    if [ "${__quiet}" = '1' ]; then
         __options="${__options} --quiet"
-fi
+    fi
 
-if [ "${__no_optimize}" = '1' ] || ( [ "${__ignore_max_optimize}" = '0' ] && [ "${1}" -gt "${__max_optimize}" ] ); then
-    __options="${__options} --no-optimize"
-fi
+    if [ "${__no_optimize}" = '1' ] || ([ "${__ignore_max_optimize}" = '0' ] && [ "${1}" -gt "${__max_optimize}" ]); then
+        __options="${__options} --no-optimize"
+    fi
 
-if [ "${__re_optimize}" = '1' ] && [ "${__should_optimize}" = '1' ]; then
-    __options="${__options} --re-optimize"
-fi
+    if [ "${__re_optimize}" = '1' ] && [ "${__should_optimize}" = '1' ]; then
+        __options="${__options} --re-optimize"
+    fi
 
-if [ "${__dry}" = '1' ]; then
-    __options="${__options} --dry"
-fi
+    if [ "${__dry}" = '1' ]; then
+        __options="${__options} --dry"
+    fi
 
-if [ "${__do_not_render}" = '1' ]; then
-    __options="${__options} --do-not-render"
-fi
+    if [ "${__do_not_render}" = '1' ]; then
+        __options="${__options} --do-not-render"
+    fi
 
-if [ "${__short_output}" = '1' ]; then
-    __options="${__options} --short"
-fi
+    if [ "${__short_output}" = '1' ]; then
+        __options="${__options} --short"
+    fi
 
-if [ "${__render_optional}" = '1' ]; then
+    if [ "${__render_optional}" = '1' ]; then
 
-    if [ "${__use_optional_size}" = '1' ]; then
+        if [ "${__use_optional_size}" = '1' ]; then
 
-        if [ "${__optional_size}" = "${1}" ]; then
+            if [ "${__optional_size}" = "${1}" ]; then
+
+                __options="${__options} --optional"
+
+            fi
+
+        elif ! [ "${1}" -gt "${__max_optional}" ] || [ "${__ignore_max_optional}" = '1' ]; then
 
             __options="${__options} --optional"
 
         fi
 
-    elif ! [ "${1}" -gt "${__max_optional}" ] || [ "${__ignore_max_optional}" = '1' ]; then
-
-        __options="${__options} --optional"
-
     fi
 
-fi
+    if [ "${__very_verbose_pack}" = '1' ]; then
+        "${__furnace_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
+    elif [ "${__verbose}" = '1' ]; then
+        "${__furnace_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
+    else
+        "${__furnace_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
+    fi
 
-if [ "${__very_verbose_pack}" = '1' ]; then
-    "${__furnace_render_bin}" ${__options} -l -p "${1}" || __error "Render encountered errors"
-elif [ "${__verbose}" = '1' ]; then
-    "${__furnace_render_bin}" ${__options} -v -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
-else
-    "${__furnace_render_bin}" ${__options} -p "${1}" || __error "Render encountered errors, please run with very verbose mode on"
-fi
+    if [ -e "./src/xml/loopstatus" ]; then
 
-if [ -e "./src/xml/loopstatus" ]; then
+        __loop_status="$(cat "./src/xml/loopstatus")"
+        rm "./src/xml/loopstatus"
 
-    __loop_status="$(cat "./src/xml/loopstatus")"
-    rm "./src/xml/loopstatus"
+    else
 
-else
+        __loop_status='0'
 
-    __loop_status='0'
-
-fi
+    fi
 
 }
 
-__render_and_pack () {
+__render_and_pack() {
 
-__force_announce "Processing \"${1}\""
+    __force_announce "Processing \"${1}\""
 
-__just_render "${1}"
+    __just_render "${1}"
 
-if [ "${__dry}" = '0' ]; then
+    if [ "${__dry}" = '0' ]; then
 
-
-if [ -e "${2}.${__pack_extension}" ]; then
-    rm "${2}.${__pack_extension}"
-fi
-
-if [ "${__mobile}" = '1' ] && [ -e "${2}_mobile.${__pack_extension}" ]; then
-    rm "${2}_mobile.${__pack_extension}"
-fi
-
-__pushd "${2}_cleaned"
-
-if [ "${__compress}" = '1' ]; then
-
-    __force_announce "Compressing resource pack"
-
-fi
-
-__zip "${2}"
-
-__popd
-
-if [ "${__mobile}" = '1' ]; then
-    __pushd "${2}_mobile"
-
-    if [ "${__compress}" = '1' ]; then
-
-        __force_announce "Compressing mobile resource pack"
-
-    fi
-
-    __zip "${2}_mobile"
-
-    __popd
-fi
-
-if [ -d "${2}_cleaned" ]; then
-    rm -r "${2}_cleaned"
-fi
-
-if [ -d "${2}_mobile" ]; then
-    rm -r "${2}_mobile"
-fi
-
-fi
-
-}
-
-__sub_loop () {
-
-__size="${1}"
-
-__packfile="$("${__furnace_render_bin}" --name-only "${__size}")"
-
-if ! [ "${?}" = 0 ]; then
-    echo "${__packfile}"
-    exit 1
-fi
-
-if [ "${__time}" = '1' ]; then
-
-    __force_timer start "Rendered size ${__size}"
-
-    if [ "${__silent}" = '1' ]; then
-        __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
-    else
-        __render_and_pack "${__size}" "${__packfile}"
-    fi
-
-    __force_timer end "Rendered size ${__size}"
-
-    if [ "${__silent}" = '0' ] && [ "${__verbose}" = '0' ]; then
-        echo
-    fi
-
-else
-
-    if [ "${__silent}" = '1' ]; then
-        __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
-    else
-        __render_and_pack "${__size}" "${__packfile}"
-    fi
-
-fi
-
-__dest="${HOME}/.minecraft/resourcepacks/${__packfile}.${__pack_extension}"
-
-if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; then
-
-    if [ -d "$(dirname "${__dest}")" ]; then
-
-        if [ -e "${__dest}" ] ; then
-            rm "${__dest}"
+        if [ -e "${2}.${__pack_extension}" ]; then
+            rm "${2}.${__pack_extension}"
         fi
 
-        cp "${__packfile}.${__pack_extension}" "${__dest}"
+        if [ "${__mobile}" = '1' ] && [ -e "${2}_mobile.${__pack_extension}" ]; then
+            rm "${2}_mobile.${__pack_extension}"
+        fi
 
-    else
+        __pushd "${2}_cleaned"
 
-        __force_warn "Minecraft does not seem to be installed, I won't try to install"
+        if [ "${__compress}" = '1' ]; then
 
-        __install='0'
+            __force_announce "Compressing resource pack"
+
+        fi
+
+        __zip "${2}"
+
+        __popd
+
+        if [ "${__mobile}" = '1' ]; then
+            __pushd "${2}_mobile"
+
+            if [ "${__compress}" = '1' ]; then
+
+                __force_announce "Compressing mobile resource pack"
+
+            fi
+
+            __zip "${2}_mobile"
+
+            __popd
+        fi
+
+        if [ -d "${2}_cleaned" ]; then
+            rm -r "${2}_cleaned"
+        fi
+
+        if [ -d "${2}_mobile" ]; then
+            rm -r "${2}_mobile"
+        fi
 
     fi
 
-fi
+}
 
-if [ "${__quiet}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
-    echo
-fi
+__sub_loop() {
+
+    __size="${1}"
+
+    __packfile="$("${__furnace_render_bin}" --name-only "${__size}")"
+
+    if ! [ "${?}" = 0 ]; then
+        echo "${__packfile}"
+        exit 1
+    fi
+
+    if [ "${__time}" = '1' ]; then
+
+        __force_timer start "Rendered size ${__size}"
+
+        if [ "${__silent}" = '1' ]; then
+            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
+        else
+            __render_and_pack "${__size}" "${__packfile}"
+        fi
+
+        __force_timer end "Rendered size ${__size}"
+
+        if [ "${__silent}" = '0' ] && [ "${__verbose}" = '0' ]; then
+            echo
+        fi
+
+    else
+
+        if [ "${__silent}" = '1' ]; then
+            __render_and_pack "${__size}" "${__packfile}" 1> /dev/null
+        else
+            __render_and_pack "${__size}" "${__packfile}"
+        fi
+
+    fi
+
+    __dest="${HOME}/.minecraft/resourcepacks/${__packfile}.${__pack_extension}"
+
+    if [ "${__install}" = '1' ] && ! [ "${__size}" -gt "${__max_install_size}" ]; then
+
+        if [ -d "$(dirname "${__dest}")" ]; then
+
+            if [ -e "${__dest}" ]; then
+                rm "${__dest}"
+            fi
+
+            cp "${__packfile}.${__pack_extension}" "${__dest}"
+
+        else
+
+            __force_warn "Minecraft does not seem to be installed, I won't try to install"
+
+            __install='0'
+
+        fi
+
+    fi
+
+    if [ "${__quiet}" = '0' ] && [ "${__dry}" = '0' ] && [ "${__time}" = '0' ] && ! [ "${__size}" = "${__final_size}" ]; then
+        echo
+    fi
 
 }
 
@@ -870,35 +872,35 @@ fi
 
 if [ "${__should_archive}" = '1' ]; then
 
-__force_timer start "Archived packs"
+    __force_timer start "Archived packs"
 
-__force_announce "Archiving packs" start
+    __force_announce "Archiving packs" start
 
-__pack_list=''
-__size_list=''
+    __pack_list=''
+    __size_list=''
 
-for __size in ${__sizes}; do
+    for __size in ${__sizes}; do
 
-    __packfile="$("${__furnace_render_bin}" --name-only "${__size}").${__pack_extension}"
+        __packfile="$("${__furnace_render_bin}" --name-only "${__size}").${__pack_extension}"
 
-    if ! [ -e "${__packfile}" ]; then
-        __force_warn "Size ${__size} has no pack file present, this isn't normal"
-    else
-        __pack_list+="
+        if ! [ -e "${__packfile}" ]; then
+            __force_warn "Size ${__size} has no pack file present, this isn't normal"
+        else
+            __pack_list+="
 ${__packfile}"
-        __size_list+="
+            __size_list+="
 ${__size}"
-    fi
+        fi
 
-done
+    done
 
-__archive_option="$(sort <<< "${__pack_list}" | uniq | tr '\n' ' ' | sed 's/^.\(.*\).$/\1/')"
+    __archive_option="$(sort <<< "${__pack_list}" | uniq | tr '\n' ' ' | sed 's/^.\(.*\).$/\1/')"
 
-__archive_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 's/.$//')"
+    __archive_name="${__name}$(sort -g <<< "${__size_list}" | uniq | tr '\n' '_' | sed 's/.$//')"
 
-__archive "${__archive_name}" ${__archive_option}
+    __archive "${__archive_name}" ${__archive_option}
 
-__force_timer end "Archived packs"
+    __force_timer end "Archived packs"
 
 fi
 

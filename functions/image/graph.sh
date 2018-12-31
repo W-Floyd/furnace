@@ -14,9 +14,9 @@
 #
 ################################################################################
 
-__graph () {
+__graph() {
 
-__short_routine 'graph' 'dependency graphing' 'sfdp neato' "${@}"
+    __short_routine 'graph' 'dependency graphing' 'sfdp neato' "${@}"
 
 }
 
@@ -28,12 +28,12 @@ __short_routine 'graph' 'dependency graphing' 'sfdp neato' "${@}"
 #
 ################################################################################
 
-__graph_common () {
-local __grapher="${1}"
+__graph_common() {
+    local __grapher="${1}"
 
-shift
+    shift
 
-"${__grapher}" -Ln5 "-Gstart=${2}" "-T${1}" "${3}" -O
+    "${__grapher}" -Ln5 "-Gstart=${2}" "-T${1}" "${3}" -O
 }
 
 ################################################################################
@@ -49,11 +49,11 @@ shift
 # dot
 ################################################################################
 
-__routine__graph__dot () {
+__routine__graph__dot() {
 
-local __grapher='dot'
+    local __grapher='dot'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -61,11 +61,11 @@ __graph_common "${__grapher}" "${@}"
 # neato
 ################################################################################
 
-__routine__graph__neato () {
+__routine__graph__neato() {
 
-local __grapher='neato'
+    local __grapher='neato'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -73,11 +73,11 @@ __graph_common "${__grapher}" "${@}"
 # twopi
 ################################################################################
 
-__routine__graph__twopi () {
+__routine__graph__twopi() {
 
-local __grapher='twopi'
+    local __grapher='twopi'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -85,11 +85,11 @@ __graph_common "${__grapher}" "${@}"
 # circo
 ################################################################################
 
-__routine__graph__circo () {
+__routine__graph__circo() {
 
-local __grapher='circo'
+    local __grapher='circo'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -97,11 +97,11 @@ __graph_common "${__grapher}" "${@}"
 # fdp
 ################################################################################
 
-__routine__graph__fdp () {
+__routine__graph__fdp() {
 
-local __grapher='fdp'
+    local __grapher='fdp'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -109,11 +109,11 @@ __graph_common "${__grapher}" "${@}"
 # sfdp
 ################################################################################
 
-__routine__graph__sfdp () {
+__routine__graph__sfdp() {
 
-local __grapher='sfdp'
+    local __grapher='sfdp'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -121,11 +121,11 @@ __graph_common "${__grapher}" "${@}"
 # patchwork
 ################################################################################
 
-__routine__graph__patchwork () {
+__routine__graph__patchwork() {
 
-local __grapher='patchwork'
+    local __grapher='patchwork'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }
 
@@ -133,10 +133,10 @@ __graph_common "${__grapher}" "${@}"
 # osage
 ################################################################################
 
-__routine__graph__osage () {
+__routine__graph__osage() {
 
-local __grapher='osage'
+    local __grapher='osage'
 
-__graph_common "${__grapher}" "${@}"
+    __graph_common "${__grapher}" "${@}"
 
 }

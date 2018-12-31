@@ -12,24 +12,24 @@
 #
 ################################################################################
 
-__routine__image_fade__convert () {
+__routine__image_fade__convert() {
 
-if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
+    if ! [ "$(__strip_zero <<< "${3}")" = '1' ]; then
 
-    local __tmptrans=$(echo "1/${3}" | bc -l | __strip_zero)
-    convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" $(__imagemagick_define) "${2}"
+        local __tmptrans=$(echo "1/${3}" | bc -l | __strip_zero)
+        convert "${1}" -alpha set -channel Alpha -evaluate Divide "${__tmptrans}" $(__imagemagick_define) "${2}"
 
-else
+    else
 
-    cp "${1}" "${2}"
+        cp "${1}" "${2}"
 
-fi
+    fi
 
 }
 
-__fade () {
+__fade() {
 
-__short_routine 'image_fade' 'image fading' 'convert' "${@}"
+    __short_routine 'image_fade' 'image fading' 'convert' "${@}"
 
 }
 
@@ -42,30 +42,30 @@ __short_routine 'image_fade' 'image fading' 'convert' "${@}"
 #
 ################################################################################
 
-__routine__image_tile__montage () {
+__routine__image_tile__montage() {
 
-if ! [ -z "${4}" ]; then
-	local __spacer="${4}"
-else
-	local __spacer='0'
-fi
+    if ! [ -z "${4}" ]; then
+        local __spacer="${4}"
+    else
+        local __spacer='0'
+    fi
 
-local __imgseq=$(for __tile in $(seq 1 "$(sed 's/x/\*/' <<< "${2}" | bc)"); do echo -n "${1} "; done)
+    local __imgseq=$(for __tile in $(seq 1 "$(sed 's/x/\*/' <<< "${2}" | bc)"); do echo -n "${1} "; done)
 
-# TODO - Find why Imagemagick throws warnings here about fonts.
-# Example:
-# montage: unable to read font `(null)' @ error/annotate.c/RenderFreetype/1388.
-montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
+    # TODO - Find why Imagemagick throws warnings here about fonts.
+    # Example:
+    # montage: unable to read font `(null)' @ error/annotate.c/RenderFreetype/1388.
+    montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${2}" ${__imgseq} "${3}" 2> /dev/null
 
-if ! [ -e "${3}" ]; then
-    __force_warn "File \"${3}\" was not produced when tiling"
-fi
+    if ! [ -e "${3}" ]; then
+        __force_warn "File \"${3}\" was not produced when tiling"
+    fi
 
 }
 
-__tile () {
+__tile() {
 
-__short_routine 'image_tile' 'image tiling' 'montage' "${@}" <<< ''
+    __short_routine 'image_tile' 'image tiling' 'montage' "${@}" <<< ''
 
 }
 
@@ -83,38 +83,38 @@ __short_routine 'image_tile' 'image tiling' 'montage' "${@}" <<< ''
 #
 ################################################################################
 
-__routine__image_custom_tile__montage () {
+__routine__image_custom_tile__montage() {
 
-if [ "${#}" -lt '4' ]; then
-    __error "Not enough options specified for __custom_tile"
-fi
+    if [ "${#}" -lt '4' ]; then
+        __error "Not enough options specified for __custom_tile"
+    fi
 
-__num_sub () {
-__option_num="$((__option_num-1))"
+    __num_sub() {
+        __option_num="$((__option_num - 1))"
+    }
+
+    local __option_num="${#}"
+
+    local __output="${!__option_num}"
+    __num_sub
+    local __spacer="${!__option_num}"
+    __num_sub
+    local __grid="${!__option_num}"
+    __num_sub
+
+    local __imgseq="$(for __num in $(seq 1 "${__option_num}"); do echo -n "${!__num} "; done)"
+
+    montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
+
+    if ! [ -e "${__output}" ]; then
+        __force_warn "File \"${__output}\" was not produced when custom tiling"
+    fi
+
 }
 
-local __option_num="${#}"
+__custom_tile() {
 
-local __output="${!__option_num}"
-__num_sub
-local __spacer="${!__option_num}"
-__num_sub
-local __grid="${!__option_num}"
-__num_sub
-
-local __imgseq="$(for __num in $(seq 1 "${__option_num}"); do echo -n "${!__num} "; done)"
-
-montage $(__imagemagick_define) -geometry "+${__spacer}+${__spacer}" -background none -tile "${__grid}" ${__imgseq} "${__output}" 2> /dev/null
-
-if ! [ -e "${__output}" ]; then
-    __force_warn "File \"${__output}\" was not produced when custom tiling"
-fi
-
-}
-
-__custom_tile () {
-
-__short_routine 'image_custom_tile' 'custom image tiling' 'montage' "${@}"
+    __short_routine 'image_custom_tile' 'custom image tiling' 'montage' "${@}"
 
 }
 
@@ -139,15 +139,15 @@ __short_routine 'image_custom_tile' 'custom image tiling' 'montage' "${@}"
 #
 ################################################################################
 
-__routine__image_crop__convert () {
+__routine__image_crop__convert() {
 
-convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
+    convert $(__imagemagick_define) "${1}" -crop "${2}x${2}+$(bc <<< "${3}*${2}")+$(bc <<< "${4}*${2}")" "${5}"
 
 }
 
-__crop () {
+__crop() {
 
-__short_routine 'image_crop' 'image cropping' 'convert' "${@}"
+    __short_routine 'image_crop' 'image cropping' 'convert' "${@}"
 
 }
 
@@ -167,45 +167,45 @@ __short_routine 'image_crop' 'image cropping' 'convert' "${@}"
 #
 ################################################################################
 
-__routine__image_rotate__mogrify () {
+__routine__image_rotate__mogrify() {
 
-case "${2}" in
-	"0")
-		local __angle="0"
-		;;
-	"1")
-		local __angle="90"
-		;;
-	"2")
-		local __angle="180"
-		;;
-	"3")
-		local __angle="270"
-		;;
-	"4")
-		local __angle="360"
-		;;
-	"-1")
-		local __angle="270"
-		;;
-	"-2")
-		local __angle="180"
-		;;
-	"-3")
-		local __angle="90"
-		;;
-	"-4")
-		local __angle="360"
-		;;
-esac
+    case "${2}" in
+        "0")
+            local __angle="0"
+            ;;
+        "1")
+            local __angle="90"
+            ;;
+        "2")
+            local __angle="180"
+            ;;
+        "3")
+            local __angle="270"
+            ;;
+        "4")
+            local __angle="360"
+            ;;
+        "-1")
+            local __angle="270"
+            ;;
+        "-2")
+            local __angle="180"
+            ;;
+        "-3")
+            local __angle="90"
+            ;;
+        "-4")
+            local __angle="360"
+            ;;
+    esac
 
-mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
+    mogrify $(__imagemagick_define) -rotate "${__angle}" "${1}"
 
 }
 
-__rotate () {
+__rotate() {
 
-__short_routine 'image_rotate' 'image rotation' 'mogrify' "${@}"
+    __short_routine 'image_rotate' 'image rotation' 'mogrify' "${@}"
 
 }
 
@@ -221,15 +221,15 @@ __short_routine 'image_rotate' 'image rotation' 'mogrify' "${@}"
 # 1.0 = 360 degrees
 ################################################################################
 
-__routine__image_rotate_exact__convert () {
+__routine__image_rotate_exact__convert() {
 
-convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
+    convert -background none $(__imagemagick_define) -distort SRT "$(bc <<< "${3}*360")" "${1}" "${2}"
 
 }
 
-__rotate_exact () {
+__rotate_exact() {
 
-__short_routine 'image_rotate_exact' 'exact image rotation' 'convert' "${@}"
+    __short_routine 'image_rotate_exact' 'exact image rotation' 'convert' "${@}"
 
 }
 
@@ -243,17 +243,17 @@ __short_routine 'image_rotate_exact' 'exact image rotation' 'convert' "${@}"
 #
 ################################################################################
 
-__routine__image_shift__convert () {
+__routine__image_shift__convert() {
 
-__tile "${1}" 1x2 "${1}"_
-mv "${1}"_ "${1}"
-convert $(__imagemagick_define) "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(echo "$(identify -format "%w" "${1}")*${2}" | bc)")" "${1}"_
-mv "${1}"_ "${1}"
+    __tile "${1}" 1x2 "${1}"_
+    mv "${1}"_ "${1}"
+    convert $(__imagemagick_define) "${1}" -crop "$(identify -format "%wx%w" "${1}")+0+$(printf "%.0f" "$(echo "$(identify -format "%w" "${1}")*${2}" | bc)")" "${1}"_
+    mv "${1}"_ "${1}"
 
 }
 
-__shift () {
+__shift() {
 
-__short_routine 'image_shift' 'image shifting' 'convert' "${@}"
+    __short_routine 'image_shift' 'image shifting' 'convert' "${@}"
 
 }

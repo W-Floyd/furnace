@@ -12,57 +12,57 @@
 #
 ################################################################################
 
-__routine__hash__md5sum () {
-if read -r -t 0; then
-    cat | md5sum "${@}"
-else
-    md5sum "${@}"
-fi
+__routine__hash__md5sum() {
+    if read -r -t 0; then
+        cat | md5sum "${@}"
+    else
+        md5sum "${@}"
+    fi
 
 }
 
-__routine__hash__sha1sum () {
-if read -r -t 0; then
-    cat | sha1sum "${@}"
-else
-    sha1sum "${@}"
-fi
+__routine__hash__sha1sum() {
+    if read -r -t 0; then
+        cat | sha1sum "${@}"
+    else
+        sha1sum "${@}"
+    fi
 
 }
 
-__routine__hash__sha224sum () {
-if read -r -t 0; then
-    cat | sha224sum "${@}"
-else
-    sha224sum "${@}"
-fi
+__routine__hash__sha224sum() {
+    if read -r -t 0; then
+        cat | sha224sum "${@}"
+    else
+        sha224sum "${@}"
+    fi
 
 }
 
-__routine__hash__sha256sum () {
-if read -r -t 0; then
-    cat | sha256sum "${@}"
-else
-    sha256sum "${@}"
-fi
+__routine__hash__sha256sum() {
+    if read -r -t 0; then
+        cat | sha256sum "${@}"
+    else
+        sha256sum "${@}"
+    fi
 
 }
 
-__routine__hash__sha384sum () {
-if read -r -t 0; then
-    cat | sha384sum "${@}"
-else
-    sha384sum "${@}"
-fi
+__routine__hash__sha384sum() {
+    if read -r -t 0; then
+        cat | sha384sum "${@}"
+    else
+        sha384sum "${@}"
+    fi
 
 }
 
-__routine__hash__sha512sum () {
-if read -r -t 0; then
-    cat | sha512sum "${@}"
-else
-    sha512sum "${@}"
-fi
+__routine__hash__sha512sum() {
+    if read -r -t 0; then
+        cat | sha512sum "${@}"
+    else
+        sha512sum "${@}"
+    fi
 
 }
 
@@ -76,13 +76,13 @@ fi
 #
 ################################################################################
 
-__hash () {
+__hash() {
 
-#__debug_toggle off
+    #__debug_toggle off
 
-"${__function_hash}" "${@}"
+    "${__function_hash}" "${@}"
 
-#__debug_toggle on
+    #__debug_toggle on
 
 }
 
@@ -95,13 +95,13 @@ __hash () {
 #
 ################################################################################
 
-__hash_piped () {
+__hash_piped() {
 
-#__debug_toggle off
+    #__debug_toggle off
 
-cat | "${__function_hash}" "${@}"
+    cat | "${__function_hash}" "${@}"
 
-#__debug_toggle on
+    #__debug_toggle on
 
 }
 
@@ -114,25 +114,31 @@ cat | "${__function_hash}" "${@}"
 #
 ################################################################################
 
-__hash_folder () {
-if [ -z "${2}" ]; then
-    local __listing="$(find . -type l; find . -type f)"
-else
-    local __listing="$(find . -not -path "./${2}/*" -type f; find . -not -path "./${2}/*" -type l)"
-fi
+__hash_folder() {
+    if [ -z "${2}" ]; then
+        local __listing="$(
+            find . -type l
+            find . -type f
+        )"
+    else
+        local __listing="$(
+            find . -not -path "./${2}/*" -type f
+            find . -not -path "./${2}/*" -type l
+        )"
+    fi
 
-if ! [ -z "${__listing}" ]; then
+    if ! [ -z "${__listing}" ]; then
 
-    {
+        {
 
-    __hash $(grep -v ' ' <<< "${__listing}" | tr '\n' ' ') >> "${1}"
+            __hash $(grep -v ' ' <<< "${__listing}" | tr '\n' ' ') >> "${1}"
 
-    grep ' ' <<< "${__listing}" | sed '/^$/d' | while read -r __file; do
-        __hash "${__file}"
-    done
+            grep ' ' <<< "${__listing}" | sed '/^$/d' | while read -r __file; do
+                __hash "${__file}"
+            done
 
-    } > "${1}"
-fi
+        } > "${1}"
+    fi
 
 }
 
@@ -144,6 +150,6 @@ fi
 #
 ################################################################################
 
-__check_hash_folder () {
-__hash -c "${1}" > "${2}"
+__check_hash_folder() {
+    __hash -c "${1}" > "${2}"
 }

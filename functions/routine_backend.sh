@@ -18,9 +18,9 @@
 #
 ################################################################################
 
-__list_prefixes () {
+__list_prefixes() {
 
-compgen -A function | grep "^__routine__" | sort | sed "s/^__routine__//" | sed 's/__.*//' | sort | uniq
+    compgen -A function | grep "^__routine__" | sort | sed "s/^__routine__//" | sed 's/__.*//' | sort | uniq
 
 }
 
@@ -33,13 +33,13 @@ compgen -A function | grep "^__routine__" | sort | sed "s/^__routine__//" | sed 
 #
 ################################################################################
 
-__check_command () {
+__check_command() {
 
-if which "${1}" &> /dev/null; then
-    return 0
-else
-    return 1
-fi
+    if which "${1}" &> /dev/null; then
+        return 0
+    else
+        return 1
+    fi
 
 }
 
@@ -66,12 +66,11 @@ fi
 #
 ################################################################################
 
-__list_functions () {
+__list_functions() {
 
-compgen -A function | grep "^__routine__${1}__" | sort | sed "s/^__routine__${1}__//"
+    compgen -A function | grep "^__routine__${1}__" | sort | sed "s/^__routine__${1}__//"
 
 }
-
 
 ################################################################################
 #
@@ -83,13 +82,13 @@ compgen -A function | grep "^__routine__${1}__" | sort | sed "s/^__routine__${1}
 #
 ################################################################################
 
-__test_function () {
+__test_function() {
 
-if __check_command "${2}" && [ "$(type -t "__routine__${1}__${2}")" = 'function' ]; then
-    return 0
-else
-    return 1
-fi
+    if __check_command "${2}" && [ "$(type -t "__routine__${1}__${2}")" = 'function' ]; then
+        return 0
+    else
+        return 1
+    fi
 
 }
 
@@ -103,19 +102,19 @@ fi
 #
 ################################################################################
 
-__test_routine () {
+__test_routine() {
 
-local __function_name="__function_${1}"
+    local __function_name="__function_${1}"
 
-if [ -z "${!__function_name}" ]; then
+    if [ -z "${!__function_name}" ]; then
 
-    return 1
+        return 1
 
-else
+    else
 
-    return 0
+        return 0
 
-fi
+    fi
 
 }
 
@@ -157,118 +156,118 @@ fi
 #
 ################################################################################
 
-__choose_function () {
+__choose_function() {
 
-#__debug_toggle off
+    #__debug_toggle off
 
-local __should_error='0'
-local __should_force='0'
-local __preference_list=''
-local __description=''
-local __function_prefix=''
-local __function_name=''
+    local __should_error='0'
+    local __should_force='0'
+    local __preference_list=''
+    local __description=''
+    local __function_prefix=''
+    local __function_name=''
 
-if ! [ "${#}" = 0 ]; then
+    if ! [ "${#}" = 0 ]; then
 
-    while ! [ "${#}" = '0' ]; do
+        while ! [ "${#}" = '0' ]; do
 
-        case "${__last_option}" in
+            case "${__last_option}" in
 
-            "-p")
+                "-p")
 
-                __preference_list+="
+                    __preference_list+="
 ${1}"
 
-                ;;
+                    ;;
 
-            "-d")
+                "-d")
 
-                __description="${1}"
+                    __description="${1}"
 
-                ;;
+                    ;;
 
-            *)
+                *)
 
-                case "${1}" in
+                    case "${1}" in
 
-                    "-e")
-                        __should_error='1'
-                        ;;
+                        "-e")
+                            __should_error='1'
+                            ;;
 
-                    "-f")
-                        __should_force='1'
-                        ;;
+                        "-f")
+                            __should_force='1'
+                            ;;
 
-                     "-p")
-                        ;;
+                        "-p") ;;
 
-                     "-d")
-                        ;;
+                        \
+                            "-d") ;;
 
-	                *)
-	                    __function_prefix="${1}"
-	                    __function_name="__function_${__function_prefix}"
-# Neat trick I found here:
-# http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
-# Means no more eval sodomy :3
-	                    if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ] && __test_function "${__function_prefix}" "${!__function_name}"; then
-	                        #__debug_toggle off on
-                            return 0
-                        fi
+                        \
+                            *)
+                            __function_prefix="${1}"
+                            __function_name="__function_${__function_prefix}"
+                            # Neat trick I found here:
+                            # http://stackoverflow.com/questions/14049057/bash-expand-variable-in-a-variable
+                            # Means no more eval sodomy :3
+                            if ! [ -z "${!__function_name}" ] && [ "${__should_force}" = '0' ] && __test_function "${__function_prefix}" "${!__function_name}"; then
+                                #__debug_toggle off on
+                                return 0
+                            fi
 
-                        ;;
+                            ;;
 
-                esac
-                ;;
+                    esac
+                    ;;
 
-        esac
+            esac
 
-        local __last_option="${1}"
+            local __last_option="${1}"
 
-        shift
+            shift
 
-    done
+        done
 
-else
+    else
+
+        #__debug_toggle on
+
+        __error "No options passed"
+
+    fi
+
+    export "__function_${__function_prefix}"="$(
+        {
+            echo "${__preference_list}"
+            __list_functions "${__function_prefix}"
+        } | tr ' ' '\n' | __funiq | while read -r __function; do
+
+            if __test_function "${__function_prefix}" "${__function}"; then
+                echo "${__function}"
+                break
+            fi
+
+        done
+    )"
+
+    if ! __test_routine "${__function_prefix}"; then
+
+        if [ -z "${__description}" ]; then
+            __description="${__function_prefix}"
+        fi
+
+        local __message="No valid routine for ${__description} found"
+
+        if [ "${__should_error}" = '1' ]; then
+            #__debug_toggle on
+            __error "${__message}"
+        else
+            __force_warn "${__message}"
+        fi
+
+    fi
 
     #__debug_toggle on
-
-    __error "No options passed"
-
-fi
-
-export "__function_${__function_prefix}"="$(
-{
-echo "${__preference_list}"
-__list_functions "${__function_prefix}"
-} | tr ' ' '\n' | __funiq | while read -r __function; do
-
-    if __test_function "${__function_prefix}" "${__function}"; then
-        echo "${__function}"
-        break
-    fi
-
-done
-)"
-
-if ! __test_routine "${__function_prefix}"; then
-
-    if [ -z "${__description}" ]; then
-        __description="${__function_prefix}"
-    fi
-
-    local __message="No valid routine for ${__description} found"
-
-    if [ "${__should_error}" = '1' ]; then
-        #__debug_toggle on
-        __error "${__message}"
-    else
-        __force_warn "${__message}"
-    fi
-
-fi
-
-#__debug_toggle on
 
 }
 
@@ -289,32 +288,32 @@ fi
 #
 ################################################################################
 
-__run_routine () {
+__run_routine() {
 
-#__debug_toggle off
+    #__debug_toggle off
 
-if read -r -t 0; then
-    local __pipe="$(cat)"
-else
-    local __pipe=''
-fi
+    if read -r -t 0; then
+        local __pipe="$(cat)"
+    else
+        local __pipe=''
+    fi
 
-local __function_prefix="${1}"
-shift
+    local __function_prefix="${1}"
+    shift
 
-#__debug_toggle on
+    #__debug_toggle on
 
-__choose_function "${__function_prefix}"
+    __choose_function "${__function_prefix}"
 
-#__debug_toggle off
+    #__debug_toggle off
 
-local __function_name="__function_${__function_prefix}"
+    local __function_name="__function_${__function_prefix}"
 
-local __routine_name="__routine__${__function_prefix}__${!__function_name}"
+    local __routine_name="__routine__${__function_prefix}__${!__function_name}"
 
-#__debug_toggle on
+    #__debug_toggle on
 
-"${__routine_name}" "${@}" <<< "${__pipe}"
+    "${__routine_name}" "${@}" <<< "${__pipe}"
 
 }
 
@@ -327,8 +326,8 @@ local __routine_name="__routine__${__function_prefix}__${!__function_name}"
 #
 ################################################################################
 
-__set_routine () {
-export "__function_${1}=${2}"
+__set_routine() {
+    export "__function_${1}=${2}"
 }
 
 ################################################################################
@@ -341,19 +340,19 @@ export "__function_${1}=${2}"
 #
 ################################################################################
 
-__short_routine () {
+__short_routine() {
 
-local __prefix="${1}"
-local __description="${2}"
-local __prefered="${3}"
-shift 3
+    local __prefix="${1}"
+    local __description="${2}"
+    local __prefered="${3}"
+    shift 3
 
-#__debug_toggle off
+    #__debug_toggle off
 
-__choose_function -e -d "${__description}" -p "${__prefered}" "${__prefix}"
+    __choose_function -e -d "${__description}" -p "${__prefered}" "${__prefix}"
 
-#__debug_toggle on
+    #__debug_toggle on
 
-__run_routine "${__prefix}" "${@}"
+    __run_routine "${__prefix}" "${@}"
 
 }

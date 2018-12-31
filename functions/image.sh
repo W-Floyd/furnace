@@ -2,12 +2,12 @@
 # Image Functions
 ################################################################################
 
-__imagemagick_define () {
-if [ -z "${__png_compression}" ]; then
-    __png_compression='30'
-fi
+__imagemagick_define() {
+    if [ -z "${__png_compression}" ]; then
+        __png_compression='30'
+    fi
 
-cat <<< "-define png:color-type=6 -quality ${__png_compression}"
+    cat <<< "-define png:color-type=6 -quality ${__png_compression}"
 }
 
 ################################################################################
@@ -20,8 +20,8 @@ cat <<< "-define png:color-type=6 -quality ${__png_compression}"
 #
 ################################################################################
 
-__pngchunks () {
-identify -verbose "${1}" | pcregrep -M " Properties(\n|.)* Artifacts:" | sed -e '1d' -e '$d' | sed 's/ *//' | grep '^png'
+__pngchunks() {
+    identify -verbose "${1}" | pcregrep -M " Properties(\n|.)* Artifacts:" | sed -e '1d' -e '$d' | sed 's/ *//' | grep '^png'
 }
 
 ################################################################################
@@ -33,13 +33,13 @@ identify -verbose "${1}" | pcregrep -M " Properties(\n|.)* Artifacts:" | sed -e 
 #
 ################################################################################
 
-__minecraft_verify () {
-local __color_type="$(__pngchunks "${1}" | grep '^png:IHDR.color_type:' | sed 's/.* \(.\) .*/\1/')"
-if [ "${__color_type}" = '0' ] || [ "${__color_type}" = '4' ]; then
-    return 1
-else
-    return 0
-fi
+__minecraft_verify() {
+    local __color_type="$(__pngchunks "${1}" | grep '^png:IHDR.color_type:' | sed 's/.* \(.\) .*/\1/')"
+    if [ "${__color_type}" = '0' ] || [ "${__color_type}" = '4' ]; then
+        return 1
+    else
+        return 0
+    fi
 }
 
 ################################################################################
@@ -52,13 +52,13 @@ fi
 #
 ################################################################################
 
-__resize () {
+__resize() {
 
-if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
-    convert "${2}" $(__imagemagick_define) -scale "$(bc -l <<< "${1}*100" | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
-else
-    __force_warn "File ${2} is not a PNG image and cannot be resized"
-fi
+    if [ "$(__oext "${2}")" = 'png' ] && [ "$(__oext "${3}")" = 'png' ]; then
+        convert "${2}" $(__imagemagick_define) -scale "$(bc -l <<< "${1}*100" | sed 's/\(\.[0-9]*[1-9]\)0*/\1/')%" "${3}"
+    else
+        __force_warn "File ${2} is not a PNG image and cannot be resized"
+    fi
 
 }
 
@@ -71,18 +71,17 @@ fi
 #
 ################################################################################
 
-__routine__image_conform__convert () {
+__routine__image_conform__convert() {
 
-if ! __minecraft_verify "${1}"; then
-    convert "${1}" $(__imagemagick_define) "$(__mext "${1}")_.$(__oext "${1}")"
-mv "$(__mext "${1}")_.$(__oext "${1}")" "${1}"
-fi
-
-}
-
-__image_conform () {
-
-__short_routine 'image_conform' 'image conformace' 'convert' "${1}"
+    if ! __minecraft_verify "${1}"; then
+        convert "${1}" $(__imagemagick_define) "$(__mext "${1}")_.$(__oext "${1}")"
+        mv "$(__mext "${1}")_.$(__oext "${1}")" "${1}"
+    fi
 
 }
 
+__image_conform() {
+
+    __short_routine 'image_conform' 'image conformace' 'convert' "${1}"
+
+}
